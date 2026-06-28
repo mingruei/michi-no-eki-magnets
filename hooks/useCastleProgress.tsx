@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   createContext,
   useCallback,
@@ -15,8 +14,7 @@ import {
   type CastleProgressField,
   type CastleProgressMap,
 } from '../types/castleProgress';
-
-const STORAGE_KEY = 'castle-progress-v1';
+import { loadProgressMap, saveProgressMap } from '../utils/castleProgressStorage';
 
 type CastleProgressContextValue = {
   loaded: boolean;
@@ -27,30 +25,6 @@ type CastleProgressContextValue = {
 
 const CastleProgressContext = createContext<CastleProgressContextValue | null>(null);
 
-function normalizeProgressMap(raw: unknown): CastleProgressMap {
-  if (!raw || typeof raw !== 'object') {
-    return {};
-  }
-
-  const map: CastleProgressMap = {};
-
-  for (const [key, value] of Object.entries(raw)) {
-    const castleId = Number(key);
-    if (!Number.isFinite(castleId) || !value || typeof value !== 'object') {
-      continue;
-    }
-
-    const entry = value as Partial<CastleProgress>;
-    map[castleId] = {
-      visited: Boolean(entry.visited),
-      meijoStamp: Boolean(entry.meijoStamp),
-      goshuin: Boolean(entry.goshuin),
-    };
-  }
-
-  return map;
-}
-
 export function CastleProgressProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false);
   const [progressMap, setProgressMap] = useState<CastleProgressMap>({});
@@ -58,12 +32,11 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((value) => {
-        if (!active) {
-          return;
+    loadProgressMap()
+      .then((map) => {
+        if (active) {
+          setProgressMap(map);
         }
-        setProgressMap(normalizeProgressMap(value ? JSON.parse(value) : {}));
       })
       .catch(() => {
         if (active) {
@@ -82,7 +55,7 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persist = useCallback((nextMap: CastleProgressMap) => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nextMap)).catch(() => undefined);
+    saveProgressMap(nextMap).catch(() => undefined);
   }, []);
 
   const getProgress = useCallback(

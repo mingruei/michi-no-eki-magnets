@@ -20,10 +20,12 @@ export const zhHant: TranslationDictionary = {
     region: '地方',
     prefecture: '府縣',
     series: '名城系列',
+    name: '名城名稱',
+    namePlaceholder: '搜尋日本名城名稱',
     selectRegion: '選擇地方',
     selectPrefecture: '選擇府縣',
     selectSeries: '選擇名城系列',
-    resultHint: '依地方・府縣・系列篩選',
+    resultHint: '依名城名稱・地方・府縣・系列篩選',
   },
   stats: {
     visited: '登城',

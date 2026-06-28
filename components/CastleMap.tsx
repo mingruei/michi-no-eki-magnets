@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { colors } from '../constants/theme';
+import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
 import { buildOsmMapHtml, buildOsmMapUpdateScript } from '../utils/osmMap';
@@ -13,7 +14,8 @@ type CastleMapProps = {
 };
 
 export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
-  const { getSeriesLabel } = useI18n();
+  const { getSeriesLabel, t } = useI18n();
+  const { progressMap } = useCastleProgress();
   const webViewRef = useRef<WebView>(null);
   const onSelectRef = useRef(onSelectCastle);
   const html = useMemo(() => buildOsmMapHtml(), []);
@@ -21,12 +23,12 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
   onSelectRef.current = onSelectCastle;
 
   const syncMarkers = () => {
-    webViewRef.current?.injectJavaScript(buildOsmMapUpdateScript(castles));
+    webViewRef.current?.injectJavaScript(buildOsmMapUpdateScript(castles, progressMap));
   };
 
   useEffect(() => {
     syncMarkers();
-  }, [castles]);
+  }, [castles, progressMap]);
 
   const handleMessage = (event: WebViewMessageEvent) => {
     try {
@@ -66,6 +68,10 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.continued }]} />
           <Text style={styles.legendText}>{getSeriesLabel('continued', true)}</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.visitedMarker }]} />
+          <Text style={styles.legendText}>{t('castle.visited')}</Text>
         </View>
       </View>
     </View>

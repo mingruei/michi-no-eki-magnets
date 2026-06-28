@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { colors, mapRegion } from '../constants/theme';
+import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
 import { getCastleMarkerColor } from '../utils/osmMap';
@@ -14,7 +15,8 @@ type CastleMapProps = {
 };
 
 export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
-  const { getSeriesLabel } = useI18n();
+  const { getSeriesLabel, t } = useI18n();
+  const { progressMap } = useCastleProgress();
   const mapHostRef = useRef<ViewType>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
@@ -64,7 +66,8 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
     layer.clearLayers();
 
     for (const castle of castles) {
-      const markerColor = getCastleMarkerColor(castle.series);
+      const visited = progressMap[castle.id]?.visited ?? false;
+      const markerColor = getCastleMarkerColor(castle.series, visited);
       const marker = L.circleMarker([castle.latitude, castle.longitude], {
         radius: 7,
         color: markerColor,
@@ -77,7 +80,7 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
       marker.on('click', () => onSelectRef.current(castle));
       marker.addTo(layer);
     }
-  }, [castles]);
+  }, [castles, progressMap]);
 
   return (
     <View style={styles.container}>
@@ -91,6 +94,10 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.continued }]} />
           <Text style={styles.legendText}>{getSeriesLabel('continued', true)}</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.visitedMarker }]} />
+          <Text style={styles.legendText}>{t('castle.visited')}</Text>
         </View>
       </View>
     </View>

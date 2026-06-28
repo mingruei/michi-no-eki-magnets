@@ -6,6 +6,7 @@ export type CastleFilters = {
   regionId: RegionId | null;
   prefecture: string | null;
   series: SeriesFilter;
+  nameQuery: string;
 };
 
 export function filterCastles(
@@ -14,6 +15,11 @@ export function filterCastles(
 ): Castle[] {
   return castles.filter((castle) => {
     if (filters.series !== 'all' && castle.series !== filters.series) {
+      return false;
+    }
+
+    const query = filters.nameQuery.trim();
+    if (query && !castle.name.includes(query)) {
       return false;
     }
 

@@ -1,5 +1,6 @@
 import { colors, mapRegion } from '../constants/theme';
 import type { Castle } from '../types/castle';
+import type { CastleProgressMap } from '../types/castleProgress';
 
 export type OsmCastleMarker = {
   id: number;
@@ -9,17 +10,24 @@ export type OsmCastleMarker = {
   color: string;
 };
 
-export function getCastleMarkerColor(series: Castle['series']): string {
+export function getCastleMarkerColor(series: Castle['series'], visited = false): string {
+  if (visited) {
+    return colors.visitedMarker;
+  }
+
   return series === 'original' ? colors.original : colors.continued;
 }
 
-export function toOsmCastleMarkers(castles: readonly Castle[]): OsmCastleMarker[] {
+export function toOsmCastleMarkers(
+  castles: readonly Castle[],
+  progressMap: CastleProgressMap = {},
+): OsmCastleMarker[] {
   return castles.map((castle) => ({
     id: castle.id,
     lat: castle.latitude,
     lng: castle.longitude,
     name: castle.name,
-    color: getCastleMarkerColor(castle.series),
+    color: getCastleMarkerColor(castle.series, progressMap[castle.id]?.visited ?? false),
   }));
 }
 
@@ -101,7 +109,10 @@ export function buildOsmMapHtml(): string {
 </html>`;
 }
 
-export function buildOsmMapUpdateScript(castles: readonly Castle[]): string {
-  const markers = JSON.stringify(toOsmCastleMarkers(castles));
+export function buildOsmMapUpdateScript(
+  castles: readonly Castle[],
+  progressMap: CastleProgressMap = {},
+): string {
+  const markers = JSON.stringify(toOsmCastleMarkers(castles, progressMap));
   return `(function(){if(window.__castleMap){window.__castleMap.updateMarkers(${markers});}})();true;`;
 }

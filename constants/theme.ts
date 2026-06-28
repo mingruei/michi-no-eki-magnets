@@ -8,6 +8,7 @@ export const colors = {
   continued: '#DC2626',
   originalLight: '#DBEAFE',
   continuedLight: '#FEE2E2',
+  visitedMarker: '#CBD5E1',
   shadow: '#0F172A',
 };
 

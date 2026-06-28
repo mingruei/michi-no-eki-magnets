@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 import castlesData from './assets/castles.json';
@@ -12,6 +12,7 @@ import { CastleProgressProvider } from './hooks/useCastleProgress';
 import { I18nProvider, useI18n } from './i18n';
 import type { Castle, SeriesFilter } from './types/castle';
 import { filterCastles, getAvailablePrefectures } from './utils/filterCastles';
+import { resolveLocalStartupContext } from './utils/localPrefecture';
 
 const castles = castlesData as Castle[];
 
@@ -25,7 +26,33 @@ function AppContent() {
   const [series, setSeries] = useState<SeriesFilter>('all');
   const [regionId, setRegionId] = useState<RegionId | null>(null);
   const [prefecture, setPrefecture] = useState<string | null>(null);
+  const [nameQuery, setNameQuery] = useState('');
   const [selectedCastle, setSelectedCastle] = useState<Castle | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    resolveLocalStartupContext(castles).then((result) => {
+      if (!active) {
+        return;
+      }
+
+      if (result.filter) {
+        setRegionId(result.filter.regionId);
+        setPrefecture(result.filter.prefecture);
+      }
+
+      if (result.nearbyCastle) {
+        setReturnScreen('browse');
+        setSelectedCastle(result.nearbyCastle);
+        setScreen('detail');
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const prefectureOptions = useMemo(() => {
     const prefectures = getAvailablePrefectures(castles, regionId, series);
@@ -40,10 +67,10 @@ function AppContent() {
 
   const filteredCastles = useMemo(
     () =>
-      filterCastles(castles, { regionId, prefecture, series }).sort(
+      filterCastles(castles, { regionId, prefecture, series, nameQuery }).sort(
         (left, right) => left.number - right.number,
       ),
-    [prefecture, regionId, series],
+    [nameQuery, prefecture, regionId, series],
   );
 
   const openCastleDetail = (castle: Castle) => {
@@ -80,60 +107,71 @@ function AppContent() {
     closeDetailIfOpen();
   };
 
-  if (screen === 'detail' && selectedCastle) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="dark-content" />
-        <CastleDetailScreen castle={selectedCastle} onBack={handleBackFromDetail} />
-      </SafeAreaView>
-    );
-  }
+  const handleNameQueryChange = (nextNameQuery: string) => {
+    setNameQuery(nextNameQuery);
+    closeDetailIfOpen();
+  };
+
+  const isDetailOpen = screen === 'detail' && selectedCastle !== null;
+  const activeMainScreen: MainScreen =
+    screen === 'browse' || screen === 'map' ? screen : returnScreen;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{t('app.title')}</Text>
-          <Text style={styles.subtitle}>{t('app.subtitle')}</Text>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            setScreen((current) => (current === 'browse' ? 'map' : 'browse'));
-            setSelectedCastle(null);
-          }}
-          style={styles.screenToggle}
-        >
-          <Text style={styles.screenToggleLabel}>
-            {screen === 'browse' ? t('screen.map') : t('screen.list')}
-          </Text>
-        </Pressable>
-      </View>
+      <View style={styles.root}>
+        <View style={styles.mainContent} pointerEvents={isDetailOpen ? 'none' : 'auto'}>
+          {!isDetailOpen ? (
+            <View style={styles.header}>
+              <View style={styles.headerText}>
+                <Text style={styles.title}>{t('app.title')}</Text>
+                <Text style={styles.subtitle}>{t('app.subtitle')}</Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setScreen((current) => (current === 'browse' ? 'map' : 'browse'));
+                  setSelectedCastle(null);
+                }}
+                style={styles.screenToggle}
+              >
+                <Text style={styles.screenToggleLabel}>
+                  {activeMainScreen === 'browse' ? t('screen.map') : t('screen.list')}
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
 
-      {screen === 'browse' ? (
-        <CastleList
-          castles={filteredCastles}
-          onSelectCastle={openCastleDetail}
-          ListHeaderComponent={
-            <BrowseListHeader
-              series={series}
-              regionId={regionId}
-              prefecture={prefecture}
-              prefectureOptions={prefectureOptions}
-              resultCount={filteredCastles.length}
-              onSeriesChange={handleSeriesChange}
-              onRegionChange={handleRegionChange}
-              onPrefectureChange={handlePrefectureChange}
+          {activeMainScreen === 'browse' ? (
+            <CastleList
+              castles={filteredCastles}
+              onSelectCastle={openCastleDetail}
+              ListHeaderComponent={
+                <BrowseListHeader
+                  series={series}
+                  regionId={regionId}
+                  prefecture={prefecture}
+                  nameQuery={nameQuery}
+                  prefectureOptions={prefectureOptions}
+                  resultCount={filteredCastles.length}
+                  onSeriesChange={handleSeriesChange}
+                  onRegionChange={handleRegionChange}
+                  onPrefectureChange={handlePrefectureChange}
+                  onNameQueryChange={handleNameQueryChange}
+                />
+              }
             />
-          }
-        />
-      ) : (
-        <CastleMap
-          castles={filteredCastles}
-          onSelectCastle={openCastleDetail}
-        />
-      )}
+          ) : (
+            <CastleMap castles={filteredCastles} onSelectCastle={openCastleDetail} />
+          )}
+        </View>
+
+        {isDetailOpen ? (
+          <SafeAreaView style={styles.detailLayer}>
+            <CastleDetailScreen castle={selectedCastle} onBack={handleBackFromDetail} />
+          </SafeAreaView>
+        ) : null}
+      </View>
     </SafeAreaView>
   );
 }
@@ -151,6 +189,16 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  root: {
+    flex: 1,
+  },
+  mainContent: {
+    flex: 1,
+  },
+  detailLayer: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.background,
   },
   header: {

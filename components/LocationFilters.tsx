@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 
@@ -22,10 +23,12 @@ type LocationFiltersProps = {
   regionId: RegionId | null;
   prefecture: string | null;
   series: SeriesFilter;
+  nameQuery: string;
   prefectureOptions: readonly Option[];
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onSeriesChange: (series: SeriesFilter) => void;
+  onNameQueryChange: (nameQuery: string) => void;
 };
 
 type ActivePicker = 'region' | 'prefecture' | 'series' | null;
@@ -50,9 +53,43 @@ function FilterField({
         onPress={onPress}
         style={[styles.fieldButton, disabled && styles.fieldButtonDisabled]}
       >
-        <Text style={[styles.fieldValue, disabled && styles.fieldValueDisabled]}>{value}</Text>
+        <Text
+          style={[styles.fieldValue, disabled && styles.fieldValueDisabled]}
+          numberOfLines={1}
+        >
+          {value}
+        </Text>
         <Text style={styles.fieldChevron}>▼</Text>
       </Pressable>
+    </View>
+  );
+}
+
+function SearchField({
+  label,
+  value,
+  placeholder,
+  onChangeText,
+}: {
+  label: string;
+  value: string;
+  placeholder: string;
+  onChangeText: (value: string) => void;
+}) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <TextInput
+        accessibilityLabel={label}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textMuted}
+        style={styles.searchInput}
+        autoCapitalize="none"
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+      />
     </View>
   );
 }
@@ -115,10 +152,12 @@ export function LocationFilters({
   regionId,
   prefecture,
   series,
+  nameQuery,
   prefectureOptions,
   onRegionChange,
   onPrefectureChange,
   onSeriesChange,
+  onNameQueryChange,
 }: LocationFiltersProps) {
   const { t, getRegionLabel, getSeriesLabel } = useI18n();
   const [activePicker, setActivePicker] = useState<ActivePicker>(null);
@@ -152,22 +191,41 @@ export function LocationFilters({
 
   return (
     <View style={styles.container}>
-      <FilterField
-        label={t('filter.series')}
-        value={seriesLabel}
-        onPress={() => setActivePicker('series')}
-      />
-      <FilterField
-        label={t('filter.region')}
-        value={regionLabel}
-        onPress={() => setActivePicker('region')}
-      />
-      <FilterField
-        label={t('filter.prefecture')}
-        value={prefectureLabel}
-        disabled={!regionId}
-        onPress={() => setActivePicker('prefecture')}
-      />
+      <View style={styles.row}>
+        <View style={styles.cell}>
+          <SearchField
+            label={t('filter.name')}
+            value={nameQuery}
+            placeholder={t('filter.namePlaceholder')}
+            onChangeText={onNameQueryChange}
+          />
+        </View>
+        <View style={styles.cell}>
+          <FilterField
+            label={t('filter.series')}
+            value={seriesLabel}
+            onPress={() => setActivePicker('series')}
+          />
+        </View>
+      </View>
+
+      <View style={styles.row}>
+        <View style={styles.cell}>
+          <FilterField
+            label={t('filter.region')}
+            value={regionLabel}
+            onPress={() => setActivePicker('region')}
+          />
+        </View>
+        <View style={styles.cell}>
+          <FilterField
+            label={t('filter.prefecture')}
+            value={prefectureLabel}
+            disabled={!regionId}
+            onPress={() => setActivePicker('prefecture')}
+          />
+        </View>
+      </View>
 
       <PickerModal
         visible={activePicker === 'series'}
@@ -205,6 +263,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cell: {
+    flex: 1,
+  },
   field: {
     gap: 6,
   },
@@ -228,7 +293,8 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   fieldValue: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text,
   },
@@ -236,8 +302,20 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   fieldChevron: {
+    marginLeft: 8,
     fontSize: 12,
     color: colors.textMuted,
+  },
+  searchInput: {
+    minHeight: 48,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
   },
   modalBackdrop: {
     flex: 1,

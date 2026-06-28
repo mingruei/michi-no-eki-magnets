@@ -16,22 +16,26 @@ type BrowseListHeaderProps = {
   series: SeriesFilter;
   regionId: RegionId | null;
   prefecture: string | null;
+  nameQuery: string;
   prefectureOptions: readonly Option[];
   resultCount: number;
   onSeriesChange: (series: SeriesFilter) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
+  onNameQueryChange: (nameQuery: string) => void;
 };
 
 export function BrowseListHeader({
   series,
   regionId,
   prefecture,
+  nameQuery,
   prefectureOptions,
   resultCount,
   onSeriesChange,
   onRegionChange,
   onPrefectureChange,
+  onNameQueryChange,
 }: BrowseListHeaderProps) {
   const { t, formatCount } = useI18n();
 
@@ -43,10 +47,12 @@ export function BrowseListHeader({
         series={series}
         regionId={regionId}
         prefecture={prefecture}
+        nameQuery={nameQuery}
         prefectureOptions={prefectureOptions}
         onSeriesChange={onSeriesChange}
         onRegionChange={onRegionChange}
         onPrefectureChange={onPrefectureChange}
+        onNameQueryChange={onNameQueryChange}
       />
       <View style={styles.divider} />
       <View style={styles.resultBar}>

@@ -20,6 +20,8 @@ export type TranslationDictionary = {
     region: string;
     prefecture: string;
     series: string;
+    name: string;
+    namePlaceholder: string;
     selectRegion: string;
     selectPrefecture: string;
     selectSeries: string;
