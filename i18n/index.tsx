@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
+import { normalizePrefectureKey } from '../constants/prefectureKeys';
 import { zhHant } from './locales/zh-Hant';
 import type { Locale, TranslationDictionary, TranslationParams } from './types';
 import type { RegionId } from '../constants/regions';
@@ -63,7 +64,7 @@ export function I18nProvider({ children, locale = DEFAULT_LOCALE }: I18nProvider
       t,
       getRegionLabel: (regionId) => dictionary.regions[regionId],
       getPrefectureLabel: (prefecture) =>
-        dictionary.prefectures[prefecture] ?? prefecture,
+        dictionary.prefectures[normalizePrefectureKey(prefecture)] ?? prefecture,
       getSeriesLabel: (series, full = false) => {
         if (series === 'original') {
           return full ? dictionary.castle.seriesOriginalFull : dictionary.castle.seriesOriginal;

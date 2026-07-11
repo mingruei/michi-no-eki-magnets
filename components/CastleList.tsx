@@ -14,7 +14,7 @@ type CastleListProps = {
   ListHeaderComponent?: ReactElement | null;
 };
 
-const PROGRESS_FIELDS: CastleProgressField[] = ['visited', 'meijoStamp', 'goshuin'];
+const PROGRESS_FIELDS: CastleProgressField[] = ['visited', 'meijoStamp', 'goshuin', 'castleCard'];
 
 function ProgressTags({ castleId }: { castleId: number }) {
   const { t } = useI18n();
@@ -25,6 +25,7 @@ function ProgressTags({ castleId }: { castleId: number }) {
     visited: t('castle.visited'),
     meijoStamp: t('castle.meijoStamp'),
     goshuin: t('castle.goshuin'),
+    castleCard: t('castle.castleCard'),
   };
 
   const checked = PROGRESS_FIELDS.filter((field) => progress[field]);

@@ -14,16 +14,18 @@ type StatsRowProps = {
   visited: number;
   meijoStamp: number;
   goshuin: number;
+  castleCard: number;
   highlight?: boolean;
 };
 
-function StatsRow({ label, visited, meijoStamp, goshuin, highlight = false }: StatsRowProps) {
+function StatsRow({ label, visited, meijoStamp, goshuin, castleCard, highlight = false }: StatsRowProps) {
   return (
     <View style={[styles.row, highlight && styles.rowHighlight]}>
       <Text style={[styles.rowLabel, highlight && styles.rowLabelHighlight]}>{label}</Text>
       <Text style={styles.cell}>{visited}</Text>
       <Text style={styles.cell}>{meijoStamp}</Text>
       <Text style={styles.cell}>{goshuin}</Text>
+      <Text style={styles.cell}>{castleCard}</Text>
     </View>
   );
 }
@@ -40,6 +42,7 @@ export function ProgressStats() {
         <Text style={styles.headerCell}>{t('stats.visited')}</Text>
         <Text style={styles.headerCell}>{t('stats.meijoStamp')}</Text>
         <Text style={styles.headerCell}>{t('stats.goshuin')}</Text>
+        <Text style={styles.headerCell}>{t('stats.castleCard')}</Text>
       </View>
 
       <StatsRow
@@ -47,18 +50,21 @@ export function ProgressStats() {
         visited={stats.original.visited}
         meijoStamp={stats.original.meijoStamp}
         goshuin={stats.original.goshuin}
+        castleCard={stats.original.castleCard}
       />
       <StatsRow
         label={t('stats.rowContinued')}
         visited={stats.continued.visited}
         meijoStamp={stats.continued.meijoStamp}
         goshuin={stats.continued.goshuin}
+        castleCard={stats.continued.castleCard}
       />
       <StatsRow
         label={t('stats.rowTotal')}
         visited={stats.total.visited}
         meijoStamp={stats.total.meijoStamp}
         goshuin={stats.total.goshuin}
+        castleCard={stats.total.castleCard}
         highlight
       />
     </View>
@@ -82,7 +88,7 @@ const styles = StyleSheet.create({
   headerCell: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: colors.textMuted,
   },
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.text,
   },

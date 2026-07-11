@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, type View as ViewType } from 'react-native';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 import { colors, mapRegion } from '../constants/theme';
 import { useCastleProgress } from '../hooks/useCastleProgress';
@@ -23,6 +22,17 @@ export function CastleMap({ castles, onSelectCastle }: CastleMapProps) {
   const onSelectRef = useRef(onSelectCastle);
 
   onSelectRef.current = onSelectCastle;
+
+  useEffect(() => {
+    const linkId = 'leaflet-stylesheet';
+    if (typeof document !== 'undefined' && !document.getElementById(linkId)) {
+      const link = document.createElement('link');
+      link.id = linkId;
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+  }, []);
 
   useEffect(() => {
     const host = mapHostRef.current as unknown as HTMLElement | null;

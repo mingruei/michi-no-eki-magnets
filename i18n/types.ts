@@ -15,6 +15,49 @@ export type TranslationDictionary = {
   screen: {
     map: string;
     list: string;
+    settings: string;
+  };
+  globalUpload: {
+    fabLabel: string;
+    chooseSource: string;
+    confirmTitle: string;
+    typeLabel: string;
+    typeHintCastleCard: string;
+    typeHintGoshuin: string;
+    castleLabel: string;
+    castleSearchPlaceholder: string;
+    castleSearchHint: string;
+    suggested: string;
+    confirmSave: string;
+    pdfNotSupported: string;
+    failed: string;
+  };
+  settings: {
+    title: string;
+    cloudSync: string;
+    cloudSyncHint: string;
+    cloudAccount: string;
+    backendLabel: string;
+    cloudNotConfigured: string;
+    signedIn: string;
+    signInGoogle: string;
+    signOut: string;
+    syncing: string;
+    signInFailed: string;
+    providerGoogle: string;
+    chooseSignIn: string;
+    chooseSignInHint: string;
+    openSignIn: string;
+    noSignInProviders: string;
+    devBuildRequired: string;
+    oauthSecretMissing: string;
+    oauthRedirectMismatch: string;
+    oauthSetupHint: string;
+    nativeSignInFallback: string;
+    mapProvider: string;
+    mapProviderHint: string;
+    mapProviderApple: string;
+    mapProviderGoogle: string;
   };
   filter: {
     region: string;
@@ -31,6 +74,7 @@ export type TranslationDictionary = {
     visited: string;
     meijoStamp: string;
     goshuin: string;
+    castleCard: string;
     rowOriginal: string;
     rowContinued: string;
     rowTotal: string;
@@ -48,9 +92,12 @@ export type TranslationDictionary = {
     description: string;
     stampLocation: string;
     traffic: string;
+    drivingLabel: string;
+    drivingNavigation: string;
     parkingNavigation: string;
     massTransportLabel: string;
     openStampMap: string;
+    openTransitMap: string;
     stampLocationValueOriginal: string;
     stampLocationValueContinued: string;
     continuedDescription: string;
@@ -61,6 +108,25 @@ export type TranslationDictionary = {
     visited: string;
     meijoStamp: string;
     goshuin: string;
+    castleCard: string;
+    goshuinUploadTitle: string;
+    castleCardUploadTitle: string;
+    collectibleUpload: string;
+    collectibleChooseSource: string;
+    collectibleScan: string;
+    collectibleUploadFile: string;
+    collectiblePhotoLibrary: string;
+    collectibleEmpty: string;
+    collectibleStorageHint: string;
+    collectibleDeleteHint: string;
+    collectibleCameraPermissionDenied: string;
+    collectibleMediaPermissionDenied: string;
+    collectibleLoadFailed: string;
+    collectibleUploadFailed: string;
+    collectibleViewerCounter: string;
+    collectibleViewerSwipeHint: string;
+    collectibleViewerDismissHint: string;
+    collectibleOpenPdf: string;
   };
   regions: Record<
     | 'hokkaido'

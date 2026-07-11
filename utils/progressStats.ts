@@ -1,7 +1,8 @@
 import type { Castle } from '../types/castle';
 import {
-  EMPTY_CASTLE_PROGRESS,
-  type CastleProgressField,
+  CASTLE_PROGRESS_FIELDS,
+  EMPTY_CASTLE_PROGRESS_ENTRY,
+  type CastleProgressEntry,
   type CastleProgressMap,
 } from '../types/castleProgress';
 
@@ -9,6 +10,7 @@ export type ProgressCounts = {
   visited: number;
   meijoStamp: number;
   goshuin: number;
+  castleCard: number;
   total: number;
 };
 
@@ -18,18 +20,19 @@ export type ProgressStats = {
   total: ProgressCounts;
 };
 
-const PROGRESS_FIELDS: CastleProgressField[] = ['visited', 'meijoStamp', 'goshuin'];
+const PROGRESS_FIELDS = CASTLE_PROGRESS_FIELDS;
 
 function createCounts(total: number): ProgressCounts {
   return {
     visited: 0,
     meijoStamp: 0,
     goshuin: 0,
+    castleCard: 0,
     total,
   };
 }
 
-function addProgress(counts: ProgressCounts, progress: typeof EMPTY_CASTLE_PROGRESS) {
+function addProgress(counts: ProgressCounts, progress: CastleProgressEntry) {
   for (const field of PROGRESS_FIELDS) {
     if (progress[field]) {
       counts[field] += 1;
@@ -45,7 +48,7 @@ export function computeProgressStats(
   const continued = createCounts(0);
 
   for (const castle of castles) {
-    const progress = progressMap[castle.id] ?? EMPTY_CASTLE_PROGRESS;
+    const progress = progressMap[castle.id] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
     if (castle.series === 'original') {
       original.total += 1;
       addProgress(original, progress);
@@ -62,6 +65,7 @@ export function computeProgressStats(
       visited: original.visited + continued.visited,
       meijoStamp: original.meijoStamp + continued.meijoStamp,
       goshuin: original.goshuin + continued.goshuin,
+      castleCard: original.castleCard + continued.castleCard,
       total: original.total + continued.total,
     },
   };

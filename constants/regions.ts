@@ -1,3 +1,5 @@
+import { normalizePrefectureKey } from './prefectureKeys';
+
 export type RegionId =
   | 'hokkaido'
   | 'tohoku'
@@ -87,7 +89,7 @@ const prefectureToRegion = new Map<string, RegionId>(
 );
 
 export function getRegionIdForPrefecture(prefecture: string): RegionId | null {
-  return prefectureToRegion.get(prefecture) ?? null;
+  return prefectureToRegion.get(normalizePrefectureKey(prefecture)) ?? null;
 }
 
 export function getRegionById(regionId: RegionId): Region {

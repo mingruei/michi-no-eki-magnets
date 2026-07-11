@@ -2,37 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 
-import type { CastleProgress, CastleProgressMap } from '../types/castleProgress';
+import type { CastleProgressMap } from '../types/castleProgress';
+import { normalizeProgressMap } from './mergeProgressMap';
 
 const LEGACY_ASYNC_STORAGE_KEY = 'castle-progress-v1';
 const PROGRESS_FILE_NAME = 'castle-progress-v1.json';
 
 function getProgressFile(): File {
   return new File(Paths.document, PROGRESS_FILE_NAME);
-}
-
-function normalizeProgressMap(raw: unknown): CastleProgressMap {
-  if (!raw || typeof raw !== 'object') {
-    return {};
-  }
-
-  const map: CastleProgressMap = {};
-
-  for (const [key, value] of Object.entries(raw)) {
-    const castleId = Number(key);
-    if (!Number.isFinite(castleId) || !value || typeof value !== 'object') {
-      continue;
-    }
-
-    const entry = value as Partial<CastleProgress>;
-    map[castleId] = {
-      visited: Boolean(entry.visited),
-      meijoStamp: Boolean(entry.meijoStamp),
-      goshuin: Boolean(entry.goshuin),
-    };
-  }
-
-  return map;
 }
 
 async function loadFromDocumentFile(): Promise<CastleProgressMap | null> {

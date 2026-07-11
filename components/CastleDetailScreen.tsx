@@ -2,12 +2,18 @@ import type { ReactNode } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { CheckOption } from '../components/CheckOption';
+import { CastleCollectibleUploadSection } from '../components/CastleCollectibleUploadSection';
 import { colors } from '../constants/theme';
+import { hasCoordinates } from '../i18n/castleContent';
 import { useCastleContent } from '../hooks/useCastleContent';
 import { useCastleProgress } from '../hooks/useCastleProgress';
+import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
+import type { NavigationPoint } from '../types/navigation';
 import {
+  openGoogleMapsTransit,
+  openMapsParkingNavigation,
   openMapsParkingSearch,
   openMapsStampLocation,
 } from '../utils/maps';
@@ -62,8 +68,28 @@ function ActionButton({
   );
 }
 
+function NavigationPointRow({
+  point,
+  actionLabel,
+  onNavigate,
+}: {
+  point: NavigationPoint;
+  actionLabel: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <View style={styles.pointRow}>
+      <Text style={styles.body}>{point.label}</Text>
+      {hasCoordinates(point) ? (
+        <ActionButton label={actionLabel} variant="secondary" onPress={onNavigate} />
+      ) : null}
+    </View>
+  );
+}
+
 export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) {
   const { t, getSeriesLabel } = useI18n();
+  const { mapProvider } = useMapProvider();
   const content = useCastleContent(castle);
   const { getProgress, toggleProgress } = useCastleProgress();
   const progress = getProgress(castle.id);
@@ -110,7 +136,24 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
             checked={progress.goshuin}
             onToggle={() => toggleProgress(castle.id, 'goshuin')}
           />
+          <CheckOption
+            label={t('castle.castleCard')}
+            checked={progress.castleCard}
+            onToggle={() => toggleProgress(castle.id, 'castleCard')}
+          />
         </Section>
+
+        <CastleCollectibleUploadSection
+          castleId={castle.id}
+          kind="goshuin"
+          title={t('castle.goshuinUploadTitle')}
+        />
+
+        <CastleCollectibleUploadSection
+          castleId={castle.id}
+          kind="castle-card"
+          title={t('castle.castleCardUploadTitle')}
+        />
 
         <Section title={t('common.location')}>
           <Text style={styles.body}>{content.locationLabel}</Text>
@@ -121,23 +164,51 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
         </Section>
 
         <Section title={t('castle.stampLocation')}>
-          <Text style={styles.body}>{content.stampLocation}</Text>
-          <ActionButton
-            label={t('castle.openStampMap')}
-            variant="secondary"
-            onPress={() => openMapsStampLocation(castle)}
-          />
+          {content.stampLocations.map((point, index) => (
+            <NavigationPointRow
+              key={`${point.label}-${index}`}
+              point={point}
+              actionLabel={t('castle.openStampMap')}
+              onNavigate={() => void openMapsStampLocation(mapProvider, point)}
+            />
+          ))}
         </Section>
 
         <Section title={t('castle.traffic')}>
-          <Text style={styles.subsectionTitle}>{t('castle.parkingNavigation')}</Text>
-          <ActionButton
-            label={t('castle.parkingNavigation')}
-            onPress={() => openMapsParkingSearch(castle)}
-          />
+          <Text style={styles.subsectionTitle}>{t('castle.drivingLabel')}</Text>
+          {content.driving.description ? (
+            <Text style={styles.body}>{content.driving.description}</Text>
+          ) : null}
+          {content.driving.parkingLocations.length > 0 ? (
+            content.driving.parkingLocations.map((point, index) => (
+              <NavigationPointRow
+                key={`${point.label}-${index}`}
+                point={point}
+                actionLabel={t('castle.drivingNavigation')}
+                onNavigate={() => void openMapsParkingNavigation(mapProvider, point)}
+              />
+            ))
+          ) : (
+            <ActionButton
+              label={t('castle.parkingNavigation')}
+              onPress={() => void openMapsParkingSearch(mapProvider, castle.name)}
+            />
+          )}
 
           <Text style={styles.subsectionTitle}>{t('castle.massTransportLabel')}</Text>
-          <Text style={styles.body}>{content.massTransport}</Text>
+          <Text style={styles.body}>{content.publicTransit.description}</Text>
+          <ActionButton
+            label={t('castle.openTransitMap')}
+            variant="secondary"
+            onPress={() =>
+              void openGoogleMapsTransit(
+                mapProvider,
+                content.publicTransit.destinationLatitude,
+                content.publicTransit.destinationLongitude,
+                content.publicTransit.destinationLabel,
+              )
+            }
+          />
         </Section>
 
         {castle.website ? (
@@ -230,15 +301,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textMuted,
   },
+  pointRow: {
+    gap: 8,
+  },
   body: {
     fontSize: 15,
     color: colors.text,
     lineHeight: 23,
-  },
-  subtle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    lineHeight: 21,
   },
   actionButton: {
     alignSelf: 'flex-start',

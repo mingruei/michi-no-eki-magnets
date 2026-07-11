@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
-"""Build assets/castles.json from 100名城 CSV and continued-castle geocoding."""
+"""Generate a reference castle dataset from source CSVs (does not touch assets/)."""
 
 from __future__ import annotations
 
 import csv
 import json
 import re
-import time
-import urllib.parse
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data-source"
-OUTPUT = ROOT / "assets" / "castles.json"
-I18N_OUTPUT = ROOT / "assets" / "i18n" / "castle-content.zh-Hant.json"
-I18N_OVERRIDES = DATA_DIR / "castle-content.zh-Hant.json"
+GENERATED_OUTPUT = DATA_DIR / "castles.generated.json"
+ASSETS_CASTLES = ROOT / "assets" / "castles.json"
 
 CASTLE_INFO_URL = (
     "https://raw.githubusercontent.com/tcunningham203/"
@@ -231,57 +228,6 @@ CONTINUED_COORDS: dict[str, tuple[float, float]] = {
 }
 
 
-PREFECTURES_ZH_HANT = {
-    "北海道": "北海道",
-    "青森県": "青森縣",
-    "岩手県": "岩手縣",
-    "宮城県": "宮城縣",
-    "秋田県": "秋田縣",
-    "山形県": "山形縣",
-    "福島県": "福島縣",
-    "茨城県": "茨城縣",
-    "栃木県": "栃木縣",
-    "群馬県": "群馬縣",
-    "埼玉県": "埼玉縣",
-    "千葉県": "千葉縣",
-    "東京都": "東京都",
-    "神奈川県": "神奈川縣",
-    "新潟県": "新潟縣",
-    "富山県": "富山縣",
-    "石川県": "石川縣",
-    "福井県": "福井縣",
-    "山梨県": "山梨縣",
-    "長野県": "長野縣",
-    "岐阜県": "岐阜縣",
-    "静岡県": "靜岡縣",
-    "愛知県": "愛知縣",
-    "三重県": "三重縣",
-    "滋賀県": "滋賀縣",
-    "京都府": "京都府",
-    "大阪府": "大阪府",
-    "兵庫県": "兵庫縣",
-    "奈良県": "奈良縣",
-    "和歌山県": "和歌山縣",
-    "鳥取県": "鳥取縣",
-    "島根県": "島根縣",
-    "岡山県": "岡山縣",
-    "広島県": "広島縣",
-    "山口県": "山口縣",
-    "徳島県": "德島縣",
-    "香川県": "香川縣",
-    "愛媛県": "愛媛縣",
-    "高知県": "高知縣",
-    "福岡県": "福岡縣",
-    "佐賀県": "佐賀縣",
-    "長崎県": "長崎縣",
-    "熊本県": "熊本縣",
-    "大分県": "大分縣",
-    "宮崎県": "宮崎縣",
-    "鹿児島県": "鹿兒島縣",
-    "沖縄県": "沖繩縣",
-}
-
-
 def split_location(location: str) -> tuple[str, str]:
     match = re.match(r"^(.{2,3}?[都道府県])(.+)$", location)
     if not match:
@@ -329,29 +275,6 @@ def make_short_description(history: str | None) -> str | None:
     if " " in trimmed:
         trimmed = trimmed.rsplit(" ", 1)[0]
     return f"{trimmed}..."
-
-
-def localized_location_label(prefecture: str, city: str) -> str:
-    prefecture_label = PREFECTURES_ZH_HANT.get(prefecture, prefecture)
-    return f"{prefecture_label}{city}"
-
-
-def load_i18n_overrides() -> dict[str, dict]:
-    if not I18N_OVERRIDES.exists():
-        return {}
-    with I18N_OVERRIDES.open(encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-def build_i18n_content(castles: list[dict], overrides: dict[str, dict]) -> dict[str, dict]:
-    content: dict[str, dict] = {}
-    for castle in castles:
-        castle_id = str(castle["id"])
-        manual = overrides.get(castle_id, {})
-        if not manual:
-            continue
-        content[castle_id] = manual
-    return content
 
 
 def load_original_hundred() -> list[dict]:
@@ -425,17 +348,11 @@ def load_continued_hundred() -> list[dict]:
 def main() -> None:
     castles = load_original_hundred() + load_continued_hundred()
     castles.sort(key=lambda item: item["number"])
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUTPUT.open("w", encoding="utf-8") as handle:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with GENERATED_OUTPUT.open("w", encoding="utf-8") as handle:
         json.dump(castles, handle, ensure_ascii=False, indent=2)
-    print(f"Wrote {len(castles)} castles to {OUTPUT}")
-
-    overrides = load_i18n_overrides()
-    i18n_content = build_i18n_content(castles, overrides)
-    I18N_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    with I18N_OUTPUT.open("w", encoding="utf-8") as handle:
-        json.dump(i18n_content, handle, ensure_ascii=False, indent=2)
-    print(f"Wrote {len(i18n_content)} castle i18n entries to {I18N_OUTPUT}")
+    print(f"Wrote {len(castles)} castles to {GENERATED_OUTPUT}")
+    print(f"App data unchanged: {ASSETS_CASTLES} (edit manually)")
 
 
 if __name__ == "__main__":

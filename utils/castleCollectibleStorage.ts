@@ -1,0 +1,137 @@
+import { Directory, File, Paths } from 'expo-file-system';
+
+import { getDisplayImageUri, readSourceBytes } from './collectibleFileIO';
+import type { CastleCollectible, CollectibleKind } from '../types/castleCollectible';
+
+const ROOT_DIR_NAME = 'castle-collectibles';
+
+const MIME_EXTENSION: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/heic': '.heic',
+  'image/heif': '.heif',
+  'image/webp': '.webp',
+  'application/pdf': '.pdf',
+};
+
+function extensionFromMimeType(mimeType?: string | null): string | null {
+  if (!mimeType) {
+    return null;
+  }
+
+  const normalized = mimeType.trim().toLowerCase();
+  return MIME_EXTENSION[normalized] ?? null;
+}
+
+function extensionFromUri(uri: string): string | null {
+  const cleanUri = uri.split('?')[0] ?? uri;
+  const match = cleanUri.match(/(\.[a-z0-9]{2,5})$/i);
+  return match?.[1]?.toLowerCase() ?? null;
+}
+
+function ensureDirectory(path: Directory): Directory {
+  if (!path.exists) {
+    path.create({ idempotent: true });
+  }
+  return path;
+}
+
+export function getCollectibleRootDirectory(): Directory {
+  return ensureDirectory(new Directory(Paths.document, ROOT_DIR_NAME));
+}
+
+export function getCastleCollectibleDirectory(
+  castleId: number,
+  kind: CollectibleKind,
+): Directory {
+  const root = getCollectibleRootDirectory();
+  const castleDir = ensureDirectory(new Directory(root, String(castleId)));
+  return ensureDirectory(new Directory(castleDir, kind));
+}
+
+function isCollectibleFile(entry: Directory | File): entry is File {
+  return entry instanceof File;
+}
+
+function parseCollectibleFile(
+  castleId: number,
+  kind: CollectibleKind,
+  file: File,
+): CastleCollectible | null {
+  if (!file.exists) {
+    return null;
+  }
+
+  const fileInfo = file.info();
+  if ((fileInfo.size ?? 0) <= 0) {
+    return null;
+  }
+
+  const timestampMatch = file.name.match(/-(\d{10,})/);
+  const createdAt = timestampMatch ? Number(timestampMatch[1]) : Date.now();
+
+  return {
+    id: file.name,
+    castleId,
+    kind,
+    uri: getDisplayImageUri(file.uri),
+    filename: file.name,
+    mimeType: file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
+    createdAt,
+  };
+}
+
+export function listCastleCollectibles(
+  castleId: number,
+  kind: CollectibleKind,
+): CastleCollectible[] {
+  const directory = getCastleCollectibleDirectory(castleId, kind);
+  if (!directory.exists) {
+    return [];
+  }
+
+  return directory
+    .list()
+    .filter(isCollectibleFile)
+    .map((file) => parseCollectibleFile(castleId, kind, file))
+    .filter((item): item is CastleCollectible => item != null)
+    .sort((left, right) => right.createdAt - left.createdAt);
+}
+
+export async function saveCastleCollectibleFromUri(
+  castleId: number,
+  kind: CollectibleKind,
+  sourceUri: string,
+  mimeType?: string | null,
+): Promise<CastleCollectible> {
+  const directory = getCastleCollectibleDirectory(castleId, kind);
+  const extension =
+    extensionFromMimeType(mimeType) ?? extensionFromUri(sourceUri) ?? '.jpg';
+  const filename = `${kind}-${Date.now()}${extension}`;
+  const destination = directory.createFile(filename, mimeType ?? null);
+  const bytes = await readSourceBytes(sourceUri);
+
+  destination.write(bytes);
+
+  const collectible = parseCollectibleFile(castleId, kind, destination);
+  if (!collectible) {
+    if (destination.exists) {
+      destination.delete();
+    }
+    throw new Error('Failed to save collectible');
+  }
+
+  return collectible;
+}
+
+export function deleteCastleCollectible(item: CastleCollectible): void {
+  const file = new File(item.uri);
+  if (file.exists) {
+    file.delete();
+  }
+}
+
+export function isImageCollectible(item: CastleCollectible): boolean {
+  return item.mimeType?.startsWith('image/') ?? !item.filename.endsWith('.pdf');
+}
