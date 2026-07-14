@@ -85,6 +85,7 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
       const persistedUri = await persistUploadImage(
         selection.uri,
         selection.mimeType ?? 'image/jpeg',
+        { base64Data: selection.base64 },
       );
       const persistedSelection: CollectibleUploadSelection = {
         ...selection,
@@ -120,15 +121,17 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
       setError(null);
 
       try {
+        const existingCount = listCastleCollectibles(castleId, kind).length;
         await saveCastleCollectibleFromUri(
           castleId,
           kind,
           draft.selection.uri,
           draft.selection.mimeType,
+          { base64Data: draft.selection.base64 },
         );
 
         const savedItems = listCastleCollectibles(castleId, kind);
-        if (savedItems.length === 0) {
+        if (savedItems.length <= existingCount) {
           throw new Error('global-upload-failed');
         }
 

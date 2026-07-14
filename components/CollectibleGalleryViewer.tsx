@@ -1,16 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
   Linking,
   Modal,
-  PanResponder,
   Pressable,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from 'react-native';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+  State,
+  type PanGestureHandlerGestureEvent,
+  type PanGestureHandlerStateChangeEvent,
+} from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../constants/theme';
@@ -28,10 +34,10 @@ type CollectibleGalleryViewerProps = {
 
 type GestureAxis = 'none' | 'x' | 'y';
 
-const SWIPE_LOCK_THRESHOLD = 4;
 const DISMISS_DISTANCE = 90;
 const DISMISS_VELOCITY = 0.6;
 const PAGE_SWIPE_DISTANCE = 50;
+const AXIS_LOCK_THRESHOLD = 8;
 
 export function CollectibleGalleryViewer({
   items,
@@ -44,31 +50,25 @@ export function CollectibleGalleryViewer({
   const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const gestureAxis = useRef<GestureAxis>('none');
-  const currentIndexRef = useRef(initialIndex);
   const translateY = useRef(new Animated.Value(0)).current;
   const backdropOpacity = useRef(new Animated.Value(1)).current;
   const contentHeight = height - insets.top - insets.bottom;
   const currentItem = items[currentIndex];
 
-  const resetDismissAnimation = useCallback(() => {
+  const resetAnimation = useCallback(() => {
     translateY.setValue(0);
     backdropOpacity.setValue(1);
+    gestureAxis.current = 'none';
   }, [backdropOpacity, translateY]);
-
-  useEffect(() => {
-    currentIndexRef.current = currentIndex;
-  }, [currentIndex]);
 
   useEffect(() => {
     if (!visible) {
       return;
     }
 
-    gestureAxis.current = 'none';
-    resetDismissAnimation();
+    resetAnimation();
     setCurrentIndex(initialIndex);
-    currentIndexRef.current = initialIndex;
-  }, [initialIndex, resetDismissAnimation, visible]);
+  }, [initialIndex, resetAnimation, visible]);
 
   const dismissViewer = useCallback(() => {
     Animated.parallel([
@@ -84,9 +84,9 @@ export function CollectibleGalleryViewer({
       }),
     ]).start(() => {
       onClose();
-      resetDismissAnimation();
+      resetAnimation();
     });
-  }, [backdropOpacity, height, onClose, resetDismissAnimation, translateY]);
+  }, [backdropOpacity, height, onClose, resetAnimation, translateY]);
 
   const snapBack = useCallback(() => {
     Animated.parallel([
@@ -103,60 +103,58 @@ export function CollectibleGalleryViewer({
     ]).start();
   }, [backdropOpacity, translateY]);
 
-  const shouldActivatePan = useCallback((dx: number, dy: number) => {
-    if (gestureAxis.current !== 'none') {
-      return true;
-    }
+  const onGestureEvent = useCallback(
+    (event: PanGestureHandlerGestureEvent) => {
+      const { translationX, translationY } = event.nativeEvent;
 
-    if (Math.abs(dx) < SWIPE_LOCK_THRESHOLD && Math.abs(dy) < SWIPE_LOCK_THRESHOLD) {
-      return false;
-    }
+      if (gestureAxis.current === 'none') {
+        if (Math.abs(translationX) < AXIS_LOCK_THRESHOLD && Math.abs(translationY) < AXIS_LOCK_THRESHOLD) {
+          return;
+        }
+        gestureAxis.current = Math.abs(translationY) >= Math.abs(translationX) ? 'y' : 'x';
+      }
 
-    gestureAxis.current = Math.abs(dy) >= Math.abs(dx) ? 'y' : 'x';
-    return true;
-  }, []);
+      if (gestureAxis.current === 'y' && translationY > 0) {
+        translateY.setValue(translationY);
+        backdropOpacity.setValue(Math.max(0.35, 1 - translationY / (height * 0.75)));
+      }
+    },
+    [backdropOpacity, height, translateY],
+  );
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => false,
-        onStartShouldSetPanResponderCapture: () => false,
-        onMoveShouldSetPanResponder: (_, gestureState) =>
-          shouldActivatePan(gestureState.dx, gestureState.dy),
-        onMoveShouldSetPanResponderCapture: (_, gestureState) =>
-          shouldActivatePan(gestureState.dx, gestureState.dy),
-        onPanResponderMove: (_, gestureState) => {
-          if (gestureAxis.current === 'y' && gestureState.dy > 0) {
-            translateY.setValue(gestureState.dy);
-            backdropOpacity.setValue(Math.max(0.35, 1 - gestureState.dy / (height * 0.75)));
-          }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureAxis.current === 'y') {
-            const shouldDismiss =
-              gestureState.dy > DISMISS_DISTANCE || gestureState.vy > DISMISS_VELOCITY;
-            if (shouldDismiss) {
-              dismissViewer();
-            } else {
-              snapBack();
-            }
-          } else if (gestureAxis.current === 'x' && items.length > 1) {
-            const index = currentIndexRef.current;
-            if (gestureState.dx <= -PAGE_SWIPE_DISTANCE && index < items.length - 1) {
-              setCurrentIndex(index + 1);
-            } else if (gestureState.dx >= PAGE_SWIPE_DISTANCE && index > 0) {
-              setCurrentIndex(index - 1);
-            }
-          }
+  const onHandlerStateChange = useCallback(
+    (event: PanGestureHandlerStateChangeEvent) => {
+      const { state, translationX, translationY, velocityY } = event.nativeEvent;
 
-          gestureAxis.current = 'none';
-        },
-        onPanResponderTerminate: () => {
-          gestureAxis.current = 'none';
+      if (state === State.BEGAN) {
+        gestureAxis.current = 'none';
+        return;
+      }
+
+      if (state !== State.END && state !== State.CANCELLED && state !== State.FAILED) {
+        return;
+      }
+
+      if (gestureAxis.current === 'y') {
+        if (translationY > DISMISS_DISTANCE || velocityY > DISMISS_VELOCITY) {
+          dismissViewer();
+        } else {
           snapBack();
-        },
-      }),
-    [dismissViewer, height, items.length, shouldActivatePan, snapBack, translateY, backdropOpacity],
+        }
+      } else if (gestureAxis.current === 'x' && items.length > 1) {
+        if (translationX <= -PAGE_SWIPE_DISTANCE && currentIndex < items.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        } else if (translationX >= PAGE_SWIPE_DISTANCE && currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+        snapBack();
+      } else {
+        snapBack();
+      }
+
+      gestureAxis.current = 'none';
+    },
+    [currentIndex, dismissViewer, items.length, snapBack],
   );
 
   const openPdf = async (uri: string) => {
@@ -173,81 +171,95 @@ export function CollectibleGalleryViewer({
   const isImage = isImageCollectible(currentItem);
 
   return (
-    <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
-      <Animated.View
-        style={[styles.container, { opacity: backdropOpacity, transform: [{ translateY }] }]}
-      >
-        <View pointerEvents="none" style={[styles.page, { height: contentHeight }]}>
-          {isImage ? (
-            <Image
-              source={{ uri: getDisplayImageUri(currentItem.uri) }}
-              style={styles.fullImage}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={styles.pdfPage}>
-              <Text style={styles.pdfTitle}>PDF</Text>
-              <Text style={styles.pdfFilename}>{currentItem.filename}</Text>
-            </View>
-          )}
-        </View>
-
-        <View
-          collapsable={false}
-          style={styles.gestureLayer}
-          {...panResponder.panHandlers}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      presentationStyle="overFullScreen"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <GestureHandlerRootView style={styles.gestureRoot}>
+        <Animated.View
+          style={[styles.container, { opacity: backdropOpacity, transform: [{ translateY }] }]}
         >
-          {!isImage ? (
-            <View pointerEvents="box-none" style={styles.pdfInteractive}>
+          <View pointerEvents="none" style={[styles.page, { height: contentHeight }]}>
+            {isImage ? (
+              <Image
+                source={{ uri: getDisplayImageUri(currentItem.uri) }}
+                style={styles.fullImage}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={styles.pdfPage}>
+                <Text style={styles.pdfTitle}>PDF</Text>
+                <Text style={styles.pdfFilename}>{currentItem.filename}</Text>
+              </View>
+            )}
+          </View>
+
+          <PanGestureHandler
+            minDist={AXIS_LOCK_THRESHOLD}
+            onGestureEvent={onGestureEvent}
+            onHandlerStateChange={onHandlerStateChange}
+          >
+            <View style={styles.gestureLayer}>
+              {!isImage ? (
+                <View pointerEvents="box-none" style={styles.pdfInteractive}>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => void openPdf(currentItem.uri)}
+                    style={styles.openPdfButton}
+                  >
+                    <Text style={styles.openPdfLabel}>{t('castle.collectibleOpenPdf')}</Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </View>
+          </PanGestureHandler>
+
+          <View
+            pointerEvents="box-none"
+            style={[styles.topBarOverlay, { paddingTop: insets.top + 8, paddingBottom: 12 }]}
+          >
+            <View pointerEvents="auto" style={styles.topBar}>
+              <Text style={styles.counter}>
+                {t('castle.collectibleViewerCounter', {
+                  current: currentIndex + 1,
+                  total: items.length,
+                })}
+              </Text>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => void openPdf(currentItem.uri)}
-                style={styles.openPdfButton}
+                hitSlop={12}
+                onPress={onClose}
+                style={styles.closeButton}
               >
-                <Text style={styles.openPdfLabel}>{t('castle.collectibleOpenPdf')}</Text>
+                <Text style={styles.closeLabel}>{t('common.close')}</Text>
               </Pressable>
             </View>
-          ) : null}
-        </View>
-
-        <View
-          pointerEvents="box-none"
-          style={[styles.topBarOverlay, { paddingTop: insets.top + 8, paddingBottom: 12 }]}
-        >
-          <View pointerEvents="auto" style={styles.topBar}>
-            <Text style={styles.counter}>
-              {t('castle.collectibleViewerCounter', {
-                current: currentIndex + 1,
-                total: items.length,
-              })}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              hitSlop={12}
-              onPress={onClose}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeLabel}>{t('common.close')}</Text>
-            </Pressable>
           </View>
-        </View>
 
-        <View
-          pointerEvents="none"
-          style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
-        >
-          <Text style={styles.swipeHint}>
-            {items.length > 1
-              ? t('castle.collectibleViewerSwipeHint')
-              : t('castle.collectibleViewerDismissHint')}
-          </Text>
-        </View>
-      </Animated.View>
+          <View
+            pointerEvents="none"
+            style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
+          >
+            <Text style={styles.swipeHint}>
+              {items.length > 1
+                ? t('castle.collectibleViewerSwipeHint')
+                : t('castle.collectibleViewerDismissHint')}
+            </Text>
+          </View>
+        </Animated.View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  gestureRoot: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.96)',

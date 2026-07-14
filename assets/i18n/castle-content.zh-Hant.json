@@ -1,19 +1,21 @@
 {
   "1": {
-    "subtitle": "根室半島查西跡群",
-    "description": "根室半島查西跡群（Chashi）是沿著根室半島北岸分布的防禦要塞群，也是日本100名城書中的第1號「城郭」。根室半島位於北海道極東端，地形狹長。據信這些要塞建於16至18世紀之間，但其確切用途至今尚未完全明確。這些要塞主要建造在緊鄰鄂霍次克海的懸崖邊緣。目前共有24處遺跡被集體登錄為國家指定史蹟並標記於地圖上；然而，多數地點皆難以抵達且不易定位。目前在北海岸的35號縣道沿線有兩處設有告示牌與小型停車場。現場已無任何留存的建築結構，僅能看見當初構築泥牆與乾壕溝所遺留下的圓形覆草土丘。",
+    "subtitle": "根室半島砦跡群",
+    "description": "根室半島砦跡群（Chashi）是沿著根室半島北岸分布的防禦要塞群，也是日本100名城書中的第1號「城郭」。根室半島位於北海道極東端，地形狹長。據信這些要塞建於16至18世紀之間，但其確切用途至今尚未完全明確。這些要塞主要建造在緊鄰鄂霍次克海的懸崖邊緣。目前共有24處遺跡被集體登錄為國家指定史蹟並標記於地圖上；然而，多數地點皆難以抵達且不易定位。目前在北海岸的35號縣道沿線有兩處設有告示牌與小型停車場。現場已無任何留存的建築結構，僅能看見當初構築泥牆與乾壕溝所遺留下的圓形覆草土丘。",
     "stampLocations": [
       {
         "label": "根室市歷史博物館（常盤町2-24）",
         "googleLabel": "根室市歴史博物館",
         "latitude": 43.323611,
-        "longitude": 145.583333
+        "longitude": 145.583333,
+        "businessHours": "開館時間：9:30～16:30　休館日：週一"
       },
       {
         "label": "根室市觀光資訊處（根室車站內）",
         "googleLabel": "根室駅",
         "latitude": 43.330556,
-        "longitude": 145.583889
+        "longitude": 145.583889,
+        "businessHours": "開館時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -39,13 +41,15 @@
         "label": "五稜郭公園管理事務所（郭內）",
         "googleLabel": "五稜郭公園管理事務所",
         "latitude": 41.796944,
-        "longitude": 140.756944
+        "longitude": 140.756944,
+        "businessHours": "營業時間：10:00～17:00（箱館奉行所板庫休憩所）"
       },
       {
         "label": "五稜郭塔售票處",
         "googleLabel": "五稜郭タワー",
         "latitude": 41.794722,
-        "longitude": 140.754167
+        "longitude": 140.754167,
+        "businessHours": "營業時間：9:00～18:00（展望門票販售至 17:50，全年無休）"
       }
     ],
     "driving": {
@@ -61,7 +65,17 @@
     "publicTransit": {
       "googleDestination": "五稜郭公園前駅",
       "description": "從函館車站搭乘路面電車至「五稜郭公園前」站下車，步行約15分鐘；或搭乘函館巴士於「五稜郭公園入口」站下車。"
-    }
+    },
+    "alias": "柳野城",
+    "castleCardLocations": [
+      {
+        "label": "箱館奉行所",
+        "googleLabel": "箱館奉行所",
+        "latitude": 41.794722,
+        "longitude": 140.754167,
+        "businessHours": "請洽詢五稜郭公園管理事務所"
+      }
+    ]
   },
   "3": {
     "subtitle": "松前城",
@@ -87,7 +101,16 @@
     "publicTransit": {
       "googleDestination": "松城 バス停",
       "description": "從木古內車站搭乘函館巴士（松前線）至「松城」站下車，步行約7分鐘。（可自新函館北斗站或函館站搭乘特急列車至木古內站轉乘）"
-    }
+    },
+    "alias": "福山城",
+    "castleCardLocations": [
+      {
+        "label": "松前観光案内所",
+        "googleLabel": "松前観光案内所",
+        "latitude": 41.429722,
+        "longitude": 140.108611
+      }
+    ]
   },
   "4": {
     "subtitle": "弘前城",
@@ -119,7 +142,24 @@
     "publicTransit": {
       "googleDestination": "市役所前(青森県) バス停",
       "description": "從JR弘前站搭乘「Dotemachi社區巴士」或一般循環巴士至「市役所前」站下車，步行約4分鐘。"
-    }
+    },
+    "alias": "鷹岡城、高岡城",
+    "castleCardLocations": [
+      {
+        "label": "弘前城天守内売店",
+        "googleLabel": "弘前城天守内売店",
+        "latitude": 40.6075,
+        "longitude": 140.464167,
+        "businessHours": "4月1日～11月23日"
+      },
+      {
+        "label": "弘前城情報館",
+        "googleLabel": "弘前城情報館",
+        "latitude": 40.606389,
+        "longitude": 140.466111,
+        "businessHours": "全年"
+      }
+    ]
   },
   "5": {
     "subtitle": "根城",
@@ -151,7 +191,8 @@
     "publicTransit": {
       "googleDestination": "根城(博物館前) バス停",
       "description": "從JR八戶站搭乘市營巴士或南部巴士（往田面木或八戶市中心方向）至「根城廣場前」或「根城（博物館前）」站下車，步行約5分鐘。"
-    }
+    },
+    "alias": "白主城"
   },
   "6": {
     "subtitle": "盛岡城",
@@ -177,7 +218,8 @@
     "publicTransit": {
       "googleDestination": "盛岡城跡公園 巴士站",
       "description": "從JR「盛岡」站搭乘盛岡都心循環巴士「Denden-mushi」至「盛岡城跡公園」站下車，步行約2分鐘。"
-    }
+    },
+    "alias": "不來方城"
   },
   "7": {
     "subtitle": "多賀城",
@@ -187,13 +229,15 @@
         "label": "多賀城跡管理事務所",
         "googleLabel": "多賀城跡管理事務所",
         "latitude": 38.299444,
-        "longitude": 140.992222
+        "longitude": 140.992222,
+        "businessHours": "時間：9:00～16:30"
       },
       {
         "label": "東北歷史博物館服務台",
         "googleLabel": "東北歴史博物館",
         "latitude": 38.298333,
-        "longitude": 141.002222
+        "longitude": 141.002222,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -209,7 +253,21 @@
     "publicTransit": {
       "googleDestination": "国府多賀城駅",
       "description": "搭乘JR仙石線至「國府多賀城」站，出站即為多賀城外郭邊緣，步行至政廳遺址約15分鐘。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "多賀城ガイダンス施設",
+        "googleLabel": "多賀城ガイダンス施設",
+        "latitude": 38.299444,
+        "longitude": 140.992222
+      },
+      {
+        "label": "多賀城市観光案内所",
+        "googleLabel": "多賀城市観光案内所",
+        "latitude": 38.299444,
+        "longitude": 140.992222
+      }
+    ]
   },
   "8": {
     "subtitle": "仙台城",
@@ -219,7 +277,8 @@
         "label": "仙台城本丸會館服務台",
         "googleLabel": "青葉城本丸会館",
         "latitude": 38.2525,
-        "longitude": 140.856389
+        "longitude": 140.856389,
+        "businessHours": "時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -235,7 +294,8 @@
     "publicTransit": {
       "googleDestination": "仙台城跡 巴士站",
       "description": "從JR仙台站搭乘觀光循環巴士「Loople仙台」至「仙台城跡」站下車即達；或搭乘地下鐵東西線至「國際中心」站步行登山約15-20分鐘。"
-    }
+    },
+    "alias": "青葉城"
   },
   "9": {
     "subtitle": "久保田城",
@@ -245,7 +305,8 @@
         "label": "久保田城御隅櫓（收費入館處）",
         "googleLabel": "久保田城御隅櫓",
         "latitude": 39.723333,
-        "longitude": 140.124444
+        "longitude": 140.124444,
+        "businessHours": "※12月1日～3月31日冬季休館期間"
       },
       {
         "label": "秋田市立佐竹史料館服務台",
@@ -267,7 +328,8 @@
     "publicTransit": {
       "googleDestination": "秋田駅",
       "description": "從秋田新幹線/JR「秋田」站西口步行約10-15分鐘即可抵達千秋公園（城址入口）。"
-    }
+    },
+    "alias": "窪田城、矢留城"
   },
   "10": {
     "subtitle": "山形城",
@@ -277,13 +339,15 @@
         "label": "山形市鄉土館（霞城公園內）",
         "googleLabel": "山形市郷土館",
         "latitude": 38.256111,
-        "longitude": 140.329444
+        "longitude": 140.329444,
+        "businessHours": "開館時間：9:00～16:30"
       },
       {
         "label": "二之丸東大手門櫓內部展覽室",
         "googleLabel": "山形城 二ノ丸東大手門",
         "latitude": 38.256389,
-        "longitude": 140.331389
+        "longitude": 140.331389,
+        "businessHours": "開館時間：9:30～16:00"
       }
     ],
     "driving": {
@@ -299,7 +363,8 @@
     "publicTransit": {
       "googleDestination": "山形駅",
       "description": "從JR「山形」站西口或一般出口步行約10-15分鐘即可直接穿過「南門」或「東大手門」進入霞城公園。"
-    }
+    },
+    "alias": "霞城"
   },
   "11": {
     "subtitle": "二本松城",
@@ -309,7 +374,8 @@
         "label": "二本松城箕輪門前管理事務所（霞城公園內）",
         "googleLabel": "霞城公園 管理事務所",
         "latitude": 37.595,
-        "longitude": 140.426944
+        "longitude": 140.426944,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一"
       }
     ],
     "driving": {
@@ -325,7 +391,16 @@
     "publicTransit": {
       "googleDestination": "霞城公園",
       "description": "從JR東北本線「二本松」站下車，步行約20分鐘即可抵達霞城公園入口。"
-    }
+    },
+    "alias": "霞城",
+    "castleCardLocations": [
+      {
+        "label": "二本松城報館（霞城公園內）",
+        "googleLabel": "にほんまつ城報館",
+        "latitude": 37.595,
+        "longitude": 140.426944
+      }
+    ]
   },
   "12": {
     "subtitle": "會津若松城",
@@ -335,7 +410,8 @@
         "label": "鶴城天守閣內部入口售票處（收費區內）",
         "googleLabel": "鶴ヶ城 天守閣",
         "latitude": 37.487778,
-        "longitude": 139.929722
+        "longitude": 139.929722,
+        "businessHours": "開館時間：8:30～17:00"
       }
     ],
     "driving": {
@@ -351,7 +427,16 @@
     "publicTransit": {
       "googleDestination": "鶴ヶ城入口 バス停",
       "description": "從JR「會津若松」站搭乘市內觀光巴士「あかべぇ」或「ハイカラさん」至「鶴ヶ城入り口」站下車，步行約5分鐘。"
-    }
+    },
+    "alias": "鶴城、黑川城",
+    "castleCardLocations": [
+      {
+        "label": "鶴ヶ城観光案内所",
+        "googleLabel": "鶴ヶ城観光案内所",
+        "latitude": 37.487778,
+        "longitude": 139.929722
+      }
+    ]
   },
   "13": {
     "subtitle": "白河小峰城",
@@ -383,7 +468,16 @@
     "publicTransit": {
       "googleDestination": "白河駅",
       "description": "從JR東北本線「白河」站步行約5-10分鐘即可抵達；若搭乘東北新幹線，請於「新白河」站下車轉乘在地電車或計程車。"
-    }
+    },
+    "alias": "小峰城、白河城",
+    "castleCardLocations": [
+      {
+        "label": "二之丸茶屋賣店",
+        "googleLabel": "二ノ丸茶屋売店",
+        "latitude": 37.1325,
+        "longitude": 140.211944
+      }
+    ]
   },
   "14": {
     "subtitle": "水戶城",
@@ -415,7 +509,28 @@
     "publicTransit": {
       "googleDestination": "水戸駅",
       "description": "搭乘JR常磐線至「水戶」站下車，由北口出站後沿著老街緩坡筆直步行約8-10分鐘即可抵達歷史古蹟弘道館及復原的水戶城大手門。"
-    }
+    },
+    "alias": "馬場城",
+    "castleCardLocations": [
+      {
+        "label": "水戸観光コンベンション協会事務所",
+        "googleLabel": "水戸観光コンベンション協会事務所",
+        "latitude": 36.375556,
+        "longitude": 140.476944
+      },
+      {
+        "label": "水戸観光案内所",
+        "googleLabel": "水戸観光案内所",
+        "latitude": 36.375556,
+        "longitude": 140.476944
+      },
+      {
+        "label": "北澤賣店（弘道館內）",
+        "googleLabel": "弘道館",
+        "latitude": 36.375556,
+        "longitude": 140.476944
+      }
+    ]
   },
   "15": {
     "subtitle": "足利氏館",
@@ -441,7 +556,8 @@
     "publicTransit": {
       "googleDestination": "足利駅",
       "description": "搭乘JR兩毛線至「足利」站下車，由北口步行約10分鐘；或搭乘東武伊勢崎線至「足利市」站步行約15分鐘即可穿過古老的大門和太鼓橋進入鑁阿寺。"
-    }
+    },
+    "alias": "鑁阿寺"
   },
   "16": {
     "subtitle": "箕輪城",
@@ -493,7 +609,8 @@
     "publicTransit": {
       "googleDestination": "太田駅(群馬県)",
       "description": "搭乘東武鐵道伊勢崎線至「太田」站下車，建議轉乘計程車約10分鐘直達金山休憩所；或從車站步行登山約需50-60分鐘。"
-    }
+    },
+    "alias": "新田金山城"
   },
   "18": {
     "subtitle": "鉢形城",
@@ -503,7 +620,8 @@
         "label": "鉢形城歷史館服務台入口處",
         "googleLabel": "鉢形城歴史館",
         "latitude": 36.114167,
-        "longitude": 139.193889
+        "longitude": 139.193889,
+        "businessHours": "※休館日は駐車場正面入口の郵便ポスト"
       }
     ],
     "driving": {
@@ -529,7 +647,8 @@
         "label": "川越城本丸御殿入口售票處服務台",
         "googleLabel": "川越城 本丸御殿",
         "latitude": 35.925278,
-        "longitude": 139.4925
+        "longitude": 139.4925,
+        "businessHours": "※休館日には川越武道館にて可蓋章 開館時間：9:00～17:00 週一休館"
       }
     ],
     "driving": {
@@ -545,7 +664,8 @@
     "publicTransit": {
       "googleDestination": "本丸御殿 バス停",
       "description": "從西武新宿線「本川越」站或JR/東武東上線「川越」站搭乘「小江戶巡迴巴士」或「東武名所巴士」，於「本丸御殿」站下車即達。"
-    }
+    },
+    "alias": "初雁城、霧隱城"
   },
   "20": {
     "subtitle": "佐倉城",
@@ -555,7 +675,8 @@
         "label": "佐倉城址公園管理中心服務台",
         "googleLabel": "佐倉城址公園中心",
         "latitude": 35.723889,
-        "longitude": 140.224167
+        "longitude": 140.224167,
+        "businessHours": "建物內外皆可，全日可蓋章"
       },
       {
         "label": "國立歷史民俗博物館入口服務台",
@@ -577,7 +698,8 @@
     "publicTransit": {
       "googleDestination": "国立歴史民俗博物館 バス停",
       "description": "從京成電鐵「京成佐倉」站南口搭乘千葉綠色巴士（往高岡方向），在「國立歷史民俗博物館」站下車即達。"
-    }
+    },
+    "alias": "鹿島城"
   },
   "21": {
     "subtitle": "江戶城",
@@ -615,7 +737,8 @@
     "publicTransit": {
       "googleDestination": "大手町駅",
       "description": "前往東御苑大手門：搭乘東京地下鐵各線至「大手町」站（C13a出口），步行約5分鐘即可抵達大手門入口。"
-    }
+    },
+    "alias": "千代田城"
   },
   "22": {
     "subtitle": "八王子城",
@@ -625,7 +748,8 @@
         "label": "八王子城跡導覽設施服務台櫃檯",
         "googleLabel": "八王子城跡ガイダンス施設",
         "latitude": 35.654722,
-        "longitude": 139.263889
+        "longitude": 139.263889,
+        "businessHours": "開館時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -651,7 +775,8 @@
         "label": "小田原城天守閣內部一樓改札售票處",
         "googleLabel": "小田原城 天守閣",
         "latitude": 35.251111,
-        "longitude": 139.153889
+        "longitude": 139.153889,
+        "businessHours": "開館時間：9:00～17:00　休館日：12月第2週三"
       }
     ],
     "driving": {
@@ -667,7 +792,17 @@
     "publicTransit": {
       "googleDestination": "小田原駅",
       "description": "搭乘JR東海道新幹線、東海道本線或小田急小田原線至「小田原」站下車，由東口出站後沿著城下町指標步行約10分鐘即可進入城址公園。"
-    }
+    },
+    "alias": "小峯城",
+    "castleCardLocations": [
+      {
+        "label": "天守閣1樓博物館商店",
+        "googleLabel": "小田原城天守閣",
+        "latitude": 35.251111,
+        "longitude": 139.153889,
+        "businessHours": "開館時間：9:00～17:00　休館日：12月第2週三"
+      }
+    ]
   },
   "24": {
     "subtitle": "武田氏館",
@@ -677,7 +812,8 @@
         "label": "武田神社境內寶物殿入口售票櫃檯",
         "googleLabel": "武田神社 宝物殿",
         "latitude": 35.686111,
-        "longitude": 138.577778
+        "longitude": 138.577778,
+        "businessHours": "請洽詢武田神社寶物殿"
       }
     ],
     "driving": {
@@ -693,7 +829,8 @@
     "publicTransit": {
       "googleDestination": "武田神社 バス停",
       "description": "從JR中央本線「甲府」站北口搭乘山梨交通巴士（往武田神社方向），車程約8分鐘，在「武田神社」終點站下車即達。"
-    }
+    },
+    "alias": "躑躅崎館"
   },
   "25": {
     "subtitle": "甲府城",
@@ -735,7 +872,8 @@
         "label": "松代城跡真田邸管理事務所（真田邸正門售票處）",
         "googleLabel": "新御殿 (真田邸)",
         "latitude": 36.564444,
-        "longitude": 138.196944
+        "longitude": 138.196944,
+        "businessHours": "時間：9:00～17:00（4月～10月 ） 9:00～16:30（11月～3月）"
       },
       {
         "label": "松代觀光案內所櫃檯（真田寶物館旁）",
@@ -757,7 +895,8 @@
     "publicTransit": {
       "googleDestination": "松代駅 バス停",
       "description": "從JR「長野」站善光寺口搭乘長電巴士（往松代方向）約30分鐘，在「松代站」巴士站下車，步行約3-5分鐘即可抵達太鼓門。"
-    }
+    },
+    "alias": "海津城"
   },
   "27": {
     "subtitle": "上田城",
@@ -767,13 +906,15 @@
         "label": "上田城觀光會館服務台二樓",
         "googleLabel": "上田観光会館",
         "latitude": 36.403611,
-        "longitude": 138.246389
+        "longitude": 138.246389,
+        "businessHours": "平日 8:30～18:00、週六日及國定假日 9:00～18:00"
       },
       {
         "label": "上田市立博物館入口服務台櫃檯",
         "googleLabel": "上田市立博物館",
         "latitude": 36.403056,
-        "longitude": 138.243611
+        "longitude": 138.243611,
+        "businessHours": "開館時間：9:00～17:00 週三休館"
       }
     ],
     "driving": {
@@ -789,7 +930,15 @@
     "publicTransit": {
       "googleDestination": "上田駅",
       "description": "搭乘北陸新幹線或信濃鐵道至「上田」站下車，由お城口出站後，沿著「中央通」及指標筆直步行約12-15分鐘即可抵達東虎口櫓門。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "上田市觀光會館賣店",
+        "googleLabel": "上田市観光会館",
+        "latitude": 36.403056,
+        "longitude": 138.243611
+      }
+    ]
   },
   "28": {
     "subtitle": "小諸城",
@@ -799,7 +948,8 @@
         "label": "小諸城址懷古園收費料金所櫃檯",
         "googleLabel": "小諸城址 懐古園",
         "latitude": 36.328333,
-        "longitude": 138.417222
+        "longitude": 138.417222,
+        "businessHours": "入園時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -815,7 +965,16 @@
     "publicTransit": {
       "googleDestination": "小諸駅",
       "description": "搭乘信濃鐵道或JR小海線至「小諸」站下車，出站後穿過地下連絡通道，步行僅需約3分鐘即可抵達懷古園「三之門」入口。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "小諸城址懷古園",
+        "googleLabel": "小諸城址 懐古園",
+        "latitude": 36.328333,
+        "longitude": 138.417222,
+        "businessHours": "入園時間：9:00～17:00"
+      }
+    ]
   },
   "29": {
     "subtitle": "松本城",
@@ -841,7 +1000,16 @@
     "publicTransit": {
       "googleDestination": "松本城・市役所前 バス停",
       "description": "從JR「松本」站搭乘市內循環巴士「Town Sneaker」北コース（北路線），車程約10分鐘，在「松本城・市役所前」站下車即達；亦可由車站步行約15-20分鐘抵達。"
-    }
+    },
+    "alias": "烏城、深志城",
+    "castleCardLocations": [
+      {
+        "label": "松本城賣店（付費區內）",
+        "googleLabel": "松本城",
+        "latitude": 36.238333,
+        "longitude": 137.969444
+      }
+    ]
   },
   "30": {
     "subtitle": "高遠城",
@@ -851,13 +1019,15 @@
         "label": "高遠城址公園內高遠閣入口櫃檯",
         "googleLabel": "高遠閣",
         "latitude": 35.831944,
-        "longitude": 138.061667
+        "longitude": 138.061667,
+        "businessHours": "印章 24 小時可蓋"
       },
       {
         "label": "伊那市高遠歷史博物館服務台",
         "googleLabel": "伊那市立高遠歴史博物館",
         "latitude": 35.835,
-        "longitude": 138.064444
+        "longitude": 138.064444,
+        "businessHours": "印章 24 小時可蓋"
       }
     ],
     "driving": {
@@ -873,7 +1043,16 @@
     "publicTransit": {
       "googleDestination": "高遠駅 バス停",
       "description": "從JR飯田線「伊那市」站搭乘JR巴士（高遠線）約25分鐘，在「高遠站」巴士總站下車，隨後沿著上坡步道步行約15分鐘即可進入城址公園。"
-    }
+    },
+    "alias": "兜山城",
+    "castleCardLocations": [
+      {
+        "label": "伊那市立高遠町歴史博物館",
+        "googleLabel": "伊那市立高遠町歴史博物館",
+        "latitude": 35.831944,
+        "longitude": 138.061667
+      }
+    ]
   },
   "31": {
     "subtitle": "新發田城",
@@ -883,7 +1062,8 @@
         "label": "新發田城本丸表門服務台（僅在開館季節4月至11月開放）",
         "googleLabel": "新発田城 表門",
         "latitude": 37.954444,
-        "longitude": 139.325556
+        "longitude": 139.325556,
+        "businessHours": "12月1日～3月下旬改至新發田市役所本廳及白壁兵營廣報資料館"
       }
     ],
     "driving": {
@@ -899,7 +1079,24 @@
     "publicTransit": {
       "googleDestination": "新発田城址公園 巴士站",
       "description": "從JR「新發田」站步行約20-25分鐘；亦可搭乘市內巴士至「新發田城址公園」附近。"
-    }
+    },
+    "alias": "菖蒲城、舟形城",
+    "castleCardLocations": [
+      {
+        "label": "新発田城正門前安兵衛茶屋",
+        "googleLabel": "新発田城正門前安兵衛茶屋",
+        "latitude": 37.954444,
+        "longitude": 139.325556,
+        "businessHours": "4月～11月"
+      },
+      {
+        "label": "新発田市観光情報センター",
+        "googleLabel": "新発田市観光情報センター",
+        "latitude": 37.954444,
+        "longitude": 139.325556,
+        "businessHours": "12月～3月"
+      }
+    ]
   },
   "32": {
     "subtitle": "春日山城",
@@ -909,7 +1106,8 @@
         "label": "春日山城跡綜合案內所（山腳下）",
         "googleLabel": "春日山城跡 総合案内所",
         "latitude": 37.146944,
-        "longitude": 138.209167
+        "longitude": 138.209167,
+        "businessHours": "開館時間：9:00～16:30　休館日：週一"
       },
       {
         "label": "上越市埋藏文化財中心服務台",
@@ -931,7 +1129,8 @@
     "publicTransit": {
       "googleDestination": "春日山神社 巴士站",
       "description": "從越後心動鐵道「春日山」站步行約30-40分鐘抵達山腳；或從「直江津」站搭乘巴士至「春日山東小前」再步行登山。"
-    }
+    },
+    "alias": "鉢峰城"
   },
   "33": {
     "subtitle": "高岡城",
@@ -957,7 +1156,15 @@
     "publicTransit": {
       "googleDestination": "高岡駅",
       "description": "搭乘愛之風富山鐵道至「高岡」站下車，由古城公園口（北口）出站後，步行約10-15分鐘即可抵達古城公園入口。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "高岡市立博物館博物館商店",
+        "googleLabel": "高岡市立博物館",
+        "latitude": 36.746111,
+        "longitude": 137.022222
+      }
+    ]
   },
   "34": {
     "subtitle": "七尾城",
@@ -967,7 +1174,8 @@
         "label": "七尾城史資料館售票櫃檯（山腳下）",
         "googleLabel": "七尾城史資料館",
         "latitude": 37.0175,
-        "longitude": 136.969167
+        "longitude": 136.969167,
+        "businessHours": "開館時間：9:00～17:00 週一休館"
       }
     ],
     "driving": {
@@ -983,7 +1191,16 @@
     "publicTransit": {
       "googleDestination": "七尾城史資料館 バス停",
       "description": "從JR七尾線「七尾」站搭乘市內循環巴士（市街地循環バス）至「七尾城史資料館」站下車。若欲登頂本丸，需從資料館旁的大手道山路步行盤旋攀登約45-60分鐘（自駕可直接開車至本丸下停車場再步行10分鐘）。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "七尾城史資料館",
+        "googleLabel": "七尾城史資料館",
+        "latitude": 37.0175,
+        "longitude": 136.969167,
+        "businessHours": "開館時間：9:00～17:00 週一休館"
+      }
+    ]
   },
   "35": {
     "subtitle": "金澤城",
@@ -1025,7 +1242,8 @@
         "label": "丸岡城天守閣入口售票處櫃檯",
         "googleLabel": "丸岡城",
         "latitude": 36.151944,
-        "longitude": 136.271667
+        "longitude": 136.271667,
+        "businessHours": "開城時間：8:30～17:00"
       }
     ],
     "driving": {
@@ -1041,7 +1259,16 @@
     "publicTransit": {
       "googleDestination": "丸岡城 バス停",
       "description": "從JR北陸本線「福井」站搭乘京福巴士（往丸岡城方向）約40分鐘，在「丸岡城」終點站下車即達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "丸岡城入場券售票處",
+        "googleLabel": "丸岡城",
+        "latitude": 36.151944,
+        "longitude": 136.271667,
+        "businessHours": "開城時間：8:30～17:00"
+      }
+    ]
   },
   "37": {
     "subtitle": "一乘谷城",
@@ -1051,13 +1278,15 @@
         "label": "一乘谷朝倉氏遺跡復原町並入口售票處",
         "googleLabel": "一乗谷朝倉氏遺跡 復原町並",
         "latitude": 36.000556,
-        "longitude": 136.295278
+        "longitude": 136.295278,
+        "businessHours": "開館時間：9:00～17:00"
       },
       {
         "label": "一乘谷朝倉氏遺跡博物館服務台",
         "googleLabel": "一乗谷朝倉氏遺跡博物館",
         "latitude": 36.006944,
-        "longitude": 136.284444
+        "longitude": 136.284444,
+        "businessHours": "開館時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -1073,7 +1302,16 @@
     "publicTransit": {
       "googleDestination": "一乗谷駅",
       "description": "搭乘JR越美北線（九頭龍線）至「一乘谷」站下車，出站後步行約5分鐘即可抵達朝倉氏遺跡博物館，步行約15-20分鐘可抵達復原町並及唐門（特定季節有接駁巴士）。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "復原町並南入場口",
+        "googleLabel": "一乗谷朝倉氏遺跡",
+        "latitude": 36.000556,
+        "longitude": 136.295278,
+        "businessHours": "開館時間：9:00～17:00"
+      }
+    ]
   },
   "38": {
     "subtitle": "岩村城",
@@ -1083,7 +1321,8 @@
         "label": "岩村歴史資料館入口服務台櫃檯（山腳下）",
         "googleLabel": "岩村歴史資料館",
         "latitude": 35.362778,
-        "longitude": 137.443611
+        "longitude": 137.443611,
+        "businessHours": "時間：9:00～17:00（4月～11月） 9:30～16:00（12月～3月） 休館日：週一"
       }
     ],
     "driving": {
@@ -1099,7 +1338,16 @@
     "publicTransit": {
       "googleDestination": "岩村駅",
       "description": "搭乘明知鐵道明知線至「岩村」站下車。出站後需沿著極具江戶風情的「岩村城下町老街」一路緩坡步行登山約30分鐘抵達山腳資料館，隨後再攀登極具挑戰性的石垣山路約25分鐘始可抵達山頂本丸遺蹟。"
-    }
+    },
+    "alias": "霧城",
+    "castleCardLocations": [
+      {
+        "label": "えなてらす、いわむら。",
+        "googleLabel": "恵那市観光協会岩村支部",
+        "latitude": 35.362778,
+        "longitude": 137.443611
+      }
+    ]
   },
   "39": {
     "subtitle": "岐阜城",
@@ -1131,7 +1379,17 @@
     "publicTransit": {
       "googleDestination": "岐阜公園・歴史博物館前 バス停",
       "description": "從JR「岐阜」站或名鐵「岐阜」站搭乘岐阜巴士（市內新快速循環線等）約15分鐘，在「岐阜公園・歷史博物館前」站下車。穿過公園至「金華山纜車站（ロープウェー）」搭乘纜車約3-4分鐘抵達山頂，再輕鬆步行約8-10分鐘即可抵達山頂天守閣。"
-    }
+    },
+    "alias": "稻葉山城",
+    "castleCardLocations": [
+      {
+        "label": "加藤榮三・東一紀念美術館",
+        "googleLabel": "加藤栄三･東一記念美術館",
+        "latitude": 35.433611,
+        "longitude": 136.7825,
+        "businessHours": "2025/10/23 起"
+      }
+    ]
   },
   "40": {
     "subtitle": "山中城",
@@ -1141,7 +1399,8 @@
         "label": "山中城跡案內所（賣店服務台，週一公休時移至三島市役所）",
         "googleLabel": "山中城跡 案内所",
         "latitude": 35.156111,
-        "longitude": 138.997222
+        "longitude": 138.997222,
+        "businessHours": "營業時間外亦可蓋章"
       }
     ],
     "driving": {
@@ -1157,7 +1416,16 @@
     "publicTransit": {
       "googleDestination": "山中城跡 巴士站",
       "description": "從JR「三島」站南口搭乘東海巴士（往元箱根港方向）約30分鐘，至「山中城跡」站下車即達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "山中城賣店",
+        "googleLabel": "山中城",
+        "latitude": 35.156111,
+        "longitude": 138.997222,
+        "businessHours": "營業時間外亦可蓋章"
+      }
+    ]
   },
   "41": {
     "subtitle": "駿府城",
@@ -1189,7 +1457,16 @@
     "publicTransit": {
       "googleDestination": "新静岡駅",
       "description": "從JR「靜岡」站北口步行約15分鐘即可抵達護城河邊；或搭乘靜岡鐵道至「新靜岡」站，步行約10分鐘即可由「東御門」入城。"
-    }
+    },
+    "alias": "府中城、静岡城",
+    "castleCardLocations": [
+      {
+        "label": "駿府城公園東御門・巽櫓土產角落",
+        "googleLabel": "駿府城公園東御門・巽櫓",
+        "latitude": 34.979444,
+        "longitude": 138.384444
+      }
+    ]
   },
   "42": {
     "subtitle": "掛川城",
@@ -1215,7 +1492,16 @@
     "publicTransit": {
       "googleDestination": "掛川駅",
       "description": "搭乘JR東海道新幹線或東海道本線至「掛川」站下車，由北口出站後步行約7-10分鐘即可看見宏偉的木造天守。"
-    }
+    },
+    "alias": "雲霧城、松尾城",
+    "castleCardLocations": [
+      {
+        "label": "掛川城御殿賣店",
+        "googleLabel": "掛川城",
+        "latitude": 34.775,
+        "longitude": 138.015278
+      }
+    ]
   },
   "43": {
     "subtitle": "犬山城",
@@ -1225,7 +1511,8 @@
         "label": "犬山城天守閣售票處（進門處櫃檯）",
         "googleLabel": "国宝犬山城",
         "latitude": 35.391111,
-        "longitude": 136.940278
+        "longitude": 136.940278,
+        "businessHours": "時間：9:00～18:00"
       }
     ],
     "driving": {
@@ -1241,7 +1528,17 @@
     "publicTransit": {
       "googleDestination": "犬山遊園駅",
       "description": "搭乘名鐵（名古屋鐵道）犬山線至「犬山遊園」站下車，沿著木曾川畔優美的步道步行約15分鐘即可抵達登山口。"
-    }
+    },
+    "alias": "白帝城",
+    "castleCardLocations": [
+      {
+        "label": "犬山城郭內白帝觀光",
+        "googleLabel": "犬山城",
+        "latitude": 35.391111,
+        "longitude": 136.940278,
+        "businessHours": "時間：9:00～18:00"
+      }
+    ]
   },
   "44": {
     "subtitle": "名古屋城",
@@ -1273,7 +1570,22 @@
     "publicTransit": {
       "googleDestination": "名古屋城駅",
       "description": "搭乘名古屋市營地下鐵名城線至「名古屋城」站（原市役所站）下車，由7號出口步行約5分鐘即可由「東門」入城。"
-    }
+    },
+    "alias": "金鯱城、金城、柳城",
+    "castleCardLocations": [
+      {
+        "label": "正門旁賣店",
+        "googleLabel": "名古屋城",
+        "latitude": 35.184444,
+        "longitude": 136.899444
+      },
+      {
+        "label": "內苑賣店",
+        "googleLabel": "名古屋城",
+        "latitude": 35.184444,
+        "longitude": 136.899444
+      }
+    ]
   },
   "45": {
     "subtitle": "岡崎城",
@@ -1283,7 +1595,8 @@
         "label": "岡崎城天守閣內部一樓售票服務台",
         "googleLabel": "岡崎城",
         "latitude": 34.956667,
-        "longitude": 137.159444
+        "longitude": 137.159444,
+        "businessHours": "開館時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -1299,7 +1612,17 @@
     "publicTransit": {
       "googleDestination": "東岡崎駅",
       "description": "搭乘名鐵名古屋本線至「東岡崎」站下車，由北口步行約15分鐘即可抵達岡崎公園；或搭乘愛知環狀鐵道至「中岡崎」站步行約10分鐘。"
-    }
+    },
+    "alias": "龍城",
+    "castleCardLocations": [
+      {
+        "label": "岡崎城天守",
+        "googleLabel": "岡崎城",
+        "latitude": 34.956667,
+        "longitude": 137.159444,
+        "businessHours": "開館時間：9:00～17:00"
+      }
+    ]
   },
   "46": {
     "subtitle": "長篠城",
@@ -1309,7 +1632,8 @@
         "label": "長篠城跡保存館入口櫃檯",
         "googleLabel": "長篠城跡保存館",
         "latitude": 34.923056,
-        "longitude": 137.560556
+        "longitude": 137.560556,
+        "businessHours": "時間外及休館日亦可蓋章"
       }
     ],
     "driving": {
@@ -1325,7 +1649,8 @@
     "publicTransit": {
       "googleDestination": "長篠城駅",
       "description": "搭乘JR飯田線至「長篠城」站下車，出站後步行僅需約8分鐘即可直接抵達長篠城本丸遺址。"
-    }
+    },
+    "alias": "末廣城"
   },
   "47": {
     "subtitle": "伊賀上野城",
@@ -1335,7 +1660,8 @@
         "label": "伊賀上野城天守閣一樓入口售票處柜檯",
         "googleLabel": "伊賀上野城",
         "latitude": 34.771944,
-        "longitude": 136.126944
+        "longitude": 136.126944,
+        "businessHours": "開館時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -1351,7 +1677,8 @@
     "publicTransit": {
       "googleDestination": "上野市駅",
       "description": "搭乘伊賀鐵道伊賀線至「上野市」站下車，出站後步行 crumbs 穿過上野公園，約5-10分鐘即可抵達天守閣與絕美巨石垣。"
-    }
+    },
+    "alias": "白鳳城"
   },
   "48": {
     "subtitle": "松阪城",
@@ -1361,7 +1688,8 @@
         "label": "松阪市立歷史民俗資料館（城內）",
         "googleLabel": "松阪市立歴史民俗資料館",
         "latitude": 34.576111,
-        "longitude": 136.527222
+        "longitude": 136.527222,
+        "businessHours": "休館日及閉館後改至豪商之町松阪觀光交流中心或松阪站觀光資訊中心"
       }
     ],
     "driving": {
@@ -1377,7 +1705,28 @@
     "publicTransit": {
       "googleDestination": "松阪駅",
       "description": "搭乘JR紀勢本線或近鐵山田線至「松阪」站下車，由JR側出口（西口）步行約15分鐘即可抵達城址石垣區。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "松阪市立歴史民俗資料館",
+        "googleLabel": "松阪市立歴史民俗資料館",
+        "latitude": 34.576111,
+        "longitude": 136.527222,
+        "businessHours": "休館日及閉館後改至豪商之町松阪觀光交流中心或松阪站觀光資訊中心"
+      },
+      {
+        "label": "松阪站觀光資訊中心",
+        "googleLabel": "松阪駅",
+        "latitude": 34.576111,
+        "longitude": 136.527222
+      },
+      {
+        "label": "豪商のまち松阪観光交流センター",
+        "googleLabel": "豪商のまち松阪観光交流センター",
+        "latitude": 34.576111,
+        "longitude": 136.527222
+      }
+    ]
   },
   "49": {
     "subtitle": "小谷城",
@@ -1387,7 +1736,8 @@
         "label": "小谷城戰國歷史資料館（山腳下）",
         "googleLabel": "小谷城戦国歴史資料館",
         "latitude": 35.451389,
-        "longitude": 136.277778
+        "longitude": 136.277778,
+        "businessHours": "開館時間：9:00～17:00 週二休館"
       }
     ],
     "driving": {
@@ -1413,13 +1763,15 @@
         "label": "彥根城天守閣表門售票處櫃檯",
         "googleLabel": "彦根城 表門券売所",
         "latitude": 35.275833,
-        "longitude": 136.251667
+        "longitude": 136.251667,
+        "businessHours": "營業時間：8:30～17:00"
       },
       {
         "label": "彥根城大手門售票處櫃檯",
         "googleLabel": "彦根城 大手門券売所",
         "latitude": 35.275,
-        "longitude": 136.249
+        "longitude": 136.249,
+        "businessHours": "營業時間：8:30～17:00"
       }
     ],
     "driving": {
@@ -1435,7 +1787,17 @@
     "publicTransit": {
       "googleDestination": "彦根駅",
       "description": "搭乘JR琵琶湖線至「彥根」站下車，由西口出站後沿著站前大路直走步行約10-15分鐘即可跨越外護城河抵達表門。"
-    }
+    },
+    "alias": "金龜城",
+    "castleCardLocations": [
+      {
+        "label": "開國紀念館",
+        "googleLabel": "彦根城",
+        "latitude": 35.275833,
+        "longitude": 136.251667,
+        "businessHours": "營業時間：8:30～17:00"
+      }
+    ]
   },
   "51": {
     "subtitle": "安土城",
@@ -1509,7 +1871,8 @@
         "label": "二條城東大手門售票處旁服務處櫃檯",
         "googleLabel": "元離宮二条城 東大手門",
         "latitude": 35.013889,
-        "longitude": 135.749167
+        "longitude": 135.749167,
+        "businessHours": "營業時間：8:45～17:00"
       }
     ],
     "driving": {
@@ -1525,7 +1888,8 @@
     "publicTransit": {
       "googleDestination": "二条城前駅",
       "description": "搭乘京都市營地下鐵東西線至「二條城前」站下車，由2號出口出站後步行僅需2分鐘即可抵達宏偉的二條城東大手門。"
-    }
+    },
+    "alias": "二条御所"
   },
   "54": {
     "subtitle": "大阪城",
@@ -1551,7 +1915,16 @@
     "publicTransit": {
       "googleDestination": "谷町四丁目駅",
       "description": "搭乘大阪市營地下鐵中央線或谷町線至「谷町四丁目」站下車，由1-B或9號出口步行約10分鐘即可由「大手門」入城；亦可搭乘JR環狀線至「大阪城公園」站步行入城。"
-    }
+    },
+    "alias": "錦城、金城",
+    "castleCardLocations": [
+      {
+        "label": "天守閣1樓博物館商店",
+        "googleLabel": "大阪城",
+        "latitude": 34.687222,
+        "longitude": 135.525833
+      }
+    ]
   },
   "55": {
     "subtitle": "千早城",
@@ -1561,7 +1934,8 @@
         "label": "金剛山麓「まつまさ」土產店服務台（登山口附近）",
         "googleLabel": "千早城跡 まつまさ",
         "latitude": 34.421667,
-        "longitude": 135.6525
+        "longitude": 135.6525,
+        "businessHours": "營業時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -1609,7 +1983,16 @@
     "publicTransit": {
       "googleDestination": "竹田駅(兵庫県)",
       "description": "搭乘JR播但線至「竹田」站下車。在特定季節可由車站轉乘「天空巴士（天空バス）」直達竹田城中腹，再步行登山約20分鐘；亦可由車站後方沿著「站後登山道」步行登山約40分鐘。"
-    }
+    },
+    "alias": "天空之城、虎臥城",
+    "castleCardLocations": [
+      {
+        "label": "情報館　天空之城",
+        "googleLabel": "竹田城",
+        "latitude": 35.301389,
+        "longitude": 134.831111
+      }
+    ]
   },
   "57": {
     "subtitle": "篠山城",
@@ -1619,7 +2002,8 @@
         "label": "篠山城大書院內部服務台入口",
         "googleLabel": "篠山城大書院",
         "latitude": 35.072222,
-        "longitude": 135.219444
+        "longitude": 135.219444,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一"
       }
     ],
     "driving": {
@@ -1635,7 +2019,17 @@
     "publicTransit": {
       "googleDestination": "二階町(兵庫県) 巴士站",
       "description": "搭乘JR福知山線至「篠山口」站下車，轉乘神姬綠色巴士（往篠山營業所方向）約15分鐘，在「二階町」站下車，步行約5分鐘即可抵達城郭大書院。"
-    }
+    },
+    "alias": "桐城",
+    "castleCardLocations": [
+      {
+        "label": "篠山城大書院博物館商店",
+        "googleLabel": "篠山城大書院",
+        "latitude": 35.072222,
+        "longitude": 135.219444,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一"
+      }
+    ]
   },
   "58": {
     "subtitle": "明石城",
@@ -1661,7 +2055,16 @@
     "publicTransit": {
       "googleDestination": "明石駅",
       "description": "搭乘JR山陽本線（新快速列車）至「明石」站，或搭乘山陽電鐵至「山陽明石」站下車，由北口出站後步行僅需約3-5分鐘即可直接進入明石公園內。"
-    }
+    },
+    "alias": "喜春城",
+    "castleCardLocations": [
+      {
+        "label": "明石公園服務中心",
+        "googleLabel": "明石公園",
+        "latitude": 34.651944,
+        "longitude": 135.000833
+      }
+    ]
   },
   "59": {
     "subtitle": "姬路城",
@@ -1671,7 +2074,8 @@
         "label": "姬路城管理事務所（進表門後的售票處附近服務台）",
         "googleLabel": "姫路城 管理事務所",
         "latitude": 34.838333,
-        "longitude": 134.693889
+        "longitude": 134.693889,
+        "businessHours": "開城時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -1687,7 +2091,24 @@
     "publicTransit": {
       "googleDestination": "姫路駅",
       "description": "搭乘JR山陽新幹線或山陽本線至「姬路」站下車。從北口（大手前口）出站後，沿著筆直的大手前通步行約15-20分鐘即可直達城堡大門；亦可搭乘神姬巴士至「姬路城大手門前」下車。"
-    }
+    },
+    "alias": "白鷺城",
+    "castleCardLocations": [
+      {
+        "label": "姫路城賣店（出改札旁）",
+        "googleLabel": "姫路城",
+        "latitude": 34.838333,
+        "longitude": 134.693889,
+        "businessHours": "開城時間：9:00～17:00"
+      },
+      {
+        "label": "西之丸化妝櫓前賣店",
+        "googleLabel": "姫路城",
+        "latitude": 34.838333,
+        "longitude": 134.693889,
+        "businessHours": "開城時間：9:00～17:00"
+      }
+    ]
   },
   "60": {
     "subtitle": "赤穗城",
@@ -1719,7 +2140,8 @@
     "publicTransit": {
       "googleDestination": "播州赤穂駅",
       "description": "搭乘JR赤穗線至「播州赤穗」站下車，由南口出站後沿著標示筆直步行約10-15分鐘即可抵達赤穗城大手門遺跡。"
-    }
+    },
+    "alias": "加里屋城"
   },
   "61": {
     "subtitle": "高取城",
@@ -1729,7 +2151,8 @@
         "label": "高取町觀光案內所「夢創館」（山腳下老街）",
         "googleLabel": "高取町観光案内所 夢創館",
         "latitude": 34.444444,
-        "longitude": 135.801667
+        "longitude": 135.801667,
+        "businessHours": "營業時間：9:30～16:30"
       }
     ],
     "driving": {
@@ -1745,7 +2168,17 @@
     "publicTransit": {
       "googleDestination": "壺阪山駅",
       "description": "搭乘近鐵吉野線至「壺阪山」站下車。建議在特定登山日轉乘巴士至「壺阪寺」，隨後步行登山約40-50分鐘抵達本丸；若由車站直接步行登山穿過老街，約需步行2小時左右。"
-    }
+    },
+    "alias": "芙蓉城",
+    "castleCardLocations": [
+      {
+        "label": "高取町観光案内所 夢創館",
+        "googleLabel": "高取町観光案内所 夢創館",
+        "latitude": 34.444444,
+        "longitude": 135.801667,
+        "businessHours": "營業時間：9:30～16:30"
+      }
+    ]
   },
   "62": {
     "subtitle": "和歌山城",
@@ -1755,7 +2188,8 @@
         "label": "和歌山城天守閣資料館入口售票處櫃檯",
         "googleLabel": "和歌山城 天守閣",
         "latitude": 34.227778,
-        "longitude": 135.174444
+        "longitude": 135.174444,
+        "businessHours": "開門時間：9：00〜17：30"
       }
     ],
     "driving": {
@@ -1771,7 +2205,17 @@
     "publicTransit": {
       "googleDestination": "和歌山城前 巴士站",
       "description": "從JR「和歌山」站或南海電鐵「和歌山市」站，搭乘和歌山巴士（往和歌山城方向）至「和歌山城前」站下車，步行僅需約3分鐘即可進入城址公園。"
-    }
+    },
+    "alias": "虎伏城",
+    "castleCardLocations": [
+      {
+        "label": "御天守茶屋",
+        "googleLabel": "和歌山城",
+        "latitude": 34.227778,
+        "longitude": 135.174444,
+        "businessHours": "開門時間：9：00〜17：30"
+      }
+    ]
   },
   "63": {
     "subtitle": "鳥取城",
@@ -1781,7 +2225,8 @@
         "label": "鳥取市文化財課企劃辦公室（位於「仁風閣」旁觀光諮詢處）",
         "googleLabel": "鳥取城跡 仁風閣",
         "latitude": 35.504167,
-        "longitude": 134.238889
+        "longitude": 134.238889,
+        "businessHours": "休館時改至鳥取市役所本廳1樓綜合窗口或管理室"
       }
     ],
     "driving": {
@@ -1797,7 +2242,29 @@
     "publicTransit": {
       "googleDestination": "西町(鳥取県) 巴士站",
       "description": "從JR山陰本線「鳥取」站搭乘市內觀光循環巴士「Kururi」綠線，在「西町」站下車，步行約5-7分鐘即可抵達久松公園入口。"
-    }
+    },
+    "alias": "久松城",
+    "castleCardLocations": [
+      {
+        "label": "鳥取城跡・仁風閣展示館",
+        "googleLabel": "鳥取城跡 仁風閣",
+        "latitude": 35.504167,
+        "longitude": 134.238889,
+        "businessHours": "休館時改至鳥取市役所本廳1樓綜合窗口或管理室"
+      },
+      {
+        "label": "鳥取市歷史博物館（やまびこ館）",
+        "googleLabel": "鳥取市歴史博物館",
+        "latitude": 35.504167,
+        "longitude": 134.238889
+      },
+      {
+        "label": "鳥取市故鄉物產館（まちパル）",
+        "googleLabel": "鳥取市ふるさと物産館",
+        "latitude": 35.504167,
+        "longitude": 134.238889
+      }
+    ]
   },
   "64": {
     "subtitle": "松江城",
@@ -1823,7 +2290,16 @@
     "publicTransit": {
       "googleDestination": "松江城(大手前) バス停",
       "description": "從JR山陰本線「松江」站搭乘市內觀光巴士「Lakesline」（レイクライン）約10分鐘，在「松江城（大手前）」站下車即達。"
-    }
+    },
+    "alias": "千鳥城",
+    "castleCardLocations": [
+      {
+        "label": "ぶらっと松江觀光案內所",
+        "googleLabel": "松江城",
+        "latitude": 35.474722,
+        "longitude": 133.050833
+      }
+    ]
   },
   "65": {
     "subtitle": "月山富田城",
@@ -1833,7 +2309,8 @@
         "label": "安來市立歷史資料館服務台（位於山腳下）",
         "googleLabel": "安来市立歴史資料館",
         "latitude": 35.367222,
-        "longitude": 133.186389
+        "longitude": 133.186389,
+        "businessHours": "※休館日には玄関前で可蓋章"
       }
     ],
     "driving": {
@@ -1849,7 +2326,17 @@
     "publicTransit": {
       "googleDestination": "市立歴史資料館 バス停",
       "description": "從JR山陰本線「安來」站搭乘廣瀨線市營巴士（往廣瀨方向）約20分鐘，在「市立歷史資料館」站下車，隨後需徒步攀登相當考驗體力的險峭山路約40-50分鐘始可抵達山頂本丸遺蹟。"
-    }
+    },
+    "alias": "郡山城",
+    "castleCardLocations": [
+      {
+        "label": "安来市立歴史資料館",
+        "googleLabel": "安来市立歴史資料館",
+        "latitude": 35.367222,
+        "longitude": 133.186389,
+        "businessHours": "※休館日には玄関前で可蓋章"
+      }
+    ]
   },
   "66": {
     "subtitle": "津和野城",
@@ -1859,7 +2346,8 @@
         "label": "津和野城跡觀光吊椅山腳售票處（「リフト乗り場」）",
         "googleLabel": "津和野城跡観光リフト",
         "latitude": 34.466111,
-        "longitude": 131.767222
+        "longitude": 131.767222,
+        "businessHours": "9:00～17:00 ※リフト運休日でも9:00から17:00の時間でスタンプの押印は可能"
       },
       {
         "label": "津和野町觀光協會服務台（津和野車站前）",
@@ -1881,7 +2369,17 @@
     "publicTransit": {
       "googleDestination": "津和野駅",
       "description": "搭乘JR山口線至「津和野」站下車，出站後步行老街約30分鐘或轉乘計程車抵達「觀光吊椅（観光リフト）」搭乘處，搭乘吊椅上山5分鐘後，再輕鬆步行約15分鐘即可抵達壯觀的本丸石垣。"
-    }
+    },
+    "alias": "三本松城",
+    "castleCardLocations": [
+      {
+        "label": "津和野城跡観光リフト",
+        "googleLabel": "津和野城跡観光リフト",
+        "latitude": 34.466111,
+        "longitude": 131.767222,
+        "businessHours": "9:00～17:00 ※リフト運休日でも9:00から17:00の時間でスタンプの押印は可能"
+      }
+    ]
   },
   "67": {
     "subtitle": "津山城",
@@ -1907,7 +2405,16 @@
     "publicTransit": {
       "googleDestination": "津山駅",
       "description": "搭乘JR津山線或姬新線至「津山」站下車，出站後穿過吉井川大橋，步行約10-15分鐘即可直達鶴山公園入口。"
-    }
+    },
+    "alias": "鶴山城",
+    "castleCardLocations": [
+      {
+        "label": "備中櫓",
+        "googleLabel": "津山城",
+        "latitude": 35.060556,
+        "longitude": 134.003611
+      }
+    ]
   },
   "68": {
     "subtitle": "備中松山城",
@@ -1933,7 +2440,28 @@
     "publicTransit": {
       "googleDestination": "備中高梁駅",
       "description": "搭乘JR伯備線至「備中高梁」站下車。建議在車站轉乘預約制觀光計程車（合乘）直達中腹的「鞴峠（ふいご峠）」，隨後需踏著鋪設平整的石階山路步行攀登約20分鐘即可抵達國寶天守閣。"
-    }
+    },
+    "alias": "高梁城",
+    "castleCardLocations": [
+      {
+        "label": "備中松山城售票處",
+        "googleLabel": "備中松山城",
+        "latitude": 34.808889,
+        "longitude": 133.622222
+      },
+      {
+        "label": "ふいご峠賣店（8合目）",
+        "googleLabel": "備中松山城",
+        "latitude": 34.808889,
+        "longitude": 133.622222
+      },
+      {
+        "label": "備中松山城登城整理巴士乘車處",
+        "googleLabel": "備中松山城",
+        "latitude": 34.808889,
+        "longitude": 133.622222
+      }
+    ]
   },
   "69": {
     "subtitle": "鬼之城",
@@ -1943,7 +2471,8 @@
         "label": "鬼之城跡導覽綜合設施服務台櫃檯",
         "googleLabel": "鬼ノ城ビジターセンター",
         "latitude": 34.729722,
-        "longitude": 133.757778
+        "longitude": 133.757778,
+        "businessHours": "休館時改至總社市埋藏文化財學習館"
       }
     ],
     "driving": {
@@ -1985,7 +2514,16 @@
     "publicTransit": {
       "googleDestination": "城下(岡山県) 電車站",
       "description": "從JR「岡山」站搭乘岡電路面電車（東山線）約5分鐘，在「城下」站下車，出站後步行穿過地下道、沿著指標步行約10-15分鐘即可跨越旭川護城河抵達城堡。"
-    }
+    },
+    "alias": "烏城、金烏城",
+    "castleCardLocations": [
+      {
+        "label": "金烏城商店（天守閣內）",
+        "googleLabel": "岡山城",
+        "latitude": 34.665556,
+        "longitude": 133.936389
+      }
+    ]
   },
   "71": {
     "subtitle": "福山城",
@@ -1995,7 +2533,8 @@
         "label": "福山城天守閣博物館內部一樓櫃檯",
         "googleLabel": "福山城博物館",
         "latitude": 34.491389,
-        "longitude": 133.361111
+        "longitude": 133.361111,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一"
       }
     ],
     "driving": {
@@ -2011,7 +2550,17 @@
     "publicTransit": {
       "googleDestination": "福山駅",
       "description": "福山城是全日本「離新幹線最近的城堡」！搭乘JR山陽新幹線或山陽本線至「福山」站下車，由「城口（北口）」出站後，步行僅需1分鐘即可抵達城堡三之丸結構。"
-    }
+    },
+    "alias": "久松城",
+    "castleCardLocations": [
+      {
+        "label": "福山城博物館內博物館商店",
+        "googleLabel": "福山城博物館",
+        "latitude": 34.491389,
+        "longitude": 133.361111,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一"
+      }
+    ]
   },
   "72": {
     "subtitle": "郡山城",
@@ -2021,7 +2570,8 @@
         "label": "安藝高田市歷史民俗博物館服務台（山腳下）",
         "googleLabel": "安芸高田市歴史民俗博物館",
         "latitude": 34.665556,
-        "longitude": 132.709444
+        "longitude": 132.709444,
+        "businessHours": "營業時間：9時〜17時 休館日：毎週週二"
       }
     ],
     "driving": {
@@ -2037,7 +2587,16 @@
     "publicTransit": {
       "googleDestination": "安芸高田市歴史民俗博物館 巴士站",
       "description": "從JR藝備線「向原」站轉乘備北交通巴士（往吉田方向）約20分鐘，在「安藝高田市歷史民俗博物館」站下車。隨後需徒步攀登相當考驗體力的深山步道約45-60分鐘始可抵達山頂本丸遺址。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "安芸高田市歴史民俗博物館",
+        "googleLabel": "安芸高田市歴史民俗博物館",
+        "latitude": 34.665556,
+        "longitude": 132.709444,
+        "businessHours": "營業時間：9時〜17時 休館日：毎週週二"
+      }
+    ]
   },
   "73": {
     "subtitle": "廣島城",
@@ -2063,7 +2622,8 @@
     "publicTransit": {
       "googleDestination": "県庁前(広島県) 駅",
       "description": "搭乘廣島電鐵路面電車至「紙屋町東」或「紙屋町西」站下車，步行約15分鐘；或搭乘廣島新交通（Astram Line）至「縣廳前」站下車，步行約10分鐘即可由「表御門」越過護城河入城。"
-    }
+    },
+    "alias": "鯉城"
   },
   "74": {
     "subtitle": "岩國城",
@@ -2073,13 +2633,15 @@
         "label": "岩國城天守閣內部一樓櫃檯",
         "googleLabel": "岩国城",
         "latitude": 34.174444,
-        "longitude": 132.174722
+        "longitude": 132.174722,
+        "businessHours": "開館時間：9:00～16:45"
       },
       {
         "label": "岩國城登山纜車山頂站",
         "googleLabel": "岩国城ロープウェー 山頂駅",
         "latitude": 34.1725,
-        "longitude": 132.174444
+        "longitude": 132.174444,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -2095,7 +2657,24 @@
     "publicTransit": {
       "googleDestination": "錦帯橋 巴士站",
       "description": "從JR「岩國」站或山陽新幹線「新岩國」站，搭乘岩國巴士至「錦帶橋」站下車。穿過錦帶橋後，自吉香公園搭乘纜車約5分鐘抵達山頂，再步行約5分鐘即可抵達天守閣。"
-    }
+    },
+    "alias": "橫山城",
+    "castleCardLocations": [
+      {
+        "label": "岩國城入口受理櫃檯",
+        "googleLabel": "岩国城",
+        "latitude": 34.174444,
+        "longitude": 132.174722,
+        "businessHours": "開館時間：9:00～16:45"
+      },
+      {
+        "label": "纜車山麓站受理（惡天時）",
+        "googleLabel": "岩国城ロープウェー",
+        "latitude": 34.174444,
+        "longitude": 132.174722,
+        "businessHours": "開館時間：9:00～16:45"
+      }
+    ]
   },
   "75": {
     "subtitle": "萩城",
@@ -2121,7 +2700,8 @@
     "publicTransit": {
       "googleDestination": "東萩駅",
       "description": "搭乘JR山陰本線至「東萩」站下車，建議在車站前租借自行車自駕前往（車程約12-15分鐘）；或搭乘萩市內循環巴士「萩Ma-ru巴士」至「萩城跡・指月公園」站下車即達。"
-    }
+    },
+    "alias": "指月城"
   },
   "76": {
     "subtitle": "德島城",
@@ -2131,7 +2711,8 @@
         "label": "德島市立德島城博物館入口售票櫃檯（城內）",
         "googleLabel": "徳島市立徳島城博物館",
         "latitude": 34.074444,
-        "longitude": 134.556667
+        "longitude": 134.556667,
+        "businessHours": "開館時間：9:30～17:00 週一休館"
       }
     ],
     "driving": {
@@ -2147,7 +2728,17 @@
     "publicTransit": {
       "googleDestination": "徳島駅",
       "description": "德島城交通極其便利！搭乘JR「德島」站下車，由北口出站後步行僅需約3-5分鐘即可越過護城河直接進入德島中央公園。"
-    }
+    },
+    "alias": "渭山城",
+    "castleCardLocations": [
+      {
+        "label": "德島城博物館內博物館商店",
+        "googleLabel": "徳島市立徳島城博物館",
+        "latitude": 34.074444,
+        "longitude": 134.556667,
+        "businessHours": "開館時間：9:30～17:00 週一休館"
+      }
+    ]
   },
   "77": {
     "subtitle": "高松城",
@@ -2179,7 +2770,22 @@
     "publicTransit": {
       "googleDestination": "高松築港駅",
       "description": "搭乘高松琴平電氣鐵道（琴電）至「高松築港」站下車，出站後步行僅需1分鐘即可抵達西門；若搭乘JR至「高松」站下車，步行約3-5分鐘即達。"
-    }
+    },
+    "alias": "玉藻城",
+    "castleCardLocations": [
+      {
+        "label": "玉藻公園管理事務所・東料金所",
+        "googleLabel": "玉藻公園",
+        "latitude": 34.349722,
+        "longitude": 134.050556
+      },
+      {
+        "label": "玉藻公園西料金所",
+        "googleLabel": "玉藻公園",
+        "latitude": 34.349722,
+        "longitude": 134.050556
+      }
+    ]
   },
   "78": {
     "subtitle": "丸龜城",
@@ -2189,7 +2795,8 @@
         "label": "丸龜城天守閣內部入口售票處櫃檯",
         "googleLabel": "丸亀城",
         "latitude": 34.285556,
-        "longitude": 133.800556
+        "longitude": 133.800556,
+        "businessHours": "開館時間：9:00～16:30"
       },
       {
         "label": "丸龜城內觀光案內所（山腳大手門旁）",
@@ -2211,7 +2818,17 @@
     "publicTransit": {
       "googleDestination": "丸亀駅",
       "description": "搭乘JR予讚線至「丸龜」站下車，由南口出站後沿著站前大路筆直步行約10-15分鐘即可抵達城址公園。"
-    }
+    },
+    "alias": "蓬萊城",
+    "castleCardLocations": [
+      {
+        "label": "丸龜城天守",
+        "googleLabel": "丸亀城",
+        "latitude": 34.285556,
+        "longitude": 133.800556,
+        "businessHours": "開館時間：9:00～16:30"
+      }
+    ]
   },
   "79": {
     "subtitle": "今治城",
@@ -2237,7 +2854,16 @@
     "publicTransit": {
       "googleDestination": "今治城前 巴士站",
       "description": "從JR予讚線「今治」站搭乘瀨戶內巴士（往今治營業所方向）約7-10分鐘，在「今治城前」站下車即達。"
-    }
+    },
+    "alias": "吹揚城",
+    "castleCardLocations": [
+      {
+        "label": "今治城天守賣店",
+        "googleLabel": "今治城",
+        "latitude": 34.063889,
+        "longitude": 133.0075
+      }
+    ]
   },
   "80": {
     "subtitle": "湯築城",
@@ -2247,7 +2873,8 @@
         "label": "道後公園湯築城資料館服務台櫃檯",
         "googleLabel": "湯築城資料館",
         "latitude": 33.848056,
-        "longitude": 132.786389
+        "longitude": 132.786389,
+        "businessHours": "※休館日は資料館玄関外で可蓋章"
       }
     ],
     "driving": {
@@ -2263,7 +2890,16 @@
     "publicTransit": {
       "googleDestination": "道後公園 電車站",
       "description": "搭乘伊予鐵道路面電車至「道後公園」站下車，出站步行僅需10秒鐘，越過外護城河便直接進入道後公園（湯築城遺址區）。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "湯築城資料館賣店",
+        "googleLabel": "湯築城資料館",
+        "latitude": 33.848056,
+        "longitude": 132.786389,
+        "businessHours": "※休館日は資料館玄関外で可蓋章"
+      }
+    ]
   },
   "81": {
     "subtitle": "伊豫松山城",
@@ -2295,7 +2931,21 @@
     "publicTransit": {
       "googleDestination": "大街道 電車站",
       "description": "從JR「松山」站搭乘路面電車至「大街道」站，步行約5分鐘即可抵達纜車東雲口站。搭乘觀光吊椅或纜車上山約5分鐘，再步行約10分鐘即可抵達本丸。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "松山城觀光案內所",
+        "googleLabel": "松山城",
+        "latitude": 33.845278,
+        "longitude": 132.765556
+      },
+      {
+        "label": "松山城售票處",
+        "googleLabel": "松山城",
+        "latitude": 33.845278,
+        "longitude": 132.765556
+      }
+    ]
   },
   "82": {
     "subtitle": "大洲城",
@@ -2321,7 +2971,16 @@
     "publicTransit": {
       "googleDestination": "伊予大洲駅",
       "description": "搭乘JR予讚線至「伊予大洲」站下車，出站後步行約20-25分鐘即可抵達大洲城登山口；亦可於車站前轉乘計程車約5分鐘直達。"
-    }
+    },
+    "alias": "地藏崎城",
+    "castleCardLocations": [
+      {
+        "label": "大洲城受理旁商品角落",
+        "googleLabel": "大洲城",
+        "latitude": 33.509444,
+        "longitude": 132.541389
+      }
+    ]
   },
   "83": {
     "subtitle": "宇和島城",
@@ -2347,7 +3006,16 @@
     "publicTransit": {
       "googleDestination": "宇和島駅",
       "description": "搭乘JR予讚線至「宇和島」站下車，出站後沿著站前大路步行約10-15分鐘即可抵達北登山口，隨後需踏著石階步道健行攀登約15-20分鐘始可抵達山頂天守。"
-    }
+    },
+    "alias": "鶴島城、丸串城",
+    "castleCardLocations": [
+      {
+        "label": "宇和島城天守受理",
+        "googleLabel": "宇和島城",
+        "latitude": 33.223333,
+        "longitude": 132.564444
+      }
+    ]
   },
   "84": {
     "subtitle": "高知城",
@@ -2357,7 +3025,8 @@
         "label": "高知城天守閣資料館入口售票櫃檯",
         "googleLabel": "高知城",
         "latitude": 33.560833,
-        "longitude": 133.531389
+        "longitude": 133.531389,
+        "businessHours": "開館時間9:00～17:00"
       }
     ],
     "driving": {
@@ -2373,7 +3042,17 @@
     "publicTransit": {
       "googleDestination": "高知城前 電車站",
       "description": "從JR「高知」站搭乘路面電車（土佐電交通）至「高知城前」站下車，步行僅需約3-5分鐘即可越過外護城河直接由追手門入城。"
-    }
+    },
+    "alias": "鷹城",
+    "castleCardLocations": [
+      {
+        "label": "懷德館櫃檯",
+        "googleLabel": "高知城",
+        "latitude": 33.560833,
+        "longitude": 133.531389,
+        "businessHours": "開館時間9:00～17:00"
+      }
+    ]
   },
   "85": {
     "subtitle": "福岡城",
@@ -2399,7 +3078,8 @@
     "publicTransit": {
       "googleDestination": "赤坂駅 (福岡県)",
       "description": "搭乘福岡市地下鐵機場線至「赤坂」站或「大濠公園」站下車，出站後步行約8-10分鐘即可進入舞鶴公園（福岡城遺址區域）。"
-    }
+    },
+    "alias": "舞鶴城、石城"
   },
   "86": {
     "subtitle": "大野城",
@@ -2425,7 +3105,16 @@
     "publicTransit": {
       "googleDestination": "都府楼前駅",
       "description": "建議自由行由西鐵天神大牟田線「都府樓前」站轉乘社區巴士（まほろば号）至「岩屋城跡」或「四王寺山」健行上山。"
-    }
+    },
+    "alias": "四王司城",
+    "castleCardLocations": [
+      {
+        "label": "大野城（各自治體圖案不同，請洽詢現場）",
+        "googleLabel": "大野城",
+        "latitude": 33.522222,
+        "longitude": 130.521389
+      }
+    ]
   },
   "87": {
     "subtitle": "名護屋城",
@@ -2435,7 +3124,8 @@
         "label": "佐賀縣立名護屋城博物館服務台",
         "googleLabel": "佐賀県立名護屋城博物館",
         "latitude": 33.529444,
-        "longitude": 129.867778
+        "longitude": 129.867778,
+        "businessHours": "開館時間：9:00～17:00 週二休館"
       }
     ],
     "driving": {
@@ -2451,7 +3141,16 @@
     "publicTransit": {
       "googleDestination": "名護屋城博物館入口 巴士站",
       "description": "從JR「唐津」站旁的「大手口巴士中心」搭乘昭和巴士（往呼子線），車程約40分鐘，在「名護屋城博物館入口」站下車步行即達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "佐賀県立名護屋城博物館",
+        "googleLabel": "佐賀県立名護屋城博物館",
+        "latitude": 33.529444,
+        "longitude": 129.867778,
+        "businessHours": "開館時間：9:00～17:00 週二休館"
+      }
+    ]
   },
   "88": {
     "subtitle": "吉野ヶ里",
@@ -2477,7 +3176,15 @@
     "publicTransit": {
       "googleDestination": "吉野ヶ里公園駅",
       "description": "搭乘JR長崎本線至「吉野里公園」站下車，由北口出站後，沿著指標筆直步行約15分鐘即可抵達歷史公園的東口主要入口。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "吉野ヶ里歷史公園東口賣店",
+        "googleLabel": "吉野ヶ里歴史公園",
+        "latitude": 33.323611,
+        "longitude": 130.383889
+      }
+    ]
   },
   "89": {
     "subtitle": "佐賀城",
@@ -2487,7 +3194,8 @@
         "label": "佐賀城本丸歷史館內部入口櫃檯",
         "googleLabel": "佐賀城本丸歴史館",
         "latitude": 33.249444,
-        "longitude": 130.301667
+        "longitude": 130.301667,
+        "businessHours": "開館時間：9:30～18:00"
       }
     ],
     "driving": {
@@ -2503,7 +3211,17 @@
     "publicTransit": {
       "googleDestination": "佐賀城跡 巴士站",
       "description": "從JR「佐賀」站旁的巴士中心，搭乘市營巴士（往佐賀城跡方向）約10分鐘，在「佐賀城跡」站下車即達。"
-    }
+    },
+    "alias": "榮城",
+    "castleCardLocations": [
+      {
+        "label": "佐賀城本丸歴史館",
+        "googleLabel": "佐賀城本丸歴史館",
+        "latitude": 33.249444,
+        "longitude": 130.301667,
+        "businessHours": "開館時間：9:30～18:00"
+      }
+    ]
   },
   "90": {
     "subtitle": "平戶城",
@@ -2529,7 +3247,8 @@
     "publicTransit": {
       "googleDestination": "猶興館高校前 巴士站",
       "description": "從西肥鐵道「佐世保」站搭乘往平戶棧橋方向的急行巴士，在「猶興館高校前」站下車，步行約10-12分鐘即可登頂。"
-    }
+    },
+    "alias": "龜岡城"
   },
   "91": {
     "subtitle": "島原城",
@@ -2539,7 +3258,8 @@
         "label": "島原城天守閣一樓入口改札櫃檯",
         "googleLabel": "島原城",
         "latitude": 32.793611,
-        "longitude": 130.368889
+        "longitude": 130.368889,
+        "businessHours": "開館時間：9:00～17:30"
       }
     ],
     "driving": {
@@ -2555,7 +3275,17 @@
     "publicTransit": {
       "googleDestination": "島原船溜駅",
       "description": "搭乘島原鐵道至「島原」站下車，出站後步行僅需約5分鐘即可越過高耸石垣的護城河直接進入城內。"
-    }
+    },
+    "alias": "森岳城",
+    "castleCardLocations": [
+      {
+        "label": "天守閣售票處",
+        "googleLabel": "島原城",
+        "latitude": 32.793611,
+        "longitude": 130.368889,
+        "businessHours": "開館時間：9:00～17:30"
+      }
+    ]
   },
   "92": {
     "subtitle": "熊本城",
@@ -2587,7 +3317,22 @@
     "publicTransit": {
       "googleDestination": "熊本城・市役所前 電車站",
       "description": "從JR「熊本」站搭乘熊本市電（路面電車）至「熊本城・市役所前」站下車，步行約5分鐘即可穿過搦手門或沿專用通道進入城堡內圈。"
-    }
+    },
+    "alias": "銀杏城",
+    "castleCardLocations": [
+      {
+        "label": "本丸休憩處",
+        "googleLabel": "熊本城",
+        "latitude": 32.806389,
+        "longitude": 130.707778
+      },
+      {
+        "label": "二之丸休憩處",
+        "googleLabel": "熊本城",
+        "latitude": 32.806389,
+        "longitude": 130.707778
+      }
+    ]
   },
   "93": {
     "subtitle": "人吉城",
@@ -2613,7 +3358,8 @@
     "publicTransit": {
       "googleDestination": "人吉駅",
       "description": "搭乘JR肥薩線（特定區間接駁車）至「人吉」站下車，出站後步行老街跨越球磨川大橋，步行約15-20分鐘即可抵達人吉城跡石垣區。"
-    }
+    },
+    "alias": "織月城"
   },
   "94": {
     "subtitle": "大分府內城",
@@ -2623,7 +3369,8 @@
         "label": "府內城跡二之丸廊下橋辦公室櫃檯",
         "googleLabel": "大分府内城跡",
         "latitude": 33.240556,
-        "longitude": 131.609444
+        "longitude": 131.609444,
+        "businessHours": "24 小時可蓋章"
       }
     ],
     "driving": {
@@ -2639,7 +3386,8 @@
     "publicTransit": {
       "googleDestination": "大分駅",
       "description": "搭乘JR日豐本線、久大本線至「大分」站下車，由府內中央口（北口）出站後，沿著「中央通」步行約10-12分鐘即可抵達大分市役所旁的大分府內城護城河邊。"
-    }
+    },
+    "alias": "荷揚城"
   },
   "95": {
     "subtitle": "岡城",
@@ -2649,7 +3397,8 @@
         "label": "岡城跡觀光總合案內所售票處（登山口櫃檯）",
         "googleLabel": "岡城跡 料金所",
         "latitude": 32.970222,
-        "longitude": 131.409167
+        "longitude": 131.409167,
+        "businessHours": "開城時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -2665,7 +3414,8 @@
     "publicTransit": {
       "googleDestination": "豊後竹田駅",
       "description": "搭乘JR久大本線至「豐後竹田」站下車，建議轉乘計程車約5-7分鐘直達登山口售票處；若由車站直接健行登山，步行約25-30分鐘即可抵達山腳。"
-    }
+    },
+    "alias": "臥牛城"
   },
   "96": {
     "subtitle": "飫肥城",
@@ -2675,7 +3425,8 @@
         "label": "飫肥城由緒設施歷史資料館入口服務台櫃檯",
         "googleLabel": "飫肥城由緒施設",
         "latitude": 31.627778,
-        "longitude": 131.353611
+        "longitude": 131.353611,
+        "businessHours": "開館時間：9:30～16:30"
       }
     ],
     "driving": {
@@ -2701,7 +3452,8 @@
         "label": "鹿兒島縣歷史資料中心「黎明館」入口服務台櫃檯",
         "googleLabel": "鹿児島県歴史資料センター黎明館",
         "latitude": 31.597778,
-        "longitude": 130.555556
+        "longitude": 130.555556,
+        "businessHours": "※休館日は西郷銅像前広場観光案内所で可蓋章 開館時間：9:00～18:00 週一休館"
       }
     ],
     "driving": {
@@ -2717,7 +3469,17 @@
     "publicTransit": {
       "googleDestination": "市役所前(鹿児島県) 電車站",
       "description": "從JR「鹿兒島中央」站搭乘鹿兒島市電至「市役所前」站下車，出站步行約5分鐘即可看見宏偉無比、黑漆包裹的木造復原「御樓門」與古老水堀。"
-    }
+    },
+    "alias": "鶴丸城",
+    "castleCardLocations": [
+      {
+        "label": "黎明館1樓 CHIN JUKAN POTTERY 喫茶室",
+        "googleLabel": "鹿児島県歴史資料センター黎明館",
+        "latitude": 31.597778,
+        "longitude": 130.555556,
+        "businessHours": "※休館日は西郷銅像前広場観光案内所で可蓋章 開館時間：9:00～18:00 週一休館"
+      }
+    ]
   },
   "98": {
     "subtitle": "今歸仁城",
@@ -2743,7 +3505,16 @@
     "publicTransit": {
       "googleDestination": "今帰仁城跡入口 巴士站",
       "description": "從那霸機場或那霸巴士總站搭乘「山原急行巴士（やんばる急行バス）」直達「今歸仁城跡入口」站下車，隨後步行沿著平整緩坡道路約15分鐘即可抵達世界遺產售票處。"
-    }
+    },
+    "alias": "北山城",
+    "castleCardLocations": [
+      {
+        "label": "今歸仁城跡售票處",
+        "googleLabel": "今帰仁城跡",
+        "latitude": 26.691389,
+        "longitude": 127.928889
+      }
+    ]
   },
   "99": {
     "subtitle": "中城城",
@@ -2769,7 +3540,27 @@
     "publicTransit": {
       "googleDestination": "中城城跡 巴士站",
       "description": "由於完全無那霸市區直達巴士，強烈自駕或由那霸市區搭乘巴士（30/52/61路）至「當間」或「大城」站下車，隨後需步行攀登非常考驗體力的緩坡山路約30分鐘始可抵達城門（特定例假日有接駁小巴）。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "中城城跡共同管理協議會管理事務所",
+        "googleLabel": "中城城跡",
+        "latitude": 26.284167,
+        "longitude": 127.801111
+      },
+      {
+        "label": "GUSUKU ROCK CAFE",
+        "googleLabel": "GUSUKU ROCK CAFE",
+        "latitude": 26.284167,
+        "longitude": 127.801111
+      },
+      {
+        "label": "中城村觀光協會事務所",
+        "googleLabel": "中城村観光協会",
+        "latitude": 26.284167,
+        "longitude": 127.801111
+      }
+    ]
   },
   "100": {
     "subtitle": "首里城",
@@ -2801,7 +3592,8 @@
     "publicTransit": {
       "googleDestination": "首里駅",
       "description": "搭乘沖繩都市單軌電車（Yui Rail）至「首里」站下車，由西口出站後沿著標示筆直步行約15分鐘即可穿過守禮門進入首里城公園公園；亦可轉乘市內巴士「首里城下町線」至「首里城前」站直達。"
-    }
+    },
+    "alias": "御城"
   },
   "101": {
     "subtitle": "志苔館",
@@ -2811,13 +3603,15 @@
         "label": "志苔館跡北方管理辦公室服務台",
         "googleLabel": "志苔館跡",
         "latitude": 41.768611,
-        "longitude": 140.801667
+        "longitude": 140.801667,
+        "businessHours": "請洽詢現場（史跡內東屋）"
       },
       {
         "label": "函館市市民體育館服務櫃檯",
         "googleLabel": "函館アリーナ",
         "latitude": 41.776667,
-        "longitude": 140.793611
+        "longitude": 140.793611,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -2869,13 +3663,15 @@
         "label": "浪岡城跡案內所（史蹟公園入口櫃檯）",
         "googleLabel": "浪岡城跡 案内所",
         "latitude": 40.716944,
-        "longitude": 140.605556
+        "longitude": 140.605556,
+        "businessHours": "請洽詢現場或官方網站確認"
       },
       {
         "label": "青森市中世之館歷史資料館",
         "googleLabel": "青森市中世の館",
         "latitude": 40.822222,
-        "longitude": 140.747222
+        "longitude": 140.747222,
+        "businessHours": "開館時間：9:00～17:00 週一休館"
       }
     ],
     "driving": {
@@ -2901,7 +3697,8 @@
         "label": "九戶城跡導覽設施服務台櫃檯（大手門入口附近）",
         "googleLabel": "九戸城跡 ガイダンスハウス",
         "latitude": 40.268889,
-        "longitude": 141.298611
+        "longitude": 141.298611,
+        "businessHours": "請洽詢九戸城ガイドハウス或二戸市埋藏文化財中心"
       }
     ],
     "driving": {
@@ -2917,7 +3714,15 @@
     "publicTransit": {
       "googleDestination": "二戸駅",
       "description": "搭乘東北新幹線或岩手銀河鐵道至「二戶」站下車。轉乘JR巴士（往二戶市街方向）約10分鐘至「岩手縣北巴士二戶營業所」站下車，隨後步行約10分鐘即可抵達大手門。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "二戸市埋蔵文化財センター",
+        "googleLabel": "二戸市埋蔵文化財センター",
+        "latitude": 40.268889,
+        "longitude": 141.298611
+      }
+    ]
   },
   "105": {
     "subtitle": "白石城",
@@ -2927,7 +3732,8 @@
         "label": "白石城天守閣資料館入口售票櫃檯",
         "googleLabel": "白石城 天守閣",
         "latitude": 38.002778,
-        "longitude": 140.617778
+        "longitude": 140.617778,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -2943,7 +3749,15 @@
     "publicTransit": {
       "googleDestination": "白石駅(宮城県)",
       "description": "搭乘JR東北本線至「白石」站下車，由西口出站後步行老街約10分鐘即可抵達益岡公園登山口；若搭乘東北新幹線，請於「白石藏王」站下車轉乘計程車約5分鐘。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "白石城歷史探訪博物館1樓賣店",
+        "googleLabel": "白石城歴史探訪ミュージアム",
+        "latitude": 38.002778,
+        "longitude": 140.617778
+      }
+    ]
   },
   "106": {
     "subtitle": "脇本城",
@@ -2953,7 +3767,8 @@
         "label": "脇本城跡導覽綜合設施櫃檯（山腳下）",
         "googleLabel": "脇本城跡 案内所",
         "latitude": 39.923889,
-        "longitude": 139.914444
+        "longitude": 139.914444,
+        "businessHours": "請洽詢史蹟脇本城跡案內所"
       }
     ],
     "driving": {
@@ -2979,13 +3794,15 @@
         "label": "秋田城跡歷史資料館入口服務台櫃檯",
         "googleLabel": "秋田城跡歴史資料館",
         "latitude": 39.739722,
-        "longitude": 140.0825
+        "longitude": 140.0825,
+        "businessHours": "請洽詢秋田城跡歷史資料館"
       },
       {
         "label": "秋田城跡管理事務所（東門附近）",
         "googleLabel": "秋田城跡史跡公園",
         "latitude": 39.741389,
-        "longitude": 140.080556
+        "longitude": 140.080556,
+        "businessHours": "請洽詢史蹟公園管理棟"
       }
     ],
     "driving": {
@@ -3001,7 +3818,16 @@
     "publicTransit": {
       "googleDestination": "秋田城跡歴史資料館前 巴士站",
       "description": "從JR「秋田」站西口巴士總站（4號月台）搭乘秋田中央交通巴士（將軍野線等）約20分鐘，在「秋田城跡歷史資料館前」站下車即達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "秋田市立秋田城跡歴史資料館",
+        "googleLabel": "秋田市立秋田城跡歴史資料館",
+        "latitude": 39.739722,
+        "longitude": 140.0825,
+        "businessHours": "請洽詢秋田城跡歷史資料館"
+      }
+    ]
   },
   "108": {
     "subtitle": "鶴岡城",
@@ -3011,13 +3837,15 @@
         "label": "莊內神社社務所櫃檯（鶴岡公園本丸內）",
         "googleLabel": "荘内神社",
         "latitude": 38.729444,
-        "longitude": 139.824167
+        "longitude": 139.824167,
+        "businessHours": "請洽詢荘內神社（鶴岡城址）"
       },
       {
         "label": "鶴岡市觀光案內所（鶴岡車站內）",
         "googleLabel": "鶴岡駅",
         "latitude": 38.739722,
-        "longitude": 139.833333
+        "longitude": 139.833333,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -3043,13 +3871,15 @@
         "label": "米澤市上杉博物館服務台入口（「傳國之杜」內）",
         "googleLabel": "米沢市上杉博物館",
         "latitude": 37.910278,
-        "longitude": 140.103333
+        "longitude": 140.103333,
+        "businessHours": "請洽詢現場或官方網站確認"
       },
       {
         "label": "上杉神社社務所售品櫃檯",
         "googleLabel": "上杉神社",
         "latitude": 37.912222,
-        "longitude": 140.101111
+        "longitude": 140.101111,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -3065,7 +3895,15 @@
     "publicTransit": {
       "googleDestination": "上杉神社前 巴士站",
       "description": "從JR山形新幹線「米澤」站搭乘市內循環巴士（右迴路線）約10-12分鐘，在「上杉神社前」站下車步行僅需約2分鐘即可抵達護城河紅橋邊。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "米澤觀光協會觀光案內所",
+        "googleLabel": "米沢観光コンベンション協会",
+        "latitude": 37.910278,
+        "longitude": 140.103333
+      }
+    ]
   },
   "110": {
     "subtitle": "三春城",
@@ -3075,7 +3913,8 @@
         "label": "三春町歷史民俗資料館服務台（山腳下）",
         "googleLabel": "三春町歴史民俗資料館",
         "latitude": 37.442222,
-        "longitude": 140.487222
+        "longitude": 140.487222,
+        "businessHours": "本丸 24 小時可蓋章；資料館請洽詢現場"
       }
     ],
     "driving": {
@@ -3101,7 +3940,8 @@
         "label": "向羽黑山城跡管理棟",
         "googleLabel": "向羽黒山城跡",
         "latitude": 37.471944,
-        "longitude": 139.891111
+        "longitude": 139.891111,
+        "businessHours": "向羽黒ギャラリー外常時可蓋章"
       }
     ],
     "driving": {
@@ -3127,7 +3967,8 @@
         "label": "笠間市觀光案內所（車站前）",
         "googleLabel": "笠間観光協会",
         "latitude": 36.3775,
-        "longitude": 140.252222
+        "longitude": 140.252222,
+        "businessHours": "開館時間：9:00～22:00　休館日：週一（かさま歴史交流館井筒屋）"
       }
     ],
     "driving": {
@@ -3143,7 +3984,16 @@
     "publicTransit": {
       "googleDestination": "笠間駅",
       "description": "從JR水戶線「笠間」站步行約25-30分鐘即可抵達山腳登山口。"
-    }
+    },
+    "alias": "胡桃城",
+    "castleCardLocations": [
+      {
+        "label": "笠間歷史交流館井筒屋",
+        "googleLabel": "かさま歴史交流館井筒屋",
+        "latitude": 36.373611,
+        "longitude": 140.247222
+      }
+    ]
   },
   "113": {
     "subtitle": "土浦城",
@@ -3153,7 +4003,8 @@
         "label": "龜城公園管理事務所",
         "googleLabel": "亀城公園",
         "latitude": 36.081111,
-        "longitude": 140.198611
+        "longitude": 140.198611,
+        "businessHours": "開館時間：9:00～16:30　休館日：週一（土浦市立博物館；休館日改至土浦まちかど蔵「大徳」）"
       }
     ],
     "driving": {
@@ -3169,7 +4020,16 @@
     "publicTransit": {
       "googleDestination": "土浦駅",
       "description": "從JR常磐線「土浦」站步行約15分鐘即可抵達。"
-    }
+    },
+    "alias": "龜城",
+    "castleCardLocations": [
+      {
+        "label": "土浦まちかど蔵「大徳」",
+        "googleLabel": "土浦まちかど蔵大徳",
+        "latitude": 36.081111,
+        "longitude": 140.198611
+      }
+    ]
   },
   "114": {
     "subtitle": "唐澤山城",
@@ -3179,7 +4039,8 @@
         "label": "唐澤山神社授與所",
         "googleLabel": "唐澤山神社",
         "latitude": 36.355278,
-        "longitude": 139.589444
+        "longitude": 139.589444,
+        "businessHours": "請洽詢唐澤山神社社務所（本丸跡）"
       }
     ],
     "driving": {
@@ -3195,7 +4056,8 @@
     "publicTransit": {
       "googleDestination": "佐野駅",
       "description": "從JR或東武線「佐野」站搭乘計程車約20分鐘直達（無巴士直達）。"
-    }
+    },
+    "alias": "栃本城"
   },
   "115": {
     "subtitle": "名胡桃城",
@@ -3205,7 +4067,8 @@
         "label": "名胡桃城址案內所",
         "googleLabel": "名胡桃城址 案内所",
         "latitude": 36.680833,
-        "longitude": 138.995833
+        "longitude": 138.995833,
+        "businessHours": "營業時間：9:00~16:00"
       }
     ],
     "driving": {
@@ -3231,7 +4094,8 @@
         "label": "沼田公園內觀光諮詢櫃檯",
         "googleLabel": "沼田公園",
         "latitude": 36.645833,
-        "longitude": 139.043611
+        "longitude": 139.043611,
+        "businessHours": "請洽詢沼田市觀光案內所"
       }
     ],
     "driving": {
@@ -3247,7 +4111,8 @@
     "publicTransit": {
       "googleDestination": "沼田駅",
       "description": "從JR上越線「沼田」站搭乘巴士至「沼田市役所」站下車，步行約5分鐘。"
-    }
+    },
+    "alias": "倉內城"
   },
   "117": {
     "subtitle": "岩櫃城",
@@ -3257,7 +4122,8 @@
         "label": "岩櫃城跡登山入口案內所",
         "googleLabel": "岩櫃城跡 登山口",
         "latitude": 36.566389,
-        "longitude": 138.742222
+        "longitude": 138.742222,
+        "businessHours": "營業時間：4/1～11/30 9:00～16:00（平澤登山口）；12/1～3/31 9:00～17:00（東吾妻町觀光協会）"
       }
     ],
     "driving": {
@@ -3283,7 +4149,8 @@
         "label": "行田市鄉土博物館入口櫃檯",
         "googleLabel": "行田市郷土博物館",
         "latitude": 36.136389,
-        "longitude": 139.458889
+        "longitude": 139.458889,
+        "businessHours": "開館時間：9:00～16:30 週一休館"
       }
     ],
     "driving": {
@@ -3299,7 +4166,30 @@
     "publicTransit": {
       "googleDestination": "行田市駅",
       "description": "從秩父鐵道「行田市」站步行約15分鐘；或從JR「吹上」站搭乘巴士至「忍城」站下車。"
-    }
+    },
+    "alias": "浮城、龜城",
+    "castleCardLocations": [
+      {
+        "label": "行田市鄉土博物館博物館商店",
+        "googleLabel": "行田市郷土博物館",
+        "latitude": 36.136389,
+        "longitude": 139.458889,
+        "businessHours": "開館時間：9:00～16:30 週一休館"
+      },
+      {
+        "label": "觀光物產ぷらっと♪ぎょうだ",
+        "googleLabel": "行田市",
+        "latitude": 36.136389,
+        "longitude": 139.458889,
+        "businessHours": "開館時間：9:00～16:30 週一休館"
+      },
+      {
+        "label": "忍城巴士總站觀光案內所",
+        "googleLabel": "忍城",
+        "latitude": 36.136389,
+        "longitude": 139.458889
+      }
+    ]
   },
   "119": {
     "subtitle": "杉山城",
@@ -3309,7 +4199,8 @@
         "label": "嵐山町立歷史民俗資料館（鄰近）",
         "googleLabel": "嵐山町立歴史民俗資料館",
         "latitude": 36.038333,
-        "longitude": 139.318333
+        "longitude": 139.318333,
+        "businessHours": "時間：8:30～17:15（嵐山町役場玄關大廳；週六日及國定假日亦有設置）"
       }
     ],
     "driving": {
@@ -3335,7 +4226,8 @@
         "label": "嵐山史蹟博物館櫃檯",
         "googleLabel": "嵐山史跡の博物館",
         "latitude": 36.0475,
-        "longitude": 139.324722
+        "longitude": 139.324722,
+        "businessHours": "※休館期間中はスタンプの押印不可"
       }
     ],
     "driving": {
@@ -3351,7 +4243,16 @@
     "publicTransit": {
       "googleDestination": "武蔵嵐山駅",
       "description": "從東武東上線「武藏嵐山」站步行約20分鐘即可抵達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "埼玉縣立嵐山史跡博物館受理",
+        "googleLabel": "嵐山史跡の博物館",
+        "latitude": 36.0475,
+        "longitude": 139.324722,
+        "businessHours": "※休館期間中はスタンプの押印不可"
+      }
+    ]
   },
   "121": {
     "subtitle": "本佐倉城",
@@ -3361,7 +4262,8 @@
         "label": "本佐倉城跡導覽所（大佐倉側入口附近）",
         "googleLabel": "本佐倉城跡 案内所",
         "latitude": 35.731389,
-        "longitude": 140.254722
+        "longitude": 140.254722,
+        "businessHours": "請洽詢國史蹟本佐倉城跡案內所"
       }
     ],
     "driving": {
@@ -3387,7 +4289,8 @@
         "label": "大多喜城本丸博物館售票櫃檯",
         "googleLabel": "千葉県立中央博物館 大多喜城分館",
         "latitude": 35.286389,
-        "longitude": 140.240833
+        "longitude": 140.240833,
+        "businessHours": "土日及國定假日：いすみ鐵道大多喜站前觀光本陣、大多喜城下停車場內賣店"
       }
     ],
     "driving": {
@@ -3403,7 +4306,8 @@
     "publicTransit": {
       "googleDestination": "大多喜駅",
       "description": "搭乘夷隅鐵道（いすみ鉄道）至「大多喜」站下車，出站後沿著歷史坡道街道上山健行步行約15-20分鐘即可抵達二之丸大手門遺跡。"
-    }
+    },
+    "alias": "大多木城"
   },
   "123": {
     "subtitle": "瀧山城",
@@ -3413,19 +4317,22 @@
         "label": "滝山城跡中の丸広場（戶外御印台，全年可押）",
         "googleLabel": "滝山城跡 中の丸",
         "latitude": 35.691389,
-        "longitude": 139.333889
+        "longitude": 139.333889,
+        "businessHours": "請洽詢滝山城跡中の丸廣場、加住市民センター或道の駅八王子滝山"
       },
       {
         "label": "加住市民センター服務台（山腳下）",
         "googleLabel": "加住市民センター",
         "latitude": 35.6995717,
-        "longitude": 139.3239178
+        "longitude": 139.3239178,
+        "businessHours": "請洽詢滝山城跡中の丸廣場、加住市民センター或道の駅八王子滝山"
       },
       {
         "label": "道の駅八王子滝山（正面入口旁資訊櫃檯）",
         "googleLabel": "道の駅 八王子滝山",
         "latitude": 35.6864699,
-        "longitude": 139.3414479
+        "longitude": 139.3414479,
+        "businessHours": "請洽詢滝山城跡中の丸廣場、加住市民センター或道の駅八王子滝山"
       }
     ],
     "driving": {
@@ -3451,13 +4358,15 @@
         "label": "東京臨海部廣報館「Tokyo Marina」（青海）",
         "googleLabel": "東京臨海部広報展示室TOKYOミナト館",
         "latitude": 35.626389,
-        "longitude": 139.778889
+        "longitude": 139.778889,
+        "businessHours": "請洽詢お台場海浜公園マリンハウス1樓"
       },
       {
         "label": "台場公園海濱管理事務所（潮風公園附近）",
         "googleLabel": "お台場海浜公園 管理事務所",
         "latitude": 35.632222,
-        "longitude": 139.776667
+        "longitude": 139.776667,
+        "businessHours": "請洽詢お台場海浜公園マリンハウス1樓"
       }
     ],
     "driving": {
@@ -3483,7 +4392,8 @@
         "label": "橫濱市小機體育中心入口櫃檯",
         "googleLabel": "横浜市小机スポーツ会館",
         "latitude": 35.508889,
-        "longitude": 139.591667
+        "longitude": 139.591667,
+        "businessHours": "開館時間：9:00～20:00（週一至六）／9:00～17:00（週日及國定假日）　休館日：每月第4週一"
       }
     ],
     "driving": {
@@ -3509,7 +4419,8 @@
         "label": "石垣山一夜城歷史公園諮詢賣店（「一夜城 Yoroizuka Farm」旁）",
         "googleLabel": "石垣山一夜城歴史公園",
         "latitude": 35.234444,
-        "longitude": 139.126944
+        "longitude": 139.126944,
+        "businessHours": "請洽詢石垣山一夜城停車場內（廁所附近）"
       }
     ],
     "driving": {
@@ -3525,7 +4436,16 @@
     "publicTransit": {
       "googleDestination": "入生田駅",
       "description": "搭乘箱根登山鐵道至「入生田」站下車，由於完全無巴士登山，步行沿著陡峭的農路盤旋登山健行約需50-60分鐘；強烈建議在「箱根板橋」站轉乘計程車約10分鐘登頂。"
-    }
+    },
+    "alias": "石垣山一夜城",
+    "castleCardLocations": [
+      {
+        "label": "小田原城天守閣賣店",
+        "googleLabel": "小田原城天守閣",
+        "latitude": 35.234444,
+        "longitude": 139.126944
+      }
+    ]
   },
   "127": {
     "subtitle": "新府城",
@@ -3535,7 +4455,8 @@
         "label": "韮崎市民民俗資料館入口櫃檯",
         "googleLabel": "韮崎市民民俗資料館",
         "latitude": 35.721667,
-        "longitude": 138.425278
+        "longitude": 138.425278,
+        "businessHours": "請洽詢韮崎市民族資料館"
       }
     ],
     "driving": {
@@ -3561,7 +4482,8 @@
         "label": "武田神社境內寶物殿入口售票處（與24號同設置地點）",
         "googleLabel": "武田神社 宝物殿",
         "latitude": 35.686111,
-        "longitude": 138.577778
+        "longitude": 138.577778,
+        "businessHours": "請洽詢甲府站前藤村記念館（距城郭較遠）"
       }
     ],
     "driving": {
@@ -3587,7 +4509,8 @@
         "label": "佐久市歷史民俗資料館服務台（城內五稜郭內）",
         "googleLabel": "佐久市歴史民俗資料館",
         "latitude": 36.196111,
-        "longitude": 138.519444
+        "longitude": 138.519444,
+        "businessHours": "請洽詢であいの館"
       }
     ],
     "driving": {
@@ -3603,7 +4526,8 @@
     "publicTransit": {
       "googleDestination": "臼田駅",
       "description": "搭乘JR小海線至「臼田」站下車，建議轉乘計程車約7-10分鐘直達星形護城河大門；或步行穿過村落老街健行約需30-35分鐘。"
-    }
+    },
+    "alias": "桔梗城、五稜郭"
   },
   "130": {
     "subtitle": "高島城",
@@ -3613,7 +4537,8 @@
         "label": "高島城天守閣資料館入口售票櫃檯",
         "googleLabel": "高島城",
         "latitude": 36.041944,
-        "longitude": 138.115556
+        "longitude": 138.115556,
+        "businessHours": "請洽詢天守內1F"
       }
     ],
     "driving": {
@@ -3629,7 +4554,8 @@
     "publicTransit": {
       "googleDestination": "高島城前 巴士站",
       "description": "從JR中央本線「上諏訪」站西口（諏訪湖口）出站後，沿著老街筆直步行約10-15分鐘即可抵達高島公園大門。"
-    }
+    },
+    "alias": "諏訪之浮城"
   },
   "131": {
     "subtitle": "村上城",
@@ -3639,7 +4565,8 @@
         "label": "村上郷土資料館服務台櫃檯（山腳下「おしゃぎり会館」）",
         "googleLabel": "村上市郷土資料館",
         "latitude": 38.225556,
-        "longitude": 139.475556
+        "longitude": 139.475556,
+        "businessHours": "請洽詢東京電力網路村上電力中心（距城郭較遠）"
       }
     ],
     "driving": {
@@ -3655,7 +4582,17 @@
     "publicTransit": {
       "googleDestination": "村上駅(新潟県)",
       "description": "搭乘JR羽越本線至「村上」站下車。轉乘市內循環巴士約10分鐘至「市役所前」或直接轉乘計程車抵達山腳登山口，隨後需步行攀登平整石階山路約20-25分鐘始可抵達山頂石頭本丸。"
-    }
+    },
+    "alias": "舞鶴城",
+    "castleCardLocations": [
+      {
+        "label": "村上市鄉土資料館大廳",
+        "googleLabel": "村上市郷土資料館",
+        "latitude": 38.225556,
+        "longitude": 139.475556,
+        "businessHours": "請洽詢東京電力網路村上電力中心（距城郭較遠）"
+      }
+    ]
   },
   "132": {
     "subtitle": "高田城",
@@ -3665,7 +4602,8 @@
         "label": "高田城三重櫓內部入口售票櫃檯",
         "googleLabel": "高田城三重櫓",
         "latitude": 37.110556,
-        "longitude": 138.255833
+        "longitude": 138.255833,
+        "businessHours": "請洽詢上越市立歷史博物館或高田城三重櫓"
       }
     ],
     "driving": {
@@ -3681,7 +4619,8 @@
     "publicTransit": {
       "googleDestination": "高田城址公園 巴士站",
       "description": "搭乘越後心動鐵道（妙高躍進線）至「高田」站下車，出站後步行沿著老街大路步行約15-20分鐘即可跨越巨大的極樂橋護城河進入高田公園。"
-    }
+    },
+    "alias": "鮫城"
   },
   "133": {
     "subtitle": "鮫ケ尾城",
@@ -3691,7 +4630,8 @@
         "label": "斐太歴史之里案內所服務台（山腳下）",
         "googleLabel": "斐太歴史の里 案内所",
         "latitude": 37.046111,
-        "longitude": 138.243611
+        "longitude": 138.243611,
+        "businessHours": "營業時間：9:00～21:30（神の宮溫泉かわら亭；休業日改至妙高市役所生涯學習課）"
       }
     ],
     "driving": {
@@ -3717,7 +4657,8 @@
         "label": "富山市鄉土博物館內部一樓入口售票櫃檯",
         "googleLabel": "富山市郷土博物館",
         "latitude": 36.693056,
-        "longitude": 137.211389
+        "longitude": 137.211389,
+        "businessHours": "請洽詢富山城天守內鄉土博物館"
       }
     ],
     "driving": {
@@ -3733,7 +4674,8 @@
     "publicTransit": {
       "googleDestination": "国際会議場前 電車站",
       "description": "從JR「富山」站南口出站，步行僅需約10分鐘即可抵達護城河大門；或搭乘市內路面電車（環狀線）至「國際會議場前」站下車即達。"
-    }
+    },
+    "alias": "浮城"
   },
   "135": {
     "subtitle": "增山城",
@@ -3743,7 +4685,8 @@
         "label": "栴檀野社區中心服務台櫃檯（「庄川の里」附近）",
         "googleLabel": "砺波市埋蔵文化財センター",
         "latitude": 36.643333,
-        "longitude": 137.018611
+        "longitude": 137.018611,
+        "businessHours": "※城郭からは離れているので注意"
       }
     ],
     "driving": {
@@ -3759,7 +4702,17 @@
     "publicTransit": {
       "googleDestination": "砺波駅",
       "description": "搭乘JR城端線至「礪波」站或「高岡」站，由於完全無大眾運輸巴士前往深山，強烈建議在車站前搭乘計程車（車程約20分鐘）直達山腳步道口。"
-    }
+    },
+    "alias": "和田城",
+    "castleCardLocations": [
+      {
+        "label": "砺波市埋蔵文化財センター",
+        "googleLabel": "砺波市埋蔵文化財センター",
+        "latitude": 36.643333,
+        "longitude": 137.018611,
+        "businessHours": "※城郭からは離れているので注意"
+      }
+    ]
   },
   "136": {
     "subtitle": "鳥越城",
@@ -3769,7 +4722,8 @@
         "label": "白山市立鳥越一向一揆歷史館服務台（山腳下）",
         "googleLabel": "白山市立鳥越一向一揆歴史館",
         "latitude": 36.289444,
-        "longitude": 136.561944
+        "longitude": 136.561944,
+        "businessHours": "請洽詢白山市立鳥越一向一揆歷史館"
       }
     ],
     "driving": {
@@ -3795,7 +4749,8 @@
         "label": "福井縣廳本丸大門入口服務台處柜檯",
         "googleLabel": "福井県庁",
         "latitude": 36.065278,
-        "longitude": 136.221944
+        "longitude": 136.221944,
+        "businessHours": "請洽詢福井縣廳"
       }
     ],
     "driving": {
@@ -3811,7 +4766,8 @@
     "publicTransit": {
       "googleDestination": "福井駅(福井県)",
       "description": "搭乘北陸新幹線、JR北陸本線至「福井」站下車，由西口出站後步行僅需約5分鐘即可跨越宏偉的御本城橋護城河直接進入本丸縣廳區。"
-    }
+    },
+    "alias": "福居城"
   },
   "138": {
     "subtitle": "越前大野城",
@@ -3821,7 +4777,8 @@
         "label": "越前大野城天守閣資料館入口售票櫃檯",
         "googleLabel": "越前大野城",
         "latitude": 35.986111,
-        "longitude": 136.481944
+        "longitude": 136.481944,
+        "businessHours": "請洽詢越前大野城天守內部"
       }
     ],
     "driving": {
@@ -3837,7 +4794,17 @@
     "publicTransit": {
       "googleDestination": "越前大野駅",
       "description": "搭乘JR越美北線至「越前大野」站下車，出站後步行穿過精美的老街約20分鐘抵達山腳登山口，隨後需沿著鋪設平整的石階步道健行攀登約15-20分鐘始可登頂天空天守。"
-    }
+    },
+    "alias": "天空之城、龜山城",
+    "castleCardLocations": [
+      {
+        "label": "越前おおの結楽座",
+        "googleLabel": "越前大野城",
+        "latitude": 35.986111,
+        "longitude": 136.481944,
+        "businessHours": "請洽詢越前大野城天守內部"
+      }
+    ]
   },
   "139": {
     "subtitle": "佐柿國吉城",
@@ -3847,7 +4814,8 @@
         "label": "若狹國吉城歷史資料館服務台櫃檯（山腳下）",
         "googleLabel": "若狭国吉城歴史資料館",
         "latitude": 35.598611,
-        "longitude": 135.919722
+        "longitude": 135.919722,
+        "businessHours": "請洽詢若狹國吉城歷史資料館"
       }
     ],
     "driving": {
@@ -3863,7 +4831,17 @@
     "publicTransit": {
       "googleDestination": "美浜駅",
       "description": "搭乘JR小濱線至「美濱」站下車，轉乘美濱町社區巴士（往敦賀方向）約10分鐘至「佐柿」站下車即達資料館，隨後步行登山約25分鐘抵達山頂石頭本丸。"
-    }
+    },
+    "alias": "國吉城",
+    "castleCardLocations": [
+      {
+        "label": "若狭国吉城歴史資料館",
+        "googleLabel": "若狭国吉城歴史資料館",
+        "latitude": 35.598611,
+        "longitude": 135.919722,
+        "businessHours": "請洽詢若狹國吉城歷史資料館"
+      }
+    ]
   },
   "140": {
     "subtitle": "玄蕃尾城",
@@ -3873,13 +4851,15 @@
         "label": "余呉湖觀光案內所櫃檯（余吳車站前）",
         "googleLabel": "余呉駅",
         "latitude": 35.526667,
-        "longitude": 136.196389
+        "longitude": 136.196389,
+        "businessHours": "請洽詢敦賀市役所3樓文化・交流推進課窗口"
       },
       {
         "label": "敦賀觀光案內所（敦賀車站內）",
         "googleLabel": "敦賀駅",
         "latitude": 35.562222,
-        "longitude": 136.101111
+        "longitude": 136.101111,
+        "businessHours": "週六日及國定假日改至時間外受付；平日請洽詢敦賀市役所3樓文化・交流推進課"
       }
     ],
     "driving": {
@@ -3905,7 +4885,8 @@
         "label": "郡上八幡城天守閣內部一樓售票櫃檯",
         "googleLabel": "郡上八幡城",
         "latitude": 35.752222,
-        "longitude": 136.964444
+        "longitude": 136.964444,
+        "businessHours": "請洽詢郡上八幡城1F"
       }
     ],
     "driving": {
@@ -3921,7 +4902,17 @@
     "publicTransit": {
       "googleDestination": "城下町プラザ 巴士站",
       "description": "從長良川鐵道「郡上八幡」站搭乘市內巴士約10分鐘至「城下町Plaza」站下車，隨後需踏著鋪設平整的歷史石階步道緩坡攀登登山約15-20分鐘始可登頂木造天守。"
-    }
+    },
+    "alias": "積翠城",
+    "castleCardLocations": [
+      {
+        "label": "郡上八幡城賣店",
+        "googleLabel": "郡上八幡城",
+        "latitude": 35.752222,
+        "longitude": 136.964444,
+        "businessHours": "請洽詢郡上八幡城1F"
+      }
+    ]
   },
   "142": {
     "subtitle": "苗木城",
@@ -3931,7 +4922,8 @@
         "label": "中津川市苗木遠山史料館服務台（山腳下）",
         "googleLabel": "中津川市苗木遠山史料館",
         "latitude": 35.511389,
-        "longitude": 137.403611
+        "longitude": 137.403611,
+        "businessHours": "請洽詢中津川市苗木遠山史料館"
       }
     ],
     "driving": {
@@ -3947,7 +4939,17 @@
     "publicTransit": {
       "googleDestination": "苗木 巴士站",
       "description": "從JR中央本線「中津川」站搭乘北惠那巴士（往付知或加子母方向）約12分鐘，在「苗木」站下車，步行至山腳史料館約15分鐘，隨後再沿山路步道攀登約20分鐘即可抵達山頂絕壁天守台。"
-    }
+    },
+    "alias": "霞城",
+    "castleCardLocations": [
+      {
+        "label": "中津川市苗木遠山史料館",
+        "googleLabel": "中津川市苗木遠山史料館",
+        "latitude": 35.511389,
+        "longitude": 137.403611,
+        "businessHours": "請洽詢中津川市苗木遠山史料館"
+      }
+    ]
   },
   "143": {
     "subtitle": "美濃金山城",
@@ -3957,7 +4959,8 @@
         "label": "可兒市戰國山城博物館入口櫃檯（山腳下「兼山歷史民俗資料館」）",
         "googleLabel": "可児市戦国山城ミュージアム",
         "latitude": 35.456667,
-        "longitude": 137.094444
+        "longitude": 137.094444,
+        "businessHours": "請洽詢可児市觀光交流館"
       }
     ],
     "driving": {
@@ -3973,7 +4976,17 @@
     "publicTransit": {
       "googleDestination": "可児市戦国山城ミュージアム 巴士站",
       "description": "從名鐵廣見線「明智」站搭乘可兒市社區巴士（往兼山方向）約15分鐘，在「可兒市戰國山城博物館」站下車即達山腳，隨後步行登山約25分鐘抵達山頂本丸遺蹟。"
-    }
+    },
+    "alias": "兼山城、烏峰城",
+    "castleCardLocations": [
+      {
+        "label": "可児市山城博物館",
+        "googleLabel": "可児市戦国山城ミュージアム",
+        "latitude": 35.456667,
+        "longitude": 137.094444,
+        "businessHours": "請洽詢可児市觀光交流館"
+      }
+    ]
   },
   "144": {
     "subtitle": "大垣城",
@@ -3983,7 +4996,8 @@
         "label": "大垣城天守閣內部一樓入口售票服務台",
         "googleLabel": "大垣城",
         "latitude": 35.361944,
-        "longitude": 136.616111
+        "longitude": 136.616111,
+        "businessHours": "請洽詢大垣城天守（鄉土館）受付"
       }
     ],
     "driving": {
@@ -3999,7 +5013,17 @@
     "publicTransit": {
       "googleDestination": "大垣駅",
       "description": "大垣城交通極其神級！搭乘JR東海道本線至「大垣」站下車，由南口出站後步行穿過市區老街街道僅需約7-10分鐘即可直接抵達大垣公園內的天守閣下。"
-    }
+    },
+    "alias": "麋城",
+    "castleCardLocations": [
+      {
+        "label": "大垣城天守",
+        "googleLabel": "大垣城",
+        "latitude": 35.361944,
+        "longitude": 136.616111,
+        "businessHours": "請洽詢大垣城天守（鄉土館）受付"
+      }
+    ]
   },
   "145": {
     "subtitle": "興國寺城",
@@ -4009,7 +5033,8 @@
         "label": "興國寺城跡穗見神社社務所前導覽箱（自主蓋章處，若無移至沼津市教育委員會）",
         "googleLabel": "興国寺城跡",
         "latitude": 35.1325,
-        "longitude": 138.801667
+        "longitude": 138.801667,
+        "businessHours": "※終日可蓋章"
       }
     ],
     "driving": {
@@ -4035,7 +5060,8 @@
         "label": "諏訪原城觀光導覽設施服務台櫃檯（大手門入口旁）",
         "googleLabel": "諏訪原城ビジターセンター",
         "latitude": 34.821111,
-        "longitude": 138.126111
+        "longitude": 138.126111,
+        "businessHours": "請洽詢ビジターセンター內事務室入口旁"
       }
     ],
     "driving": {
@@ -4051,7 +5077,8 @@
     "publicTransit": {
       "googleDestination": "金谷駅",
       "description": "搭乘JR東海道本線或大井川鐵道至「金谷」站下車。出站後步行攀登極具古風的「舊東海道金谷坂石疊古道」上山緩坡步行約20-25分鐘即可直接進入外郭馬出防線。"
-    }
+    },
+    "alias": "扇城"
   },
   "147": {
     "subtitle": "高天神城",
@@ -4061,7 +5088,8 @@
         "label": "高天神城山腳「大總」觀光諮詢所（或高天神北登山口管理箱）",
         "googleLabel": "高天神城跡",
         "latitude": 34.728889,
-        "longitude": 138.033333
+        "longitude": 138.033333,
+        "businessHours": "請洽詢大東北公民館、掛川觀光協会ビジターセンター或掛川南部觀光案內處"
       }
     ],
     "driving": {
@@ -4077,7 +5105,8 @@
     "publicTransit": {
       "googleDestination": "掛川駅",
       "description": "高天神城交通較為偏遠，建議自JR「掛川」站搭乘秋葉巴士（往大東支所方向）約25分鐘，在「高天神登山口」站下車，步行登山盤旋陡峭石階約25-30分鐘始可抵達本丸遺蹟。"
-    }
+    },
+    "alias": "鶴舞城"
   },
   "148": {
     "subtitle": "濱松城",
@@ -4087,7 +5116,8 @@
         "label": "濱松城天守閣內部一樓入口售票處櫃檯",
         "googleLabel": "浜松城",
         "latitude": 34.711667,
-        "longitude": 137.725556
+        "longitude": 137.725556,
+        "businessHours": "請洽詢浜松城天守內"
       }
     ],
     "driving": {
@@ -4103,7 +5133,8 @@
     "publicTransit": {
       "googleDestination": "市役所南(静岡県) 巴士站",
       "description": "從JR東海道新幹線「濱松」站北口巴士總站（13或14號月台）搭乘遠鐵巴士約7分鐘，在「市役所南」站下車，步行僅需約5分鐘即可由護城河邊進入濱松城公園。"
-    }
+    },
+    "alias": "出世城"
   },
   "149": {
     "subtitle": "小牧山城",
@@ -4113,13 +5144,15 @@
         "label": "小諸山城歷史館一樓入口售票櫃檯（小諸市歷史館）",
         "googleLabel": "小牧市歴史館",
         "latitude": 35.433611,
-        "longitude": 136.7825
+        "longitude": 136.7825,
+        "businessHours": "請洽詢小牧山歷史館或れきしるこまき"
       },
       {
         "label": "小諸市役所文化財課（特定公休日）",
         "googleLabel": "小牧市役所",
         "latitude": 35.427778,
-        "longitude": 136.785
+        "longitude": 136.785,
+        "businessHours": "請洽詢小牧山歷史館或れきしるこまき"
       }
     ],
     "driving": {
@@ -4135,7 +5168,23 @@
     "publicTransit": {
       "googleDestination": "小諸駅",
       "description": "從名鐵小牧線「小諸」站或JR中央本線轉乘，搭乘名鐵巴士至「小諸市役所前」站下車，步行約10分鐘即可抵達山腳登山口，隨後步行登山約10分鐘即達山頂天守。"
-    }
+    },
+    "alias": "小牧城",
+    "castleCardLocations": [
+      {
+        "label": "小牧山城史跡情報館（れきしるこまき）",
+        "googleLabel": "小牧市歴史館",
+        "latitude": 35.433611,
+        "longitude": 136.7825,
+        "businessHours": "請洽詢小牧山歷史館或れきしるこまき"
+      },
+      {
+        "label": "小牧山歴史館",
+        "googleLabel": "小牧山歴史館",
+        "latitude": 35.291389,
+        "longitude": 136.9125
+      }
+    ]
   },
   "150": {
     "subtitle": "古宮城",
@@ -4145,7 +5194,8 @@
         "label": "作手歷史民俗資料館服務台櫃檯（山腳下老街附近）",
         "googleLabel": "作手歴史民俗資料館",
         "latitude": 34.944167,
-        "longitude": 137.430833
+        "longitude": 137.430833,
+        "businessHours": "請洽詢作手歷史民俗資料館"
       }
     ],
     "driving": {
@@ -4171,7 +5221,8 @@
         "label": "吉田城本丸鐵櫓內部一樓展示室櫃檯",
         "googleLabel": "吉田城 鉄櫓",
         "latitude": 34.769444,
-        "longitude": 137.393611
+        "longitude": 137.393611,
+        "businessHours": "請洽詢吉田城鐵櫓內或豐橋市役所東館13樓"
       }
     ],
     "driving": {
@@ -4187,7 +5238,8 @@
     "publicTransit": {
       "googleDestination": "市役所前(愛知県) 電電車站",
       "description": "從JR「豐橋」站搭乘豐橋鐵道東田本線（路面電車）約8分鐘，在「市役所前」站下車，出站沿指標步行約5-7分鐘即可穿過本丸護城河。"
-    }
+    },
+    "alias": "今橋城"
   },
   "152": {
     "subtitle": "津城",
@@ -4197,13 +5249,15 @@
         "label": "津車站觀光資訊處（JR/近鐵津站東口）",
         "googleLabel": "津駅",
         "latitude": 34.733889,
-        "longitude": 136.510278
+        "longitude": 136.510278,
+        "businessHours": "時間：9:00～16:00（高山神社）"
       },
       {
         "label": "津高虎太鼓山手案內所（鄰近公園賣店）",
         "googleLabel": "津城跡",
         "latitude": 34.717778,
-        "longitude": 136.509444
+        "longitude": 136.509444,
+        "businessHours": "時間：9:00～16:00（高山神社）"
       }
     ],
     "driving": {
@@ -4229,7 +5283,8 @@
         "label": "北畠神社社務所售品櫃檯（城內庭園入口）",
         "googleLabel": "北畠神社",
         "latitude": 35.140278,
-        "longitude": 136.166667
+        "longitude": 136.166667,
+        "businessHours": "時間：8時30分～17時"
       }
     ],
     "driving": {
@@ -4245,7 +5300,8 @@
     "publicTransit": {
       "googleDestination": "伊勢奥津駅",
       "description": "搭乘JR名松線至終點站「伊勢奧津」站下車（班次極少），轉乘美杉社區巴士（津市コミュニティバス）約10分鐘至「北畠神社前」站下車即達。"
-    }
+    },
+    "alias": "伊丹城"
   },
   "154": {
     "subtitle": "田丸城",
@@ -4255,13 +5311,15 @@
         "label": "玉城町中央公民館入口服務台（山腳下大手門旁）",
         "googleLabel": "玉城町中央公民館",
         "latitude": 34.490556,
-        "longitude": 136.631667
+        "longitude": 136.631667,
+        "businessHours": "請洽詢村山龍平紀念館"
       },
       {
         "label": "田丸城址表門觀光案內箱（自主蓋章處）",
         "googleLabel": "田丸城跡",
         "latitude": 34.489167,
-        "longitude": 136.630556
+        "longitude": 136.630556,
+        "businessHours": "請洽詢村山龍平紀念館"
       }
     ],
     "driving": {
@@ -4287,7 +5345,8 @@
         "label": "道の駅 熊野・板屋九郎兵衛之里 服務台櫃檯",
         "googleLabel": "道の駅 熊野・板屋九郎兵衛の里",
         "latitude": 33.896667,
-        "longitude": 135.845833
+        "longitude": 135.845833,
+        "businessHours": "請洽詢道の駅熊野・板屋九郎兵衛の里"
       }
     ],
     "driving": {
@@ -4303,7 +5362,22 @@
     "publicTransit": {
       "googleDestination": "赤木城跡 巴士站",
       "description": "赤木城地處熊野極深之山區，大眾運輸極其艱難。可自JR紀勢本線「熊野市」站搭乘熊野市自主運行巴士（往紀和町方向約50分鐘）至「赤木城跡」站下車步行即達。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "入鹿温泉ホテル瀞流荘",
+        "googleLabel": "入鹿温泉ホテル瀞流荘",
+        "latitude": 33.896667,
+        "longitude": 135.845833
+      },
+      {
+        "label": "道の駅 熊野・板屋九郎兵衛の里",
+        "googleLabel": "道の駅 熊野・板屋九郎兵衛の里",
+        "latitude": 33.896667,
+        "longitude": 135.845833,
+        "businessHours": "請洽詢道の駅熊野・板屋九郎兵衛の里"
+      }
+    ]
   },
   "156": {
     "subtitle": "鎌刃城",
@@ -4313,13 +5387,15 @@
         "label": "米原市番場資料館服務台（山腳下番場簡易郵便局旁）",
         "googleLabel": "番場資料館",
         "latitude": 35.314722,
-        "longitude": 136.301389
+        "longitude": 136.301389,
+        "businessHours": "請洽詢 Cafe&Gallery源右衛門"
       },
       {
         "label": "Cafe 蓮（蓮花咖啡店櫃檯，週末特定季節開放）",
         "googleLabel": "米原市番場",
         "latitude": 35.313889,
-        "longitude": 136.311667
+        "longitude": 136.311667,
+        "businessHours": "請洽詢 Cafe&Gallery源右衛門"
       }
     ],
     "driving": {
@@ -4345,7 +5421,8 @@
         "label": "八幡山空中纜車山腳站（諮詢售票櫃檯）",
         "googleLabel": "八幡山ロープウェー",
         "latitude": 35.143611,
-        "longitude": 136.087778
+        "longitude": 136.087778,
+        "businessHours": "請洽詢村雲御所瑞龍寺"
       }
     ],
     "driving": {
@@ -4371,7 +5448,8 @@
         "label": "福知山城天守閣資料館入口售票櫃檯（需購票入館）",
         "googleLabel": "福知山城",
         "latitude": 35.296944,
-        "longitude": 135.1325
+        "longitude": 135.1325,
+        "businessHours": "請洽詢福知山城天守閣或JR福知山站北口觀光案內所"
       }
     ],
     "driving": {
@@ -4387,7 +5465,8 @@
     "publicTransit": {
       "googleDestination": "福知山駅",
       "description": "搭乘JR山陰本線或福知山線至「福知山」站下車，由南口出站後步行沿著市區老街大路筆直步行約15分鐘即可跨越開闊的法川大橋直達天守閣下。"
-    }
+    },
+    "alias": "臥龍城"
   },
   "159": {
     "subtitle": "芥川山城",
@@ -4397,7 +5476,8 @@
         "label": "高槻市立「しろあと歷史館」服務台櫃檯（位於高槻市區內，注意非城址現場）",
         "googleLabel": "高槻市立しろあと歴史館",
         "latitude": 34.849167,
-        "longitude": 135.617222
+        "longitude": 135.617222,
+        "businessHours": "請洽詢高槻市しろあと歷史館、觀光協会事務所或觀光案內所"
       }
     ],
     "driving": {
@@ -4413,7 +5493,8 @@
     "publicTransit": {
       "googleDestination": "上の口 巴士站",
       "description": "從JR京都線「高槻」站北口搭乘高槻市營巴士（往上の口方向）約20分鐘，在「上の口」終點站下車。隨後需徒步沿著平整緩坡山路盤旋攀登約25-30分鐘始可抵達三好山頂本丸遺址。"
-    }
+    },
+    "alias": "若櫻城"
   },
   "160": {
     "subtitle": "飯盛城",
@@ -4423,13 +5504,15 @@
         "label": "大東市立歷史民俗資料館服務台櫃檯（山腳下）",
         "googleLabel": "大東市立歴史民俗資料館",
         "latitude": 34.7225,
-        "longitude": 135.641667
+        "longitude": 135.641667,
+        "businessHours": "請洽詢大東市立歷史民俗資料館、野外活動センター或四條畷市立歷史民俗資料館"
       },
       {
         "label": "四條畷市立歷史民俗資料館服務台柜檯",
         "googleLabel": "四條畷市 歴史民俗資料館",
         "latitude": 34.736944,
-        "longitude": 135.643056
+        "longitude": 135.643056,
+        "businessHours": "請洽詢大東市立歷史民俗資料館、野外活動センター或四條畷市立歷史民俗資料館"
       }
     ],
     "driving": {
@@ -4445,7 +5528,23 @@
     "publicTransit": {
       "googleDestination": "野崎駅",
       "description": "搭乘JR片町線（學研都市線）至「野崎」站下車，出站後先至山腳大東資料館蓋章。隨後需沿著極具挑戰性的「野崎觀音登山道」原始森林步道，盤旋攀登約45-50分鐘始可登頂飯盛石頭本丸主郭。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "飯盛城（大東市）",
+        "googleLabel": "大東市立歴史民俗資料館",
+        "latitude": 34.7225,
+        "longitude": 135.641667,
+        "businessHours": "請洽詢大東市立歷史民俗資料館、野外活動センター或四條畷市立歷史民俗資料館"
+      },
+      {
+        "label": "飯盛城（四條畷市）",
+        "googleLabel": "四條畷市 歴史民俗資料館",
+        "latitude": 34.736944,
+        "longitude": 135.643056,
+        "businessHours": "請洽詢大東市立歷史民俗資料館、野外活動センター或四條畷市立歷史民俗資料館"
+      }
+    ]
   },
   "161": {
     "subtitle": "岸和田城",
@@ -4455,7 +5554,8 @@
         "label": "岸和田城天守閣內部一樓入口櫃檯",
         "googleLabel": "岸和田城",
         "latitude": 34.458889,
-        "longitude": 135.370833
+        "longitude": 135.370833,
+        "businessHours": "請洽詢岸和田城天守閣受付"
       }
     ],
     "driving": {
@@ -4471,7 +5571,17 @@
     "publicTransit": {
       "googleDestination": "蛸地蔵駅",
       "description": "搭乘南海本線至「蛸地藏」站下車，出站後步行老街約7分鐘即可直達城堡護城河邊；或從「岸和田」站步行約10分鐘即達。"
-    }
+    },
+    "alias": "千龜利城",
+    "castleCardLocations": [
+      {
+        "label": "岸和田だんじり会館",
+        "googleLabel": "岸和田城",
+        "latitude": 34.458889,
+        "longitude": 135.370833,
+        "businessHours": "請洽詢岸和田城天守閣受付"
+      }
+    ]
   },
   "162": {
     "subtitle": "出石城‧有子山城",
@@ -4481,7 +5591,8 @@
         "label": "出石觀光案內所櫃檯（靠近辰鼓樓）",
         "googleLabel": "但馬国出石観光協会",
         "latitude": 35.460278,
-        "longitude": 134.873333
+        "longitude": 134.873333,
+        "businessHours": "請洽詢いずし觀光センター"
       }
     ],
     "driving": {
@@ -4497,7 +5608,15 @@
     "publicTransit": {
       "googleDestination": "出石 巴士站",
       "description": "從JR山陰本線「豐岡」站或「江原」站搭乘全但巴士（往出石方向）約30分鐘，在「出石」終點站下車即達山腳。若欲登頂有子山城，需沿後方陡峭山路步行攀登約40-50分鐘。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "出石觀光案內所",
+        "googleLabel": "いずし観光センター",
+        "latitude": 35.460278,
+        "longitude": 134.873333
+      }
+    ]
   },
   "163": {
     "subtitle": "黑井城",
@@ -4507,7 +5626,8 @@
         "label": "春日地域振興局一樓服務台（山腳下）",
         "googleLabel": "丹波市 春日庁舎",
         "latitude": 35.181111,
-        "longitude": 135.127778
+        "longitude": 135.127778,
+        "businessHours": "請洽詢春日住民センター"
       }
     ],
     "driving": {
@@ -4533,7 +5653,8 @@
         "label": "洲本市立淡路文化史料館服務台（山腳下）",
         "googleLabel": "洲本市立淡路文化資料館",
         "latitude": 34.333056,
-        "longitude": 134.908056
+        "longitude": 134.908056,
+        "businessHours": "營業時間：9:00～17:00"
       }
     ],
     "driving": {
@@ -4549,7 +5670,17 @@
     "publicTransit": {
       "googleDestination": "洲本高速バスセンター",
       "description": "自神戶或大阪搭乘高速巴士至「洲本高速巴士中心」下車。由於無公車直達山頂，建議轉乘計程車約10分鐘直達山頂停車場（亦可自山腳文化史料館旁沿登山步道步行上山約30分鐘）。"
-    }
+    },
+    "alias": "三熊城",
+    "castleCardLocations": [
+      {
+        "label": "洲本市立淡路文化史料館",
+        "googleLabel": "洲本市立淡路文化史料館",
+        "latitude": 34.333056,
+        "longitude": 134.908056,
+        "businessHours": "營業時間：9:00～17:00"
+      }
+    ]
   },
   "165": {
     "subtitle": "大和郡山城",
@@ -4559,7 +5690,8 @@
         "label": "大和郡山城址「柳澤文庫」入口服務台櫃檯",
         "googleLabel": "柳沢文庫",
         "latitude": 34.651944,
-        "longitude": 135.781667
+        "longitude": 135.781667,
+        "businessHours": "請洽詢柳澤文庫"
       }
     ],
     "driving": {
@@ -4575,7 +5707,23 @@
     "publicTransit": {
       "googleDestination": "近鉄郡山駅",
       "description": "搭乘近鐵橿原線至「近鐵郡山」站下車，出站由北口步行僅需約7-10分鐘即可跨越開闊的護城河直接由追手門入城。"
-    }
+    },
+    "alias": "大內館",
+    "castleCardLocations": [
+      {
+        "label": "柳沢文庫",
+        "googleLabel": "柳沢文庫",
+        "latitude": 34.651944,
+        "longitude": 135.781667,
+        "businessHours": "請洽詢柳澤文庫"
+      },
+      {
+        "label": "柳澤文庫前庭園內「番屋カフェ」（文庫休業日）",
+        "googleLabel": "大和郡山市観光協会",
+        "latitude": 34.651944,
+        "longitude": 135.781667
+      }
+    ]
   },
   "166": {
     "subtitle": "宇陀松山城",
@@ -4585,7 +5733,8 @@
         "label": "「大宇陀温泉あきののゆ」服務台櫃檯（或大宇陀歷史文化館「藥之館」）",
         "googleLabel": "大宇陀歴史文化館「薬の館」",
         "latitude": 34.478889,
-        "longitude": 135.930278
+        "longitude": 135.930278,
+        "businessHours": "請洽詢宇陀市松山地區まちかどラボ"
       }
     ],
     "driving": {
@@ -4601,7 +5750,16 @@
     "publicTransit": {
       "googleDestination": "大宇陀 巴士站",
       "description": "從近鐵大阪線「榛原」站搭乘奈良交通巴士（往大宇陀方向）約20分鐘，在「大宇陀」終點站下車。隨後需沿著指標老街缓坡步道盤旋攀登約20-25分鐘始可抵達山頂本丸遺蹟。"
-    }
+    },
+    "alias": "鴻之峰城",
+    "castleCardLocations": [
+      {
+        "label": "宇陀市松山地区まちかどラボ",
+        "googleLabel": "宇陀市松山地区まちかどラボ",
+        "latitude": 34.478889,
+        "longitude": 135.930278
+      }
+    ]
   },
   "167": {
     "subtitle": "新宮城",
@@ -4611,13 +5769,15 @@
         "label": "新宮車站觀光案內所（JR新宮站前）",
         "googleLabel": "新宮駅",
         "latitude": 33.723889,
-        "longitude": 135.994444
+        "longitude": 135.994444,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一（新宮市立歷史民俗資料館）"
       },
       {
         "label": "新宮城跡丹鶴城公園管理箱（自主蓋章）",
         "googleLabel": "新宮城跡",
         "latitude": 33.729722,
-        "longitude": 135.992222
+        "longitude": 135.992222,
+        "businessHours": "開館時間：9:00～17:00　休館日：週一（新宮市立歷史民俗資料館）"
       }
     ],
     "driving": {
@@ -4633,7 +5793,16 @@
     "publicTransit": {
       "googleDestination": "新宮駅",
       "description": "搭乘JR紀勢本線至「新宮」站下車，出站後步行穿過歷史老街街道僅需約10-12分鐘即可直達城堡梯階登山口，登頂本丸石垣約需5分鐘。"
-    }
+    },
+    "alias": "長登城",
+    "castleCardLocations": [
+      {
+        "label": "新宮市觀光協會",
+        "googleLabel": "新宮市立歴史民俗資料館",
+        "latitude": 33.729722,
+        "longitude": 135.992222
+      }
+    ]
   },
   "168": {
     "subtitle": "若桜鬼ケ城",
@@ -4643,7 +5812,8 @@
         "label": "JR若櫻車站前觀光案內所（若櫻町觀光協會）",
         "googleLabel": "若桜駅",
         "latitude": 35.3425,
-        "longitude": 134.399444
+        "longitude": 134.399444,
+        "businessHours": "請洽詢若桜町觀光案內所"
       }
     ],
     "driving": {
@@ -4659,7 +5829,15 @@
     "publicTransit": {
       "googleDestination": "若桜駅",
       "description": "搭乘若櫻鐵道至終點「若櫻」站下車。由於完全無公車登山，由車站步行至中腹登山口約20分鐘，隨後需徒步攀登原始森林山路步道約30分鐘始可抵達山頂本丸石頭防線。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "若桜町観光案内所",
+        "googleLabel": "若桜町観光案内所",
+        "latitude": 35.3425,
+        "longitude": 134.399444
+      }
+    ]
   },
   "169": {
     "subtitle": "米子城",
@@ -4669,13 +5847,15 @@
         "label": "米子市山陰歷史館服務台櫃檯（市區內）",
         "googleLabel": "米子市立山陰歴史館",
         "latitude": 35.428889,
-        "longitude": 133.328333
+        "longitude": 133.328333,
+        "businessHours": "請洽詢米子城跡三之丸番所或米子市立山陰歷史館"
       },
       {
         "label": "米子城跡湊山登山口管理箱（自主蓋章）",
         "googleLabel": "米子城跡",
         "latitude": 35.427222,
-        "longitude": 133.326389
+        "longitude": 133.326389,
+        "businessHours": "請洽詢米子城跡三之丸番所或米子市立山陰歷史館"
       }
     ],
     "driving": {
@@ -4691,7 +5871,23 @@
     "publicTransit": {
       "googleDestination": "米子駅",
       "description": "搭乘JR山陰本線至「米子」站下車，出站後步行約15-20分鐘抵達湊山公園登山口，隨後需踏著鋪設平整的石階山路健行攀登約15分鐘即可登頂無敵視野的天守台。"
-    }
+    },
+    "alias": "久米城",
+    "castleCardLocations": [
+      {
+        "label": "米子市立山陰歴史館",
+        "googleLabel": "米子市立山陰歴史館",
+        "latitude": 35.428889,
+        "longitude": 133.328333,
+        "businessHours": "請洽詢米子城跡三之丸番所或米子市立山陰歷史館"
+      },
+      {
+        "label": "米子まちなか観光案内所",
+        "googleLabel": "米子まちなか観光案内所",
+        "latitude": 35.427222,
+        "longitude": 133.326389
+      }
+    ]
   },
   "170": {
     "subtitle": "濱田城",
@@ -4701,7 +5897,8 @@
         "label": "濱田城資料館服務台櫃檯（山腳下長屋門附近）",
         "googleLabel": "浜田城資料館",
         "latitude": 34.901667,
-        "longitude": 132.083889
+        "longitude": 132.083889,
+        "businessHours": "請洽詢濱田護國神社社務所或濱田市濱田城資料館"
       }
     ],
     "driving": {
@@ -4717,7 +5914,8 @@
     "publicTransit": {
       "googleDestination": "浜田駅",
       "description": "搭乘JR山陰本線至「濱田」站下車，出站後轉乘市內循環巴士約7分鐘至「城山公園口」站下車即達資料館，隨後沿山路步道步行登山約10分鐘即可抵達山頂石頭本丸。"
-    }
+    },
+    "alias": "龜山城"
   },
   "171": {
     "subtitle": "備中高松城",
@@ -4727,7 +5925,8 @@
         "label": "備中高松城跡資料館服務台櫃檯",
         "googleLabel": "備中高松城跡資料館",
         "latitude": 34.694444,
-        "longitude": 133.823611
+        "longitude": 133.823611,
+        "businessHours": "休館日改至清鏡庵"
       }
     ],
     "driving": {
@@ -4753,13 +5952,15 @@
         "label": "JR三原車站觀光案內所（車站大廳一樓）",
         "googleLabel": "三原駅",
         "latitude": 34.400556,
-        "longitude": 133.083333
+        "longitude": 133.083333,
+        "businessHours": "請洽詢三原觀光協会或三原市歷史民俗資料館"
       },
       {
         "label": "三原歷史民俗資料館服務台櫃檯",
         "googleLabel": "三原市歴史民俗資料館",
         "latitude": 34.403889,
-        "longitude": 133.079444
+        "longitude": 133.079444,
+        "businessHours": "請洽詢三原觀光協会或三原市歷史民俗資料館"
       }
     ],
     "driving": {
@@ -4775,7 +5976,15 @@
     "publicTransit": {
       "googleDestination": "三原駅",
       "description": "三原城交通極其神級！搭乘JR山陽新幹線或山陽本線至「三原」站下車，本丸天守台遺蹟直接與車站二樓月台相連，出站步行1分鐘即可登頂石垣台。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "三原観光協会",
+        "googleLabel": "三原観光協会",
+        "latitude": 34.400556,
+        "longitude": 133.083333
+      }
+    ]
   },
   "173": {
     "subtitle": "新高山城",
@@ -4785,7 +5994,8 @@
         "label": "本鄉生涯學習中心服務台（山腳下，週一公休時移至三原車站觀光案內所）",
         "googleLabel": "本郷生涯学習センター",
         "latitude": 34.409167,
-        "longitude": 132.995833
+        "longitude": 132.995833,
+        "businessHours": "請洽詢本郷生涯學習センター或本郷町觀光協会"
       }
     ],
     "driving": {
@@ -4801,7 +6011,16 @@
     "publicTransit": {
       "googleDestination": "本郷駅(広島県)",
       "description": "搭乘JR山陽本線至「本鄉」站下車，出站後步行先至山腳學習中心蓋章。隨後步行至登山口約15分鐘，隨後需徒步攀登相當考驗體力的原始懸崖山路步道約35-40分鐘始可抵達本丸遺址。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "本郷町觀光協會",
+        "googleLabel": "本郷生涯学習センター",
+        "latitude": 34.409167,
+        "longitude": 132.995833,
+        "businessHours": "平日午前のみ"
+      }
+    ]
   },
   "174": {
     "subtitle": "大內氏館‧高嶺城",
@@ -4811,7 +6030,8 @@
         "label": "山口市大內文化特定地域導覽設施（「大內氏館跡」庭園入口服務台）",
         "googleLabel": "大内氏館跡",
         "latitude": 34.185278,
-        "longitude": 131.488611
+        "longitude": 131.488611,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -4837,7 +6057,8 @@
         "label": "勝瑞城館跡考古導覽展示室（勝瑞史蹟公園內櫃檯）",
         "googleLabel": "勝瑞城館跡",
         "latitude": 34.118056,
-        "longitude": 134.520833
+        "longitude": 134.520833,
+        "businessHours": "請洽詢勝瑞現場事務所或武田石油"
       }
     ],
     "driving": {
@@ -4853,7 +6074,15 @@
     "publicTransit": {
       "googleDestination": "勝瑞駅",
       "description": "勝瑞城交通極其神級！搭乘JR高德線至「勝瑞」站下車，出站由北口沿指標田園道路筆直步行僅需約5分鐘即可直接進入世界遺產史蹟公園內圈。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "apollostation勝瑞SS（武田石油）",
+        "googleLabel": "apollostation勝瑞SS",
+        "latitude": 34.118056,
+        "longitude": 134.520833
+      }
+    ]
   },
   "176": {
     "subtitle": "一宮城",
@@ -4863,7 +6092,8 @@
         "label": "一宮城跡山腳管理引導箱（或一宮社區中心服務台櫃檯）",
         "googleLabel": "一宮城跡",
         "latitude": 34.054444,
-        "longitude": 134.464167
+        "longitude": 134.464167,
+        "businessHours": "請洽詢一宮城登山口說明板旁"
       }
     ],
     "driving": {
@@ -4889,7 +6119,8 @@
         "label": "東香川市引田飛鳥公民館服務台（山腳下老街附近）",
         "googleLabel": "東かがわ市引田飛鳥公民館",
         "latitude": 34.220833,
-        "longitude": 134.404722
+        "longitude": 134.404722,
+        "businessHours": "開館時間：9:00～17:00　休館日：週二（引田公民館）；或讃州井筒屋敷 營業時間：10:00～16:00　休館日：週三"
       }
     ],
     "driving": {
@@ -4915,7 +6146,8 @@
         "label": "今治市村上海賊博物館入口服務台櫃檯（位於大島岸邊，注意非島上現場）",
         "googleLabel": "今治市村上海賊ミュージアム",
         "latitude": 34.195278,
-        "longitude": 133.078889
+        "longitude": 133.078889,
+        "businessHours": "請洽詢今治市村上海賊ミュージアム"
       }
     ],
     "driving": {
@@ -4931,7 +6163,17 @@
     "publicTransit": {
       "googleDestination": "村上海賊ミュージアム前 巴士站",
       "description": "從JR予讚線「今治」站或山陽新幹線「福山」站搭乘島波海道高速巴士至「大島宮窪」站下車，轉乘島內巴士至「村上海賊博物館前」站下車即達。攻城師可在博物館前直接遠眺海峽中央的能島荒島遺蹟。"
-    }
+    },
+    "alias": "玖島城",
+    "castleCardLocations": [
+      {
+        "label": "JiBaカフェ能島（村上海賊博物館）",
+        "googleLabel": "今治市村上海賊ミュージアム",
+        "latitude": 34.195278,
+        "longitude": 133.078889,
+        "businessHours": "請洽詢今治市村上海賊ミュージアム"
+      }
+    ]
   },
   "179": {
     "subtitle": "河後森城",
@@ -4941,7 +6183,8 @@
         "label": "河後森城跡導覽綜合設施服務台櫃檯（西口主要入口旁）",
         "googleLabel": "河後森城跡案内所",
         "latitude": 33.195278,
-        "longitude": 132.708889
+        "longitude": 132.708889,
+        "businessHours": "全年無休、無營業時間限制（河後森城跡西第十曲輪馬屋）"
       }
     ],
     "driving": {
@@ -4967,7 +6210,8 @@
         "label": "高知縣立歷史民俗資料館服務台櫃檯（與城內本丸相鄰）",
         "googleLabel": "高知県立歴史民俗資料館",
         "latitude": 33.593889,
-        "longitude": 133.573611
+        "longitude": 133.573611,
+        "businessHours": "請洽詢高知縣立歷史民俗資料館二樓綜合案內"
       }
     ],
     "driving": {
@@ -4983,7 +6227,16 @@
     "publicTransit": {
       "googleDestination": "学校前(高知県) 巴士站",
       "description": "從JR「高知」站或「南國」市區，搭乘土佐電交通巴士（往領石方向約20分鐘）至「學校前」站下車，出站沿指標緩坡上山步行健行約15分鐘即可抵達歷史民俗資料館與岡豐城詰之丸遺跡。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "高知縣立歷史民俗資料館博物館商店",
+        "googleLabel": "高知県立歴史民俗資料館",
+        "latitude": 33.593889,
+        "longitude": 133.573611,
+        "businessHours": "請洽詢高知縣立歷史民俗資料館二樓綜合案內"
+      }
+    ]
   },
   "181": {
     "subtitle": "小倉城",
@@ -4993,7 +6246,8 @@
         "label": "小倉城天守閣內部一樓入口櫃檯（需購票入館）",
         "googleLabel": "小倉城",
         "latitude": 33.884167,
-        "longitude": 130.874444
+        "longitude": 130.874444,
+        "businessHours": "請洽詢しろテラス（小倉城土產處）"
       }
     ],
     "driving": {
@@ -5009,7 +6263,17 @@
     "publicTransit": {
       "googleDestination": "小倉駅",
       "description": "搭乘JR山陽新幹線或鹿兒島本線至「小倉」站下車，出站後步行穿過市區紫川大橋與老街街道約15分鐘即可抵達小倉城址公園；或由JR「西小倉」站步行約10分鐘即達。"
-    }
+    },
+    "alias": "勝山城",
+    "castleCardLocations": [
+      {
+        "label": "しろテラス",
+        "googleLabel": "小倉城",
+        "latitude": 33.884167,
+        "longitude": 130.874444,
+        "businessHours": "請洽詢しろテラス（小倉城土產處）"
+      }
+    ]
   },
   "182": {
     "subtitle": "水城",
@@ -5019,7 +6283,8 @@
         "label": "水城館歷史導覽設施櫃檯（水城跡東門旁）",
         "googleLabel": "水城館",
         "latitude": 33.526667,
-        "longitude": 130.496389
+        "longitude": 130.496389,
+        "businessHours": "請洽詢現場或官方網站確認"
       }
     ],
     "driving": {
@@ -5035,7 +6300,16 @@
     "publicTransit": {
       "googleDestination": "水城駅",
       "description": "搭乘JR鹿兒島本線至「水城」站下車，出站後步行沿著鐵道旁古道指標僅需約5分鐘即可直達巨型土壘遺蹟邊緣。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "水城館",
+        "googleLabel": "水城館",
+        "latitude": 33.526667,
+        "longitude": 130.496389,
+        "businessHours": "請洽詢現場或官方網站確認"
+      }
+    ]
   },
   "183": {
     "subtitle": "久留米城",
@@ -5045,7 +6319,8 @@
         "label": "久留米城跡本丸內篠山神社社務所櫃檯",
         "googleLabel": "篠山神社",
         "latitude": 33.328056,
-        "longitude": 130.505556
+        "longitude": 130.505556,
+        "businessHours": "請洽詢篠山神社社務所"
       }
     ],
     "driving": {
@@ -5061,7 +6336,8 @@
     "publicTransit": {
       "googleDestination": "大学病院前(福岡県) 巴士站",
       "description": "從JR「久留米」站搭乘西鐵巴士（往大學醫院方向約5分鐘）至「大學醫院前」站下車，步行僅需約3分鐘即可跨越護城河直接由冠木門遺跡入城。"
-    }
+    },
+    "alias": "篠原城"
   },
   "184": {
     "subtitle": "基肄城",
@@ -5071,7 +6347,8 @@
         "label": "基山町立歷史民俗資料館服務台櫃檯（山腳下）",
         "googleLabel": "基山町立歴史民俗資料館",
         "latitude": 33.431389,
-        "longitude": 130.518611
+        "longitude": 130.518611,
+        "businessHours": "請洽詢基山町民會館內事務所"
       }
     ],
     "driving": {
@@ -5097,7 +6374,8 @@
         "label": "唐津城天守閣內部一樓入口改札櫃檯（需買票進館）",
         "googleLabel": "唐津城",
         "latitude": 33.453611,
-        "longitude": 129.978056
+        "longitude": 129.978056,
+        "businessHours": "請洽詢唐津城1樓入館受付"
       }
     ],
     "driving": {
@@ -5113,7 +6391,8 @@
     "publicTransit": {
       "googleDestination": "唐津駅",
       "description": "搭乘JR筑肥線或唐津線至「唐津」站下車，出站後步行穿過歷史市區老街約15-20分鐘即可直達滿島山腳，可選擇搭乘付費電梯或健行踏石階上山約5分鐘抵達天守下。"
-    }
+    },
+    "alias": "舞鶴城"
   },
   "186": {
     "subtitle": "金田城",
@@ -5123,13 +6402,15 @@
         "label": "對馬觀光物產協會服務台（位於嚴原港市區，注意非城址現場）",
         "googleLabel": "対馬観光物産協会",
         "latitude": 34.204444,
-        "longitude": 129.289444
+        "longitude": 129.289444,
+        "businessHours": "請洽詢觀光情報館ふれあい処つしま或美津島地區公民館"
       },
       {
         "label": "美津島町地域活性化中心「美津島綜合支所」櫃檯",
         "googleLabel": "美津島合同庁舎",
         "latitude": 34.275556,
-        "longitude": 129.319722
+        "longitude": 129.319722,
+        "businessHours": "請洽詢觀光情報館ふれあい処つしま或美津島地區公民館"
       }
     ],
     "driving": {
@@ -5155,7 +6436,8 @@
         "label": "五島市觀光歷史資料館入口服務台櫃檯（位於城內二之丸）",
         "googleLabel": "五島市観光歴史資料館",
         "latitude": 32.695278,
-        "longitude": 128.841944
+        "longitude": 128.841944,
+        "businessHours": "請洽詢五島氏庭園隱殿屋敷或心字ヶ池"
       }
     ],
     "driving": {
@@ -5171,7 +6453,16 @@
     "publicTransit": {
       "googleDestination": "福江港ターミナル",
       "description": "從長崎港或博多港搭乘渡輪/噴射船抵達五島列島「福江港」碼頭下車。出站後沿著港口步道老街指標步行僅需約10分鐘即可跨越外護城河直接抵達福江城蹴門遺跡。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "五島市觀光協會",
+        "googleLabel": "五島市観光歴史資料館",
+        "latitude": 32.695278,
+        "longitude": 128.841944,
+        "businessHours": "請洽詢五島氏庭園隱殿屋敷或心字ヶ池"
+      }
+    ]
   },
   "188": {
     "subtitle": "原城",
@@ -5181,13 +6472,15 @@
         "label": "原城跡導覽綜合設施櫃檯（大手門入口旁）",
         "googleLabel": "原城跡案内所",
         "latitude": 32.626944,
-        "longitude": 130.255556
+        "longitude": 130.255556,
+        "businessHours": "營業時間：9:30～16:30"
       },
       {
         "label": "南島原市有馬切支丹遺產紀念館服務台",
         "googleLabel": "有馬キリシタン遺産記念館",
         "latitude": 32.622222,
-        "longitude": 130.222222
+        "longitude": 130.222222,
+        "businessHours": "開館時間：9:00～18:00 週四休館"
       }
     ],
     "driving": {
@@ -5203,7 +6496,8 @@
     "publicTransit": {
       "googleDestination": "原城前 巴士站",
       "description": "從島原鐵道「島原」站搭乘島鐵巴士（往加津佐海水浴場方向約50分鐘）至「原城前」站下車，隨後沿著平整緩坡道路指標步行約15分鐘即可抵達世界遺產天守台廢墟。"
-    }
+    },
+    "alias": "春之城"
   },
   "189": {
     "subtitle": "鞠智城",
@@ -5213,7 +6507,8 @@
         "label": "歷史公園鞠智城溫故創生館服務台櫃檯",
         "googleLabel": "温故創生館",
         "latitude": 33.004167,
-        "longitude": 130.785556
+        "longitude": 130.785556,
+        "businessHours": "請洽詢歷史公園鞠智城或溫故創生館"
       }
     ],
     "driving": {
@@ -5239,13 +6534,15 @@
         "label": "八代市立博物館未來之館服務台（位於城外隔壁，注意公休時移至城內社務所）",
         "googleLabel": "八代市立博物館 未来の森ミュージアム",
         "latitude": 32.508333,
-        "longitude": 130.598889
+        "longitude": 130.598889,
+        "businessHours": "請洽詢八代市立博物館未來之森ミュージアム或八代市民俗傳統藝能傳承館"
       },
       {
         "label": "八代城本丸內八代宮社務所櫃檯",
         "googleLabel": "八代宮",
         "latitude": 32.506389,
-        "longitude": 130.601111
+        "longitude": 130.601111,
+        "businessHours": "請洽詢八代市立博物館未來之森ミュージアム或八代市民俗傳統藝能傳承館"
       }
     ],
     "driving": {
@@ -5261,7 +6558,8 @@
     "publicTransit": {
       "googleDestination": "八代市役所前 巴士站",
       "description": "搭乘JR肥薩線/鹿兒島本線至「八代」站下車，轉乘產交巴士約7分鐘至「八代市役所前」站下車，出站步行僅需約3分鐘即可跨越巨大的護城河紅橋直接進入石頭本丸।"
-    }
+    },
+    "alias": "白鷺城"
   },
   "191": {
     "subtitle": "中津城",
@@ -5271,7 +6569,8 @@
         "label": "中津城天守閣內部一樓入口售票服務台（需買票進館）",
         "googleLabel": "中津城",
         "latitude": 33.606111,
-        "longitude": 131.188333
+        "longitude": 131.188333,
+        "businessHours": "營業時間：9時～17時（全年無休）"
       }
     ],
     "driving": {
@@ -5287,7 +6586,8 @@
     "publicTransit": {
       "googleDestination": "中津駅(大分県)",
       "description": "搭乘JR日豐本線（特急列車）至「中津」站下車，由北口出站後沿著老街指標筆直步行約15分鐘即可直接看見宏偉的水城護城河牆。"
-    }
+    },
+    "alias": "扇城"
   },
   "192": {
     "subtitle": "角牟禮城",
@@ -5297,7 +6597,8 @@
         "label": "豐後森藩資料館櫃檯（山腳下「わらべの館」內）",
         "googleLabel": "豊後森藩資料館",
         "latitude": 33.284444,
-        "longitude": 131.159444
+        "longitude": 131.159444,
+        "businessHours": "開館時間：9時～16時半 週一休館"
       }
     ],
     "driving": {
@@ -5323,7 +6624,8 @@
         "label": "臼杵市観光交流プラザ 服務台櫃檯（山腳下老街旁）",
         "googleLabel": "臼杵市観光交流プラザ",
         "latitude": 33.118056,
-        "longitude": 131.807778
+        "longitude": 131.807778,
+        "businessHours": "營業時間：9時～18時"
       }
     ],
     "driving": {
@@ -5349,7 +6651,8 @@
         "label": "佐伯市歴史資料館服務台櫃檯（三之丸御殿跡旁）",
         "googleLabel": "佐伯市歴史資料館",
         "latitude": 32.961111,
-        "longitude": 131.895556
+        "longitude": 131.895556,
+        "businessHours": "開館時間：9時～17時 週一休館"
       }
     ],
     "driving": {
@@ -5365,7 +6668,17 @@
     "publicTransit": {
       "googleDestination": "佐伯駅",
       "description": "搭乘JR日豐本線至「佐伯」站下車。由站前轉乘大分巴士（往市街地方向約10分鐘）至「大手前」終點站下車即達資料館。隨後需踏著鋪設整齊的石階山路攀登約20-25分鐘始可登頂石頭本丸。"
-    }
+    },
+    "alias": "鶴屋城",
+    "castleCardLocations": [
+      {
+        "label": "佐伯市歴史資料館",
+        "googleLabel": "佐伯市歴史資料館",
+        "latitude": 32.961111,
+        "longitude": 131.895556,
+        "businessHours": "開館時間：9時～17時 週一休館"
+      }
+    ]
   },
   "195": {
     "subtitle": "延岡城",
@@ -5375,7 +6688,8 @@
         "label": "延岡城跡二之丸管理事務所服務台櫃檯（北大手門旁）",
         "googleLabel": "延岡城跡(城山公園)",
         "latitude": 32.581667,
-        "longitude": 131.663056
+        "longitude": 131.663056,
+        "businessHours": "二之丸廣場管理事務所入口前，全日可蓋章"
       }
     ],
     "driving": {
@@ -5391,7 +6705,17 @@
     "publicTransit": {
       "googleDestination": "延岡駅",
       "description": "搭乘JR日豐本線（特急）至「延岡」站下車，轉乘宮崎交通巴士約7分鐘至「市役所前」站下車，出站由側門步行僅需約5分鐘即可抵達城山公園主要入口。"
-    }
+    },
+    "alias": "縣城",
+    "castleCardLocations": [
+      {
+        "label": "二之丸廣場觀光交流中心",
+        "googleLabel": "延岡城跡",
+        "latitude": 32.581667,
+        "longitude": 131.663056,
+        "businessHours": "二之丸廣場管理事務所入口前，全日可蓋章"
+      }
+    ]
   },
   "196": {
     "subtitle": "佐土原城",
@@ -5401,7 +6725,8 @@
         "label": "佐土原城跡二之丸御殿歷史資料館入口服務台",
         "googleLabel": "佐土原城跡二の丸御殿",
         "latitude": 32.064167,
-        "longitude": 131.428889
+        "longitude": 131.428889,
+        "businessHours": "開館日：週六日及國定假日（平日休館）　開館時間：9:00～16:30（佐土原歷史資料館鶴松館）；或佐土原城駅「佐土原いろは館」營業時間：9:00～18:00（全年無休）"
       }
     ],
     "driving": {
@@ -5417,7 +6742,8 @@
     "publicTransit": {
       "googleDestination": "佐土原駅",
       "description": "搭乘JR日豐本線至「佐土原」站下車。由於無直達公車前往，強烈建議在車站前轉乘計程車（車程約10分鐘）直達二之丸御殿；隨後若欲登頂本丸，需沿極陡峭的原始山路攀登步行約25分鐘。"
-    }
+    },
+    "alias": "鶴松城"
   },
   "197": {
     "subtitle": "志布志城",
@@ -5427,7 +6753,8 @@
         "label": "志布志市埋藏文化財中心服務台櫃檯（山腳下老街附近）",
         "googleLabel": "志布志市埋蔵文化財センター",
         "latitude": 31.478889,
-        "longitude": 131.103333
+        "longitude": 131.103333,
+        "businessHours": "開館時間：9時～17時 週一休館"
       }
     ],
     "driving": {
@@ -5443,7 +6770,8 @@
     "publicTransit": {
       "googleDestination": "志布志駅",
       "description": "搭乘JR日南線至終點「志布志」站下車，出站後先步行沿著老街指標步行約15分鐘至埋藏文化財中心蓋章。隨後再步行約12分鐘即可抵達內城大手門步道口，進入如迷宮般的深邃土溝要塞群。"
-    }
+    },
+    "alias": "內城"
   },
   "198": {
     "subtitle": "知覧城",
@@ -5453,7 +6781,8 @@
         "label": "知覧武家屋敷群觀光案內所（市區老街老街內，注意非城址現場）",
         "googleLabel": "知覧武家屋敷庭園",
         "latitude": 31.378889,
-        "longitude": 130.431389
+        "longitude": 130.431389,
+        "businessHours": "開館時間：9:00～17:00　休館日：週三（ミュージアム知覧）"
       }
     ],
     "driving": {
@@ -5479,7 +6808,8 @@
         "label": "世界遺產座喜味城跡尤恩塔文化資料館服務台櫃檯（歷史公園入口旁）",
         "googleLabel": "ユンタンザミュージアム",
         "latitude": 26.406944,
-        "longitude": 127.742222
+        "longitude": 127.742222,
+        "businessHours": "請洽詢座喜味城跡ユンタンザミュージアム"
       }
     ],
     "driving": {
@@ -5495,7 +6825,16 @@
     "publicTransit": {
       "googleDestination": "座喜味 巴士站",
       "description": "從那霸巴士總站搭乘琉球巴士（29路路公車）約1小時10分鐘，在「座喜味」站下車，出站後步行沿著松林坡道指標步行僅需約10-12分鐘即可穿過守護大門直達圓拱白石頭牆前。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "世界遺產座喜味城跡ユンタンザミュージアム",
+        "googleLabel": "ユンタンザミュージアム",
+        "latitude": 26.406944,
+        "longitude": 127.742222,
+        "businessHours": "請洽詢座喜味城跡ユンタンザミュージアム"
+      }
+    ]
   },
   "200": {
     "subtitle": "勝連城",
@@ -5505,7 +6844,8 @@
         "label": "勝連城跡導覽綜合設施服務台櫃檯（「あまわりパーク」歷史文化設施內）",
         "googleLabel": "あまわりパーク",
         "latitude": 26.330556,
-        "longitude": 127.878889
+        "longitude": 127.878889,
+        "businessHours": "請洽詢觀光ターミナル或勝連城跡"
       }
     ],
     "driving": {
@@ -5521,6 +6861,15 @@
     "publicTransit": {
       "googleDestination": "勝連城跡前 巴士站",
       "description": "從那霸巴士總站搭乘沖繩巴士（27或52路路公車）約1小時20分鐘，在「勝連城跡前」站下車。出站先至Amawari Park資料館蓋章。隨後可搭乘付費電動接駁小車或步行緩坡上山約5分鐘抵達山腳下，隨後攀登極其震撼盤旋的石頭梯階約10分鐘即可直達天際本丸主郭。"
-    }
+    },
+    "castleCardLocations": [
+      {
+        "label": "勝連城（調整中）",
+        "googleLabel": "勝連城",
+        "latitude": 26.330556,
+        "longitude": 127.878889,
+        "businessHours": "調整中，販售時期未定"
+      }
+    ]
   }
 }

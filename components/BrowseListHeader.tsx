@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
 import type { RegionId } from '../constants/regions';
-import type { SeriesFilter } from '../types/castle';
+import type { SeriesFilter, ProgressFilter } from '../types/castle';
 import { LocationFilters } from './LocationFilters';
 import { ProgressStats } from './ProgressStats';
 
@@ -14,12 +14,14 @@ type Option = {
 
 type BrowseListHeaderProps = {
   series: SeriesFilter;
+  progressFilter: ProgressFilter;
   regionId: RegionId | null;
   prefecture: string | null;
   nameQuery: string;
   prefectureOptions: readonly Option[];
   resultCount: number;
   onSeriesChange: (series: SeriesFilter) => void;
+  onProgressFilterChange: (progressFilter: ProgressFilter) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onNameQueryChange: (nameQuery: string) => void;
@@ -27,12 +29,14 @@ type BrowseListHeaderProps = {
 
 export function BrowseListHeader({
   series,
+  progressFilter,
   regionId,
   prefecture,
   nameQuery,
   prefectureOptions,
   resultCount,
   onSeriesChange,
+  onProgressFilterChange,
   onRegionChange,
   onPrefectureChange,
   onNameQueryChange,
@@ -45,11 +49,13 @@ export function BrowseListHeader({
       <View style={styles.divider} />
       <LocationFilters
         series={series}
+        progressFilter={progressFilter}
         regionId={regionId}
         prefecture={prefecture}
         nameQuery={nameQuery}
         prefectureOptions={prefectureOptions}
         onSeriesChange={onSeriesChange}
+        onProgressFilterChange={onProgressFilterChange}
         onRegionChange={onRegionChange}
         onPrefectureChange={onPrefectureChange}
         onNameQueryChange={onNameQueryChange}

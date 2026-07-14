@@ -1,6 +1,14 @@
 import { Directory, File, Paths } from 'expo-file-system';
 
-import { getDisplayImageUri, readSourceBytes } from './collectibleFileIO';
+import {
+  getDisplayImageUri,
+  isDirectoryEntry,
+  isFileEntry,
+  fileHasContent,
+  fileLikelyHasContent,
+  writeSourceToNewFile,
+} from './collectibleFileIO';
+import { normalizeFileUri } from './normalizeFileUri';
 import type { CastleCollectible, CollectibleKind } from '../types/castleCollectible';
 
 const ROOT_DIR_NAME = 'castle-collectibles';
@@ -51,7 +59,20 @@ export function getCastleCollectibleDirectory(
 }
 
 function isCollectibleFile(entry: Directory | File): entry is File {
-  return entry instanceof File;
+  return isFileEntry(entry);
+}
+
+function getStoredFileByteLength(file: File): number {
+  const reportedSize = file.info().size ?? 0;
+  if (reportedSize > 0) {
+    return reportedSize;
+  }
+
+  try {
+    return file.bytesSync().length;
+  } catch {
+    return 0;
+  }
 }
 
 function parseCollectibleFile(
@@ -63,8 +84,7 @@ function parseCollectibleFile(
     return null;
   }
 
-  const fileInfo = file.info();
-  if ((fileInfo.size ?? 0) <= 0) {
+  if (!fileLikelyHasContent(file) && getStoredFileByteLength(file) <= 0) {
     return null;
   }
 
@@ -80,6 +100,58 @@ function parseCollectibleFile(
     mimeType: file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
     createdAt,
   };
+}
+
+export function getCollectibleZipPath(
+  castleId: number,
+  kind: CollectibleKind,
+  filename: string,
+): string {
+  return `castle-collectibles/${castleId}/${kind}/${filename}`;
+}
+
+export function listAllCollectibles(): CastleCollectible[] {
+  const root = getCollectibleRootDirectory();
+  if (!root.exists) {
+    return [];
+  }
+
+  const results: CastleCollectible[] = [];
+
+  for (const castleEntry of root.list()) {
+    if (!isDirectoryEntry(castleEntry)) {
+      continue;
+    }
+
+    const castleId = Number(castleEntry.name);
+    if (!Number.isFinite(castleId) || castleId <= 0) {
+      continue;
+    }
+
+    for (const kindEntry of castleEntry.list()) {
+      if (!isDirectoryEntry(kindEntry)) {
+        continue;
+      }
+
+      const kind = kindEntry.name;
+      if (kind !== 'goshuin' && kind !== 'castle-card') {
+        continue;
+      }
+
+      for (const fileEntry of kindEntry.list()) {
+        if (!isCollectibleFile(fileEntry)) {
+          continue;
+        }
+
+        const item = parseCollectibleFile(castleId, kind, fileEntry);
+        if (item) {
+          results.push(item);
+        }
+      }
+    }
+  }
+
+  return results.sort((left, right) => right.createdAt - left.createdAt);
 }
 
 export function listCastleCollectibles(
@@ -104,18 +176,21 @@ export async function saveCastleCollectibleFromUri(
   kind: CollectibleKind,
   sourceUri: string,
   mimeType?: string | null,
+  options?: { base64Data?: string | null },
 ): Promise<CastleCollectible> {
   const directory = getCastleCollectibleDirectory(castleId, kind);
   const extension =
     extensionFromMimeType(mimeType) ?? extensionFromUri(sourceUri) ?? '.jpg';
   const filename = `${kind}-${Date.now()}${extension}`;
-  const destination = directory.createFile(filename, mimeType ?? null);
-  const bytes = await readSourceBytes(sourceUri);
-
-  destination.write(bytes);
+  const destination = await writeSourceToNewFile(
+    sourceUri,
+    directory,
+    filename,
+    { base64Data: options?.base64Data },
+  );
 
   const collectible = parseCollectibleFile(castleId, kind, destination);
-  if (!collectible) {
+  if (!collectible || !(await fileHasContent(destination))) {
     if (destination.exists) {
       destination.delete();
     }
@@ -126,7 +201,7 @@ export async function saveCastleCollectibleFromUri(
 }
 
 export function deleteCastleCollectible(item: CastleCollectible): void {
-  const file = new File(item.uri);
+  const file = new File(normalizeFileUri(item.uri));
   if (file.exists) {
     file.delete();
   }

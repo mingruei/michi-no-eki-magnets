@@ -1,31 +1,8 @@
 import type { ExpoConfig } from 'expo/config';
 
 const locationPermissionMessage = '用於依您目前位置自動篩選所在地方與府縣。';
-const photoPermissionMessage = '用於上傳御城印與城カード照片。';
-const cameraPermissionMessage = '用於掃描御城印與城カード。';
-
-function getGoogleIosUrlScheme(iosClientId: string): string | undefined {
-  const trimmed = iosClientId.trim();
-  if (!trimmed.endsWith('.apps.googleusercontent.com')) {
-    return undefined;
-  }
-
-  return `com.googleusercontent.apps.${trimmed.replace('.apps.googleusercontent.com', '')}`;
-}
-
-const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? '';
-const googleIosUrlScheme = getGoogleIosUrlScheme(googleIosClientId);
-
-const googlePlugins: NonNullable<ExpoConfig['plugins']> = googleIosUrlScheme
-  ? [
-      [
-        '@react-native-google-signin/google-signin',
-        {
-          iosUrlScheme: googleIosUrlScheme,
-        },
-      ],
-    ]
-  : [];
+const photoPermissionMessage = '用於上傳御城印與城卡照片。';
+const cameraPermissionMessage = '用於掃描御城印與城卡。';
 
 const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
 
@@ -39,7 +16,6 @@ const config: ExpoConfig = {
   scheme: 'japan-castles-map',
   plugins: [
     ...(isProductionBuild ? [] : (['expo-dev-client'] as const)),
-    'expo-web-browser',
     'expo-screen-orientation',
     [
       'expo-location',
@@ -70,25 +46,16 @@ const config: ExpoConfig = {
         ios: {
           deploymentTarget: '16.4',
           buildReactNativeFromSource: true,
-          extraPods: [
-            { name: 'AppCheckCore', version: '11.2.0' },
-            { name: 'GoogleUtilities', modular_headers: true },
-            { name: 'RecaptchaInterop', modular_headers: true },
-          ],
         },
       },
     ],
-    ...googlePlugins,
+    './plugins/withFmtXcode26Fix.js',
+    './plugins/withHermesDsym.js',
   ],
   extra: {
     eas: {
       projectId: 'a381aae1-a8d8-4d8f-9af8-47dc03fb19e4',
     },
-    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
-    googleIosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? '',
-    googleAndroidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ?? '',
-    googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? '',
   },
   ios: {
     supportsTablet: true,
@@ -103,7 +70,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 2,
+    versionCode: 38,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',

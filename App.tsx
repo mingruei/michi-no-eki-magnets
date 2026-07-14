@@ -1,40 +1,40 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import * as WebBrowser from 'expo-web-browser';
-
 import castlesData from './assets/castles.json';
 import { GlobalCollectibleUploadFab } from './components/GlobalCollectibleUploadFab';
 import { CastleDetailScreen } from './components/CastleDetailScreen';
 import { BrowseListHeader } from './components/BrowseListHeader';
 import { CastleList } from './components/CastleList';
 import { CastleMap } from './components/CastleMap';
-import { SettingsScreen } from './components/SettingsScreen';
 import type { RegionId } from './constants/regions';
 import { colors } from './constants/theme';
-import { CloudSyncProvider } from './hooks/useCloudSync';
 import { MapProviderProvider } from './hooks/useMapProvider';
-import { CastleProgressProvider } from './hooks/useCastleProgress';
+import { CastleProgressProvider, useCastleProgress } from './hooks/useCastleProgress';
 import { useConditionalPortraitLock } from './hooks/useConditionalPortraitLock';
 import { I18nProvider, useI18n } from './i18n';
-import type { Castle, SeriesFilter } from './types/castle';
+import type { Castle, ProgressFilter, SeriesFilter } from './types/castle';
 import { filterCastles, getAvailablePrefectures } from './utils/filterCastles';
 import { resolveLocalStartupContext } from './utils/localPrefecture';
 
 const castles = castlesData as Castle[];
 
-WebBrowser.maybeCompleteAuthSession();
+const SettingsScreen = lazy(() =>
+  import('./components/SettingsScreen').then((module) => ({ default: module.SettingsScreen })),
+);
 
 type MainScreen = 'browse' | 'map';
 type Screen = MainScreen | 'detail' | 'settings';
 
 function AppContent() {
   const { t, getPrefectureLabel } = useI18n();
+  const { progressMap } = useCastleProgress();
   useConditionalPortraitLock();
   const [screen, setScreen] = useState<Screen>('browse');
   const [returnScreen, setReturnScreen] = useState<MainScreen>('browse');
   const [series, setSeries] = useState<SeriesFilter>('all');
+  const [progressFilter, setProgressFilter] = useState<ProgressFilter>('all');
   const [regionId, setRegionId] = useState<RegionId | null>(null);
   const [prefecture, setPrefecture] = useState<string | null>(null);
   const [nameQuery, setNameQuery] = useState('');
@@ -83,10 +83,15 @@ function AppContent() {
 
   const filteredCastles = useMemo(
     () =>
-      filterCastles(castles, { regionId, prefecture, series, nameQuery }).sort(
-        (left, right) => left.number - right.number,
-      ),
-    [nameQuery, prefecture, regionId, series],
+      filterCastles(castles, {
+        regionId,
+        prefecture,
+        series,
+        nameQuery,
+        progressFilter,
+        progressMap,
+      }).sort((left, right) => left.number - right.number),
+    [nameQuery, prefecture, progressFilter, progressMap, regionId, series],
   );
 
   const openCastleDetail = (castle: Castle) => {
@@ -123,6 +128,11 @@ function AppContent() {
   const handlePrefectureChange = (nextPrefecture: string | null) => {
     setPrefecture(nextPrefecture);
     setNameQuery('');
+    closeDetailIfOpen();
+  };
+
+  const handleProgressFilterChange = (nextProgressFilter: ProgressFilter) => {
+    setProgressFilter(nextProgressFilter);
     closeDetailIfOpen();
   };
 
@@ -208,12 +218,14 @@ function AppContent() {
               ListHeaderComponent={
                 <BrowseListHeader
                   series={series}
+                  progressFilter={progressFilter}
                   regionId={regionId}
                   prefecture={prefecture}
                   nameQuery={nameQuery}
                   prefectureOptions={prefectureOptions}
                   resultCount={filteredCastles.length}
                   onSeriesChange={handleSeriesChange}
+                  onProgressFilterChange={handleProgressFilterChange}
                   onRegionChange={handleRegionChange}
                   onPrefectureChange={handlePrefectureChange}
                   onNameQueryChange={handleNameQueryChange}
@@ -233,7 +245,15 @@ function AppContent() {
 
         {isSettingsOpen ? (
           <SafeAreaView style={styles.detailLayer} edges={['top', 'left', 'right', 'bottom']}>
-            <SettingsScreen onBack={handleBackFromSettings} />
+            <Suspense
+              fallback={
+                <View style={styles.settingsLoading}>
+                  <ActivityIndicator size="large" color={colors.original} />
+                </View>
+              }
+            >
+              <SettingsScreen onBack={handleBackFromSettings} />
+            </Suspense>
           </SafeAreaView>
         ) : null}
       </View>
@@ -252,11 +272,9 @@ export default function App() {
     <SafeAreaProvider>
       <I18nProvider>
         <MapProviderProvider>
-          <CloudSyncProvider>
-            <CastleProgressProvider>
-              <AppContent />
-            </CastleProgressProvider>
-          </CloudSyncProvider>
+          <CastleProgressProvider>
+            <AppContent />
+          </CastleProgressProvider>
         </MapProviderProvider>
       </I18nProvider>
     </SafeAreaProvider>
@@ -276,6 +294,12 @@ const styles = StyleSheet.create({
   },
   detailLayer: {
     ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.background,
+  },
+  settingsLoading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background,
   },
   header: {

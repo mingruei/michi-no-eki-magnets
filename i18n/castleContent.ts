@@ -6,6 +6,7 @@ import type {
   CastlePublicTransitContent,
   NavigationPoint,
 } from '../types/navigation';
+import { extractCastleAliases } from '../utils/castleDisplayName';
 import {
   getCastleParkingCoordinates,
   getCastleStampCoordinates,
@@ -29,9 +30,11 @@ type CastlePublicTransitOverlay = {
 
 type CastleContentOverlay = {
   subtitle?: string | null;
+  alias?: string | null;
   description?: string;
   stampLocation?: string;
   stampLocations?: NavigationPoint[];
+  castleCardLocations?: NavigationPoint[];
   massTransport?: string;
   driving?: CastleDrivingOverlay;
   publicTransit?: CastlePublicTransitOverlay;
@@ -181,6 +184,49 @@ function resolvePublicTransitContent(
   };
 }
 
+function collectCastleContentAliases(): Readonly<Record<number, string>> {
+  const aliasesByCastleId = new Map<number, string>();
+
+  for (const localeContent of Object.values(castleContentByLocale)) {
+    for (const [castleIdKey, overlay] of Object.entries(localeContent)) {
+      const castleId = Number(castleIdKey);
+      const alias = resolveCastleAlias(overlay);
+
+      if (!Number.isFinite(castleId) || !alias) {
+        continue;
+      }
+
+      aliasesByCastleId.set(castleId, alias);
+    }
+  }
+
+  return Object.fromEntries(aliasesByCastleId.entries());
+}
+
+const castleContentAliasesByCastleId = collectCastleContentAliases();
+
+export function getCastleContentAlias(castleId: number): string | null {
+  return castleContentAliasesByCastleId[castleId] ?? null;
+}
+
+export function matchesCastleContentAlias(castleId: number, query: string): boolean {
+  const alias = getCastleContentAlias(castleId);
+  return alias != null && alias.includes(query);
+}
+
+function resolveCastleAlias(overlay: CastleContentOverlay): string | null {
+  const explicitAlias = overlay.alias?.trim();
+  if (explicitAlias) {
+    return explicitAlias;
+  }
+
+  if (!overlay.description) {
+    return null;
+  }
+
+  return extractCastleAliases(overlay.description);
+}
+
 function resolveZhHantContent(
   castle: Castle,
   t: TranslateFn,
@@ -188,9 +234,12 @@ function resolveZhHantContent(
 ): CastleContentFields {
   const overlay = castleContentByLocale['zh-Hant'][String(castle.id)] ?? {};
   const locationLabel = getLocationLabel(castle, getPrefectureLabel);
+  const displayName = overlay.subtitle?.trim() || castle.name;
 
   return {
     locationLabel,
+    displayName,
+    alias: resolveCastleAlias(overlay),
     subtitle: overlay.subtitle ?? null,
     description:
       overlay.description ??
@@ -198,6 +247,7 @@ function resolveZhHantContent(
         ? t('castle.continuedDescription', { location: locationLabel })
         : t('castle.noDescription')),
     stampLocations: resolveStampLocations(castle, overlay, locationLabel, t),
+    castleCardLocations: overlay.castleCardLocations ?? [],
     driving: resolveDrivingContent(castle, overlay),
     publicTransit: resolvePublicTransitContent(castle, overlay, t),
   };
@@ -236,9 +286,12 @@ function resolveDefaultContent(
 
   return {
     locationLabel,
+    displayName: castle.name,
+    alias: null,
     subtitle: castle.nameEn ?? null,
     description: castle.shortDescription ?? castle.history ?? t('castle.noDescription'),
     stampLocations,
+    castleCardLocations: [],
     driving: {
       description: null,
       parkingLocations,

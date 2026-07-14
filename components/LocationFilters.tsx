@@ -12,7 +12,7 @@ import {
 import { REGIONS, type RegionId } from '../constants/regions';
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
-import type { SeriesFilter } from '../types/castle';
+import type { SeriesFilter, ProgressFilter } from '../types/castle';
 
 type Option = {
   value: string | null;
@@ -23,15 +23,17 @@ type LocationFiltersProps = {
   regionId: RegionId | null;
   prefecture: string | null;
   series: SeriesFilter;
+  progressFilter: ProgressFilter;
   nameQuery: string;
   prefectureOptions: readonly Option[];
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onSeriesChange: (series: SeriesFilter) => void;
+  onProgressFilterChange: (progressFilter: ProgressFilter) => void;
   onNameQueryChange: (nameQuery: string) => void;
 };
 
-type ActivePicker = 'region' | 'prefecture' | 'series' | null;
+type ActivePicker = 'region' | 'prefecture' | 'series' | 'progress' | null;
 
 function FilterField({
   label,
@@ -152,11 +154,13 @@ export function LocationFilters({
   regionId,
   prefecture,
   series,
+  progressFilter,
   nameQuery,
   prefectureOptions,
   onRegionChange,
   onPrefectureChange,
   onSeriesChange,
+  onProgressFilterChange,
   onNameQueryChange,
 }: LocationFiltersProps) {
   const { t, getRegionLabel, getSeriesLabel } = useI18n();
@@ -182,12 +186,29 @@ export function LocationFilters({
     [getSeriesLabel, t],
   );
 
+  const progressOptions = useMemo<readonly Option[]>(
+    () => [
+      { value: 'all', label: t('common.all') },
+      { value: 'not-visited', label: t('filter.progressNotVisited') },
+      { value: 'no-meijo-stamp', label: t('filter.progressNoMeijoStamp') },
+      { value: 'no-goshuin', label: t('filter.progressNoGoshuin') },
+      { value: 'no-castle-card', label: t('filter.progressNoCastleCard') },
+      { value: 'visited', label: t('filter.progressVisited') },
+      { value: 'has-meijo-stamp', label: t('filter.progressHasMeijoStamp') },
+      { value: 'has-goshuin', label: t('filter.progressHasGoshuin') },
+      { value: 'has-castle-card', label: t('filter.progressHasCastleCard') },
+    ],
+    [t],
+  );
+
   const regionLabel =
     regionOptions.find((option) => option.value === regionId)?.label ?? t('common.all');
   const prefectureLabel =
     prefectureOptions.find((option) => option.value === prefecture)?.label ?? t('common.all');
   const seriesLabel =
     seriesOptions.find((option) => option.value === series)?.label ?? t('common.all');
+  const progressLabel =
+    progressOptions.find((option) => option.value === progressFilter)?.label ?? t('common.all');
 
   return (
     <View style={styles.container}>
@@ -226,6 +247,21 @@ export function LocationFilters({
           />
         </View>
       </View>
+
+      <FilterField
+        label={t('filter.progress')}
+        value={progressLabel}
+        onPress={() => setActivePicker('progress')}
+      />
+
+      <PickerModal
+        visible={activePicker === 'progress'}
+        title={t('filter.selectProgress')}
+        options={progressOptions}
+        selectedValue={progressFilter}
+        onSelect={(value) => onProgressFilterChange((value ?? 'all') as ProgressFilter)}
+        onClose={() => setActivePicker(null)}
+      />
 
       <PickerModal
         visible={activePicker === 'series'}

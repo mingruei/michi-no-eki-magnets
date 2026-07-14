@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 
 import { colors } from '../constants/theme';
-import { CollectibleGalleryViewer } from '../components/CollectibleGalleryViewer';
 import { useCastleCollectibles } from '../hooks/useCastleCollectibles';
 import { useI18n } from '../i18n';
 import type { CollectibleKind } from '../types/castleCollectible';
@@ -26,6 +25,11 @@ type CastleCollectibleUploadSectionProps = {
 };
 
 const UPLOAD_SOURCES: CollectibleUploadSource[] = ['scan', 'file', 'gallery'];
+
+const CollectibleGalleryViewer = lazy(async () => {
+  const module = await import('./CollectibleGalleryViewer');
+  return { default: module.CollectibleGalleryViewer };
+});
 
 function getUploadSourceLabel(
   source: CollectibleUploadSource,
@@ -54,6 +58,12 @@ function getErrorMessage(error: string | null, t: (key: string) => string): stri
     case 'collectible-load-failed':
       return t('castle.collectibleLoadFailed');
     case 'collectible-upload-failed':
+      return t('castle.collectibleUploadFailed');
+    case 'Failed to read selected file':
+    case 'Failed to write selected file':
+    case 'Failed to save collectible':
+    case 'Failed to persist upload image':
+    case 'picker-timeout':
       return t('castle.collectibleUploadFailed');
     default:
       return error;
@@ -136,12 +146,16 @@ export function CastleCollectibleUploadSection({
         <Text style={styles.deleteHint}>{t('castle.collectibleDeleteHint')}</Text>
       ) : null}
 
-      <CollectibleGalleryViewer
-        items={items}
-        initialIndex={viewerIndex}
-        visible={viewerVisible}
-        onClose={() => setViewerVisible(false)}
-      />
+      {viewerVisible ? (
+        <Suspense fallback={null}>
+          <CollectibleGalleryViewer
+            items={items}
+            initialIndex={viewerIndex}
+            visible={viewerVisible}
+            onClose={() => setViewerVisible(false)}
+          />
+        </Suspense>
+      ) : null}
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 

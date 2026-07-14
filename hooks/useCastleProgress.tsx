@@ -4,14 +4,9 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
-  type Dispatch,
-  type MutableRefObject,
   type ReactNode,
-  type SetStateAction,
 } from 'react';
-import { AppState } from 'react-native';
 
 import {
   EMPTY_CASTLE_PROGRESS_ENTRY,
@@ -21,8 +16,6 @@ import {
   type CastleProgressMap,
 } from '../types/castleProgress';
 import { loadProgressMap, saveProgressMap } from '../utils/castleProgressStorage';
-import { mergeProgressMaps } from '../utils/mergeProgressMap';
-import { useCloudSync } from './useCloudSync';
 
 type CastleProgressContextValue = {
   loaded: boolean;
@@ -30,37 +23,14 @@ type CastleProgressContextValue = {
   getProgress: (castleId: number) => CastleProgressEntry;
   toggleProgress: (castleId: number, field: CastleProgressField) => void;
   markProgressCollected: (castleId: number, field: CastleProgressField) => void;
+  reloadProgressMap: () => Promise<void>;
 };
 
 const CastleProgressContext = createContext<CastleProgressContextValue | null>(null);
 
-function applyMergedProgress(
-  merged: CastleProgressMap,
-  revisionAtSyncStart: number,
-  localRevisionRef: MutableRefObject<number>,
-  setProgressMap: Dispatch<SetStateAction<CastleProgressMap>>,
-): void {
-  void saveProgressMap(merged).catch(() => undefined);
-
-  if (revisionAtSyncStart === localRevisionRef.current) {
-    setProgressMap(merged);
-    return;
-  }
-
-  setProgressMap((current) => mergeProgressMaps(merged, current));
-}
-
 export function CastleProgressProvider({ children }: { children: ReactNode }) {
-  const {
-    loaded: cloudLoaded,
-    cloudSyncEnabled,
-    session,
-    syncProgressWithCloud,
-    pullAndMergeProgress,
-  } = useCloudSync();
   const [loaded, setLoaded] = useState(false);
   const [progressMap, setProgressMap] = useState<CastleProgressMap>({});
-  const localRevisionRef = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -87,57 +57,9 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const runCloudPull = useCallback(() => {
-    const revisionAtPullStart = localRevisionRef.current;
-
-    void pullAndMergeProgress().then((merged) => {
-      if (!merged) {
-        return;
-      }
-
-      applyMergedProgress(merged, revisionAtPullStart, localRevisionRef, setProgressMap);
-    });
-  }, [pullAndMergeProgress]);
-
-  useEffect(() => {
-    if (!loaded || !cloudLoaded || !cloudSyncEnabled || !session?.userId) {
-      return;
-    }
-
-    runCloudPull();
-  }, [cloudLoaded, cloudSyncEnabled, loaded, runCloudPull, session?.userId]);
-
-  useEffect(() => {
-    if (!loaded || !cloudLoaded || !cloudSyncEnabled || !session?.userId) {
-      return;
-    }
-
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') {
-        runCloudPull();
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [cloudLoaded, cloudSyncEnabled, loaded, runCloudPull, session?.userId]);
-
-  const persist = useCallback(
-    (nextMap: CastleProgressMap) => {
-      const revisionAtSyncStart = localRevisionRef.current;
-      void saveProgressMap(nextMap).catch(() => undefined);
-
-      void syncProgressWithCloud(nextMap).then((merged) => {
-        if (!merged) {
-          return;
-        }
-
-        applyMergedProgress(merged, revisionAtSyncStart, localRevisionRef, setProgressMap);
-      });
-    },
-    [syncProgressWithCloud],
-  );
+  const persist = useCallback((nextMap: CastleProgressMap) => {
+    void saveProgressMap(nextMap).catch(() => undefined);
+  }, []);
 
   const getProgress = useCallback(
     (castleId: number) => progressMap[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY,
@@ -146,7 +68,6 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
 
   const toggleProgress = useCallback(
     (castleId: number, field: CastleProgressField) => {
-      localRevisionRef.current += 1;
       setProgressMap((current) => {
         const previous = current[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
         const next = {
@@ -167,7 +88,6 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      localRevisionRef.current += 1;
       setProgressMap((current) => {
         const entry = current[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
         const next = {
@@ -181,6 +101,11 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
     [persist, progressMap],
   );
 
+  const reloadProgressMap = useCallback(async () => {
+    const map = await loadProgressMap();
+    setProgressMap(map);
+  }, []);
+
   const value = useMemo(
     () => ({
       loaded,
@@ -188,8 +113,9 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
       getProgress,
       toggleProgress,
       markProgressCollected,
+      reloadProgressMap,
     }),
-    [getProgress, loaded, markProgressCollected, progressMap, toggleProgress],
+    [getProgress, loaded, markProgressCollected, progressMap, reloadProgressMap, toggleProgress],
   );
 
   return (

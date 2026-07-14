@@ -7,6 +7,7 @@ import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
 import type { CastleProgressField } from '../types/castleProgress';
+import { formatChineseSubtitleLine } from '../utils/castleDisplayName';
 
 type CastleListProps = {
   castles: readonly Castle[];
@@ -59,6 +60,9 @@ function CastleListItem({
   const progress = getProgress(castle.id);
   const hasProgress = PROGRESS_FIELDS.some((field) => progress[field]);
   const seriesColor = castle.series === 'original' ? colors.original : colors.continued;
+  const chineseSubtitleLine = content.subtitle
+    ? formatChineseSubtitleLine(content.subtitle, content.alias)
+    : null;
 
   return (
     <Pressable
@@ -77,7 +81,9 @@ function CastleListItem({
         </View>
       </View>
       <Text style={styles.itemTitle}>{castle.name}</Text>
-      {content.subtitle ? <Text style={styles.itemSubtitle}>{content.subtitle}</Text> : null}
+      {chineseSubtitleLine ? (
+        <Text style={styles.itemSubtitle}>{chineseSubtitleLine}</Text>
+      ) : null}
       <Text style={styles.itemLocation}>{content.locationLabel}</Text>
       <ProgressTags castleId={castle.id} />
     </Pressable>

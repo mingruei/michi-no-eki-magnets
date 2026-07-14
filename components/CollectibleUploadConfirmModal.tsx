@@ -25,6 +25,7 @@ type CollectibleUploadConfirmModalProps = {
   draft: GlobalUploadDraft;
   castles: readonly Castle[];
   saving: boolean;
+  errorMessage?: string | null;
   onClose: () => void;
   onConfirm: (castleId: number, kind: CollectibleKind) => void;
 };
@@ -40,6 +41,7 @@ export function CollectibleUploadConfirmModal({
   draft,
   castles,
   saving,
+  errorMessage = null,
   onClose,
   onConfirm,
 }: CollectibleUploadConfirmModalProps) {
@@ -163,6 +165,7 @@ export function CollectibleUploadConfirmModal({
             <Text style={styles.confirmLabel}>{t('globalUpload.confirmSave')}</Text>
           )}
         </Pressable>
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       </View>
     </Modal>
   );
@@ -316,5 +319,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: colors.surface,
+  },
+  errorText: {
+    marginHorizontal: 16,
+    marginTop: 10,
+    fontSize: 13,
+    color: colors.continued,
+    lineHeight: 18,
+    textAlign: 'center',
   },
 });

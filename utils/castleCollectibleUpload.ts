@@ -7,6 +7,22 @@ import DocumentScanner, {
 } from 'react-native-document-scanner-plugin';
 
 import { normalizeFileUri } from './normalizeFileUri';
+import { waitForNativePicker } from './waitForNativePicker';
+
+const DOCUMENT_PICKER_TIMEOUT_MS = 120_000;
+
+const DOCUMENT_PICKER_TYPES =
+  Platform.OS === 'ios'
+    ? ([
+        'public.image',
+        'public.jpeg',
+        'public.png',
+        'public.heic',
+        'com.adobe.pdf',
+        'image/*',
+        'application/pdf',
+      ] as const)
+    : (['image/*', 'application/pdf'] as const);
 
 export type CollectibleUploadSource = 'scan' | 'file' | 'gallery';
 
@@ -15,6 +31,7 @@ export type CollectibleUploadSelection = {
   mimeType: string | null;
   width?: number | null;
   height?: number | null;
+  base64?: string | null;
 };
 
 function toSelection(
@@ -22,6 +39,7 @@ function toSelection(
   mimeType?: string | null,
   width?: number | null,
   height?: number | null,
+  base64?: string | null,
 ): CollectibleUploadSelection | null {
   if (!uri) {
     return null;
@@ -32,6 +50,7 @@ function toSelection(
     mimeType: mimeType ?? null,
     width: width ?? null,
     height: height ?? null,
+    base64: base64 ?? null,
   };
 }
 
@@ -54,10 +73,30 @@ async function ensureMediaLibraryPermission(): Promise<boolean> {
   return requested.granted;
 }
 
+async function withPickerTimeout<T>(promise: Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('picker-timeout'));
+    }, DOCUMENT_PICKER_TIMEOUT_MS);
+
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
 export async function pickCollectibleFromScan(): Promise<CollectibleUploadSelection[]> {
   if (Platform.OS === 'web') {
     return pickCollectibleFromFile();
   }
+
+  await waitForNativePicker();
 
   const cameraGranted = await ensureAndroidCameraPermission();
   if (!cameraGranted) {
@@ -80,17 +119,22 @@ export async function pickCollectibleFromScan(): Promise<CollectibleUploadSelect
 
 export async function pickCollectibleFromGallery(): Promise<CollectibleUploadSelection[]> {
   if (Platform.OS !== 'web') {
+    await waitForNativePicker();
+
     const granted = await ensureMediaLibraryPermission();
     if (!granted) {
       throw new Error('media-permission-denied');
     }
   }
 
-  const result = await ImagePicker.launchImageLibraryAsync({
+  const result = await withPickerTimeout(
+    ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
     quality: 1,
     allowsEditing: false,
-  });
+      base64: Platform.OS === 'android',
+    }),
+  );
 
   if (result.canceled || !result.assets?.[0]) {
     return [];
@@ -102,16 +146,21 @@ export async function pickCollectibleFromGallery(): Promise<CollectibleUploadSel
     asset.mimeType ?? 'image/jpeg',
     asset.width,
     asset.height,
+    asset.base64,
   );
   return selection ? [selection] : [];
 }
 
 export async function pickCollectibleFromFile(): Promise<CollectibleUploadSelection[]> {
-  const result = await DocumentPicker.getDocumentAsync({
-    type: ['image/*', 'application/pdf'],
-    copyToCacheDirectory: true,
-    multiple: false,
-  });
+  await waitForNativePicker();
+
+  const result = await withPickerTimeout(
+    DocumentPicker.getDocumentAsync({
+      type: [...DOCUMENT_PICKER_TYPES],
+      copyToCacheDirectory: true,
+      multiple: false,
+    }),
+  );
 
   if (result.canceled || !result.assets?.[0]) {
     return [];

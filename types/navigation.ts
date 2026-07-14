@@ -3,6 +3,8 @@ export type NavigationPoint = {
   label: string;
   /** Japanese place name for Google Maps. Falls back to label, then coordinates. */
   googleLabel?: string;
+  /** Opening hours for stamp locations (Traditional Chinese). */
+  businessHours?: string;
   latitude?: number | null;
   longitude?: number | null;
 };

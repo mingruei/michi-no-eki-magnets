@@ -1,14 +1,20 @@
 import { normalizePrefectureKey } from '../constants/prefectureKeys';
 import type { RegionId } from '../constants/regions';
 import { getRegionIdForPrefecture } from '../constants/regions';
-import { matchesCastleContentSubtitle } from '../i18n/castleContent';
-import type { Castle, SeriesFilter } from '../types/castle';
+import { matchesCastleContentAlias, matchesCastleContentSubtitle } from '../i18n/castleContent';
+import type { Castle, ProgressFilter, SeriesFilter } from '../types/castle';
+import {
+  EMPTY_CASTLE_PROGRESS_ENTRY,
+  type CastleProgressMap,
+} from '../types/castleProgress';
 
 export type CastleFilters = {
   regionId: RegionId | null;
   prefecture: string | null;
   series: SeriesFilter;
   nameQuery: string;
+  progressFilter: ProgressFilter;
+  progressMap?: CastleProgressMap;
 };
 
 function normalizeSearchQuery(raw: string): string {
@@ -64,11 +70,56 @@ function matchesTextQuery(castle: Castle, query: string): boolean {
     return true;
   }
 
+  if (matchesCastleContentAlias(castle.id, query)) {
+    return true;
+  }
+
   return false;
 }
 
 function matchesExactNumberQuery(castle: Castle, numberQuery: number): boolean {
   return castle.number === numberQuery || castle.id === numberQuery;
+}
+
+function matchesProgressFilter(
+  castleId: number,
+  progressFilter: ProgressFilter,
+  progressMap: CastleProgressMap | undefined,
+): boolean {
+  if (progressFilter === 'all') {
+    return true;
+  }
+
+  const progress = progressMap?.[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
+
+  switch (progressFilter) {
+    case 'visited':
+      return progress.visited;
+    case 'not-visited':
+      return !progress.visited;
+    case 'has-meijo-stamp':
+      return progress.meijoStamp;
+    case 'no-meijo-stamp':
+      return !progress.meijoStamp;
+    case 'has-goshuin':
+      return progress.goshuin;
+    case 'no-goshuin':
+      return !progress.goshuin;
+    case 'has-castle-card':
+      return progress.castleCard;
+    case 'no-castle-card':
+      return !progress.castleCard;
+    default:
+      return true;
+  }
+}
+
+function applyCastleFilters(castles: readonly Castle[], filters: CastleFilters): Castle[] {
+  return castles.filter(
+    (castle) =>
+      matchesLocationFilters(castle, filters) &&
+      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+  );
 }
 
 export function filterCastles(
@@ -78,15 +129,23 @@ export function filterCastles(
   const query = normalizeSearchQuery(filters.nameQuery);
 
   if (!query) {
-    return castles.filter((castle) => matchesLocationFilters(castle, filters));
+    return applyCastleFilters(castles, filters);
   }
 
   const numberQuery = parseExactNumberQuery(query);
   if (numberQuery != null) {
-    return castles.filter((castle) => matchesExactNumberQuery(castle, numberQuery));
+    return castles.filter(
+      (castle) =>
+        matchesExactNumberQuery(castle, numberQuery) &&
+        matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+    );
   }
 
-  return castles.filter((castle) => matchesTextQuery(castle, query));
+  return castles.filter(
+    (castle) =>
+      matchesTextQuery(castle, query) &&
+      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+  );
 }
 
 export function getAvailablePrefectures(

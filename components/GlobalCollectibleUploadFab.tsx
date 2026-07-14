@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   StyleSheet,
   Text,
+  View,
 } from 'react-native';
 
 import { CollectibleUploadConfirmModal } from './CollectibleUploadConfirmModal';
@@ -49,6 +51,12 @@ function getErrorMessage(error: string | null, t: (key: string) => string): stri
       return t('globalUpload.pdfNotSupported');
     case 'global-upload-failed':
       return t('globalUpload.failed');
+    case 'Failed to read selected file':
+    case 'Failed to write selected file':
+    case 'Failed to save collectible':
+    case 'Failed to persist upload image':
+    case 'picker-timeout':
+      return t('globalUpload.failed');
     default:
       return error;
   }
@@ -81,13 +89,20 @@ export function GlobalCollectibleUploadFab({
   const errorMessage = getErrorMessage(error, t);
   const isConfirmPhase = phase === 'confirm' || phase === 'saving';
   const showSourcePicker = phase === 'source-picker';
+  const isPicking = phase === 'picking';
 
-  if (!enabled && !showSourcePicker && !isConfirmPhase) {
+  if (!enabled && !showSourcePicker && !isConfirmPhase && !isPicking) {
     return null;
   }
 
   return (
     <>
+      <Modal visible={isPicking} transparent animationType="fade">
+        <View style={styles.pickingOverlay}>
+          <ActivityIndicator size="large" color={colors.surface} />
+        </View>
+      </Modal>
+
       <Modal
         visible={showSourcePicker}
         transparent
@@ -124,6 +139,7 @@ export function GlobalCollectibleUploadFab({
           draft={draft}
           castles={castles}
           saving={phase === 'saving'}
+          errorMessage={errorMessage}
           onClose={closeFlow}
           onConfirm={(castleId, kind) => void confirmUpload(castleId, kind)}
         />
@@ -176,5 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.continued,
     lineHeight: 18,
+  },
+  pickingOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.35)',
   },
 });

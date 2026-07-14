@@ -33,3 +33,14 @@ export type Castle = {
 };
 
 export type SeriesFilter = 'all' | CastleSeries;
+
+export type ProgressFilter =
+  | 'all'
+  | 'visited'
+  | 'not-visited'
+  | 'has-meijo-stamp'
+  | 'no-meijo-stamp'
+  | 'has-goshuin'
+  | 'no-goshuin'
+  | 'has-castle-card'
+  | 'no-castle-card';

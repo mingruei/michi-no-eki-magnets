@@ -77,21 +77,25 @@ export function useCastleCollectibles(
           return;
         }
 
+        const existingCount = listCastleCollectibles(castleId, kind).length;
+
         for (const selection of selections) {
           const persistedUri = await persistUploadImage(
             selection.uri,
             selection.mimeType ?? 'image/jpeg',
+            { base64Data: selection.base64 },
           );
           await saveCastleCollectibleFromUri(
             castleId,
             kind,
             persistedUri,
             selection.mimeType,
+            { base64Data: selection.base64 },
           );
         }
 
         const savedItems = listCastleCollectibles(castleId, kind);
-        if (savedItems.length === 0) {
+        if (savedItems.length <= existingCount) {
           throw new Error('collectible-upload-failed');
         }
 

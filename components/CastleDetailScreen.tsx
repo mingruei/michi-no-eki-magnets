@@ -11,6 +11,7 @@ import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
 import type { NavigationPoint } from '../types/navigation';
+import { formatChineseSubtitleLine } from '../utils/castleDisplayName';
 import {
   openGoogleMapsTransit,
   openMapsParkingNavigation,
@@ -71,15 +72,22 @@ function ActionButton({
 function NavigationPointRow({
   point,
   actionLabel,
+  businessHoursLabel,
   onNavigate,
 }: {
   point: NavigationPoint;
   actionLabel: string;
+  businessHoursLabel: string;
   onNavigate: () => void;
 }) {
   return (
     <View style={styles.pointRow}>
       <Text style={styles.body}>{point.label}</Text>
+      {point.businessHours ? (
+        <Text style={styles.hours}>
+          {businessHoursLabel}：{point.businessHours}
+        </Text>
+      ) : null}
       {hasCoordinates(point) ? (
         <ActionButton label={actionLabel} variant="secondary" onPress={onNavigate} />
       ) : null}
@@ -98,6 +106,9 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
     castle.series === 'original' ? colors.originalLight : colors.continuedLight;
   const badgeTextColor =
     castle.series === 'original' ? colors.original : colors.continued;
+  const chineseSubtitleLine = content.subtitle
+    ? formatChineseSubtitleLine(content.subtitle, content.alias)
+    : null;
 
   return (
     <View style={styles.container}>
@@ -118,7 +129,9 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
         </View>
 
         <Text style={styles.name}>{castle.name}</Text>
-        {content.subtitle ? <Text style={styles.subtitle}>{content.subtitle}</Text> : null}
+        {chineseSubtitleLine ? (
+          <Text style={styles.subtitle}>{chineseSubtitleLine}</Text>
+        ) : null}
 
         <Section title={t('castle.progress')}>
           <CheckOption
@@ -166,12 +179,29 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
         <Section title={t('castle.stampLocation')}>
           {content.stampLocations.map((point, index) => (
             <NavigationPointRow
-              key={`${point.label}-${index}`}
+              key={`stamp-${point.label}-${index}`}
               point={point}
               actionLabel={t('castle.openStampMap')}
+              businessHoursLabel={t('castle.businessHours')}
               onNavigate={() => void openMapsStampLocation(mapProvider, point)}
             />
           ))}
+        </Section>
+
+        <Section title={t('castle.castleCardLocation')}>
+          {content.castleCardLocations.length > 0 ? (
+            content.castleCardLocations.map((point, index) => (
+              <NavigationPointRow
+                key={`card-${point.label}-${index}`}
+                point={point}
+                actionLabel={t('castle.openCastleCardMap')}
+                businessHoursLabel={t('castle.businessHours')}
+                onNavigate={() => void openMapsStampLocation(mapProvider, point)}
+              />
+            ))
+          ) : (
+            <Text style={styles.body}>{t('castle.noCastleCardLocation')}</Text>
+          )}
         </Section>
 
         <Section title={t('castle.traffic')}>
@@ -185,6 +215,7 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
                 key={`${point.label}-${index}`}
                 point={point}
                 actionLabel={t('castle.drivingNavigation')}
+                businessHoursLabel={t('castle.businessHours')}
                 onNavigate={() => void openMapsParkingNavigation(mapProvider, point)}
               />
             ))
@@ -308,6 +339,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
     lineHeight: 23,
+  },
+  hours: {
+    fontSize: 13,
+    color: colors.textMuted,
+    lineHeight: 20,
   },
   actionButton: {
     alignSelf: 'flex-start',

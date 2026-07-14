@@ -1,81 +1,279 @@
-import { lazy, Suspense, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   View,
 } from 'react-native';
 
-const CloudSignInScreen = lazy(() =>
-  import('./CloudSignInScreen').then((module) => ({ default: module.CloudSignInScreen })),
-);
 import { colors } from '../constants/theme';
-import { useCloudSync } from '../hooks/useCloudSync';
+import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
-import { isCloudConfigured } from '../constants/cloudConfig';
 import type { MapProvider } from '../types/mapProvider';
+import type { CollectibleImportMode } from '../types/collectibleBackup';
 
 type SettingsScreenProps = {
   onBack: () => void;
 };
 
+type CollectibleImportPhase = 'preparing' | 'choosing-mode' | 'processing';
+
+function waitForProcessingOverlay(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, Platform.OS === 'android' ? 100 : 50);
+      });
+    });
+  });
+}
+
 export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { t } = useI18n();
-  const {
-    cloudSyncEnabled,
-    session,
-    syncing,
-    syncError,
-    cloudConfigured,
-    cloudBackendName,
-    setCloudSyncEnabled,
-    signOut,
-  } = useCloudSync();
   const { mapProvider, setMapProvider } = useMapProvider();
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { reloadProgressMap } = useCastleProgress();
+  const [exportingCollectibles, setExportingCollectibles] = useState(false);
+  const [importPhase, setImportPhase] = useState<CollectibleImportPhase | null>(null);
+  const [pendingImportUri, setPendingImportUri] = useState<string | null>(null);
+  const [selectedImportMode, setSelectedImportMode] = useState<CollectibleImportMode>('merge-newer');
+  const [collectibleMessage, setCollectibleMessage] = useState<string | null>(null);
+  const [collectibleError, setCollectibleError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void import('../utils/collectibleBackup');
+  }, []);
+
+  const isImportBusy = importPhase !== null;
+
+  const resolveCollectibleError = useCallback(
+    (error: unknown, mode: 'export' | 'import'): string => {
+      const code = error instanceof Error ? error.message : '';
+
+      switch (code) {
+        case 'collectible-backup-nothing-to-export':
+          return t('settings.collectibleBackupNothingToExport');
+        case 'collectible-backup-import-nothing-new':
+          return t('settings.collectibleBackupImportNothingNew');
+        case 'collectible-backup-invalid-manifest':
+        case 'collectible-backup-invalid-progress':
+        case 'collectible-backup-unsupported-version':
+        case 'collectible-backup-empty-archive':
+        case 'collectible-backup-invalid-archive':
+          return t('settings.collectibleBackupInvalidArchive');
+        case 'collectible-backup-share-unavailable':
+          return t('settings.collectibleBackupShareUnavailable');
+        case 'collectible-backup-export-failed':
+          return t('settings.collectibleBackupExportFailed');
+        case 'collectible-backup-read-failed':
+          return t('settings.collectibleBackupReadFailed');
+        case 'Failed to read selected file':
+        case 'Failed to write selected file':
+          return t('settings.collectibleBackupReadFailed');
+        default:
+          return mode === 'export'
+            ? t('settings.collectibleBackupExportFailed')
+            : t('settings.collectibleBackupImportFailed');
+      }
+    },
+    [t],
+  );
+
+  const handleExportCollectibles = async () => {
+    setCollectibleMessage(null);
+    setCollectibleError(null);
+    setExportingCollectibles(true);
+    await waitForProcessingOverlay();
+
+    try {
+      const { exportCollectibleArchive } = await import('../utils/collectibleBackup');
+      const result = await exportCollectibleArchive();
+      setCollectibleMessage(
+        t('settings.collectibleExportSuccess', {
+          files: result.fileCount,
+          progress: result.progressCastles,
+        }),
+      );
+    } catch (error) {
+      setCollectibleError(resolveCollectibleError(error, 'export'));
+    } finally {
+      setExportingCollectibles(false);
+    }
+  };
+
+  const handleImportCollectibles = async () => {
+    setCollectibleMessage(null);
+    setCollectibleError(null);
+    setImportPhase('preparing');
+    await waitForProcessingOverlay();
+
+    try {
+      const { pickCollectibleArchive } = await import('../utils/collectibleBackup');
+      const sourceUri = await pickCollectibleArchive();
+      if (!sourceUri) {
+        setImportPhase(null);
+        return;
+      }
+
+      setPendingImportUri(sourceUri);
+      setSelectedImportMode('merge-newer');
+      setImportPhase('choosing-mode');
+    } catch (error) {
+      setCollectibleError(resolveCollectibleError(error, 'import'));
+      setImportPhase(null);
+    }
+  };
+
+  const handleCancelImportMode = () => {
+    setPendingImportUri(null);
+    setImportPhase(null);
+  };
+
+  const handleConfirmImport = async () => {
+    if (!pendingImportUri) {
+      return;
+    }
+
+    setImportPhase('processing');
+    await waitForProcessingOverlay();
+
+    try {
+      const { processCollectibleImport } = await import('../utils/collectibleBackup');
+      const result = await processCollectibleImport(pendingImportUri, selectedImportMode);
+      await reloadProgressMap();
+      setCollectibleMessage(
+        t('settings.collectibleImportSuccess', {
+          imported: result.imported,
+          skipped: result.skipped,
+          progress: result.progressMerged,
+        }),
+      );
+    } catch (error) {
+      setCollectibleError(resolveCollectibleError(error, 'import'));
+    } finally {
+      setPendingImportUri(null);
+      setImportPhase(null);
+    }
+  };
+
+  const importModeOptions: {
+    id: CollectibleImportMode;
+    titleKey: 'settings.collectibleImportModeReplace' | 'settings.collectibleImportModeMergeNewer';
+    hintKey:
+      | 'settings.collectibleImportModeReplaceHint'
+      | 'settings.collectibleImportModeMergeNewerHint';
+  }[] = [
+    {
+      id: 'replace',
+      titleKey: 'settings.collectibleImportModeReplace',
+      hintKey: 'settings.collectibleImportModeReplaceHint',
+    },
+    {
+      id: 'merge-newer',
+      titleKey: 'settings.collectibleImportModeMergeNewer',
+      hintKey: 'settings.collectibleImportModeMergeNewerHint',
+    },
+  ];
 
   const mapProviderOptions: { id: MapProvider; labelKey: 'settings.mapProviderApple' | 'settings.mapProviderGoogle' }[] = [
     { id: 'apple', labelKey: 'settings.mapProviderApple' },
     { id: 'google', labelKey: 'settings.mapProviderGoogle' },
   ];
 
-  const canOfferSignIn = cloudConfigured;
-
-  const handleToggleCloud = async (enabled: boolean) => {
-    await setCloudSyncEnabled(enabled);
-    if (enabled && !session && canOfferSignIn) {
-      setShowSignIn(true);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  if (showSignIn) {
-    return (
-      <Suspense
-        fallback={
-          <View style={styles.loadingFallback}>
-            <ActivityIndicator size="large" color={colors.original} />
-          </View>
-        }
-      >
-        <CloudSignInScreen
-          onBack={() => setShowSignIn(false)}
-          onSignedIn={() => setShowSignIn(false)}
-        />
-      </Suspense>
-    );
-  }
-
   return (
     <View style={styles.container}>
+      <Modal
+        visible={exportingCollectibles || importPhase === 'preparing' || importPhase === 'processing'}
+        transparent
+        animationType="fade"
+        onRequestClose={() => undefined}
+      >
+        <View style={styles.processingOverlay}>
+          <View style={styles.processingCard}>
+            <ActivityIndicator size="large" color={colors.original} />
+            <Text style={styles.processingTitle}>
+              {importPhase === 'preparing'
+                ? t('settings.collectibleSelectingArchive')
+                : importPhase === 'processing'
+                  ? t('settings.collectibleImporting')
+                  : t('settings.collectibleExporting')}
+            </Text>
+            <Text style={styles.processingHint}>
+              {importPhase === 'preparing'
+                ? t('settings.collectibleSelectingArchiveHint')
+                : importPhase === 'processing'
+                  ? t('settings.collectibleProcessingImportHint')
+                  : t('settings.collectibleProcessingExportHint')}
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={importPhase === 'choosing-mode'}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCancelImportMode}
+      >
+        <View style={styles.processingOverlay}>
+          <View style={styles.importModeCard}>
+            <Text style={styles.processingTitle}>{t('settings.collectibleImportModeTitle')}</Text>
+            <Text style={styles.processingHint}>{t('settings.collectibleImportModeHint')}</Text>
+
+            <View style={styles.importModeOptionGroup}>
+              {importModeOptions.map((option) => {
+                const selected = selectedImportMode === option.id;
+                return (
+                  <Pressable
+                    key={option.id}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    onPress={() => setSelectedImportMode(option.id)}
+                    style={[styles.importModeOption, selected && styles.importModeOptionSelected]}
+                  >
+                    <View style={styles.importModeOptionHeader}>
+                      <View
+                        style={[
+                          styles.optionIndicator,
+                          selected && styles.optionIndicatorSelected,
+                        ]}
+                      />
+                      <Text style={styles.importModeOptionTitle}>{t(option.titleKey)}</Text>
+                    </View>
+                    <Text style={styles.importModeOptionHint}>{t(option.hintKey)}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <View style={styles.importModeActions}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={handleCancelImportMode}
+                style={styles.importModeCancelButton}
+              >
+                <Text style={styles.importModeCancelLabel}>
+                  {t('settings.collectibleImportModeCancel')}
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => void handleConfirmImport()}
+                style={[styles.primaryButton, styles.importModeConfirmButton]}
+              >
+                <Text style={styles.primaryButtonLabel}>
+                  {t('settings.collectibleImportModeConfirm')}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.header}>
         <Pressable accessibilityRole="button" onPress={onBack} style={styles.backButton}>
           <Text style={styles.backLabel}>{t('common.back')}</Text>
@@ -84,21 +282,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.card}>
-          <View style={styles.row}>
-            <View style={styles.rowText}>
-              <Text style={styles.rowTitle}>{t('settings.cloudSync')}</Text>
-              <Text style={styles.rowHint}>{t('settings.cloudSyncHint')}</Text>
-            </View>
-            <Switch
-              value={cloudSyncEnabled}
-              onValueChange={handleToggleCloud}
-              trackColor={{ false: colors.border, true: colors.originalLight }}
-              thumbColor={cloudSyncEnabled ? colors.original : colors.surface}
-            />
-          </View>
-        </View>
-
         {Platform.OS === 'ios' ? (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>{t('settings.mapProvider')}</Text>
@@ -123,47 +306,58 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           </View>
         ) : null}
 
-        {cloudSyncEnabled ? (
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>{t('settings.cloudAccount')}</Text>
-            <Text style={styles.clusterLabel}>
-              {t('settings.backendLabel', { backend: cloudBackendName })}
-            </Text>
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>{t('settings.collectibleBackup')}</Text>
+          <Text style={styles.rowHint}>{t('settings.collectibleBackupHint')}</Text>
 
-            {!cloudConfigured ? (
-              <Text style={styles.warningText}>{t('settings.cloudNotConfigured')}</Text>
-            ) : null}
+          <View style={styles.backupButtonRow}>
+            <Pressable
+              accessibilityRole="button"
+              disabled={exportingCollectibles || isImportBusy}
+              onPress={() => void handleExportCollectibles()}
+              style={[
+                styles.primaryButton,
+                styles.backupButton,
+                (exportingCollectibles || isImportBusy) && styles.buttonDisabled,
+              ]}
+            >
+              {exportingCollectibles ? (
+                <ActivityIndicator size="small" color={colors.surface} />
+              ) : (
+                <Text style={styles.primaryButtonLabel}>{t('settings.collectibleExport')}</Text>
+              )}
+            </Pressable>
 
-            {session ? (
-              <View style={styles.signedInBox}>
-                <Text style={styles.signedInTitle}>{t('settings.signedIn')}</Text>
-                <Text style={styles.signedInMeta}>{t('settings.providerGoogle')}</Text>
-                {session.email ? <Text style={styles.signedInMeta}>{session.email}</Text> : null}
-                <Pressable accessibilityRole="button" onPress={handleSignOut} style={styles.secondaryButton}>
-                  <Text style={styles.secondaryButtonLabel}>{t('settings.signOut')}</Text>
-                </Pressable>
-              </View>
-            ) : (
-              <Pressable
-                accessibilityRole="button"
-                disabled={!canOfferSignIn}
-                onPress={() => setShowSignIn(true)}
-                style={[styles.primaryButton, !canOfferSignIn && styles.buttonDisabled]}
-              >
-                <Text style={styles.primaryButtonLabel}>{t('settings.openSignIn')}</Text>
-              </Pressable>
-            )}
-
-            {syncing ? (
-              <View style={styles.syncRow}>
+            <Pressable
+              accessibilityRole="button"
+              disabled={exportingCollectibles || isImportBusy}
+              onPress={() => void handleImportCollectibles()}
+              style={[
+                styles.secondaryActionButton,
+                (exportingCollectibles || isImportBusy) && styles.buttonDisabled,
+              ]}
+            >
+              {isImportBusy ? (
                 <ActivityIndicator size="small" color={colors.original} />
-                <Text style={styles.syncText}>{t('settings.syncing')}</Text>
-              </View>
-            ) : null}
-
-            {syncError ? <Text style={styles.errorText}>{syncError}</Text> : null}
+              ) : (
+                <Text style={styles.secondaryActionButtonLabel}>{t('settings.collectibleImport')}</Text>
+              )}
+            </Pressable>
           </View>
-        ) : null}
+
+          {exportingCollectibles ? (
+            <Text style={styles.syncText}>{t('settings.collectibleExporting')}</Text>
+          ) : null}
+          {isImportBusy ? (
+            <Text style={styles.syncText}>
+              {importPhase === 'preparing'
+                ? t('settings.collectibleSelectingArchive')
+                : t('settings.collectibleImporting')}
+            </Text>
+          ) : null}
+          {collectibleMessage ? <Text style={styles.successText}>{collectibleMessage}</Text> : null}
+          {collectibleError ? <Text style={styles.errorText}>{collectibleError}</Text> : null}
+        </View>
       </ScrollView>
     </View>
   );
@@ -174,11 +368,97 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  loadingFallback: {
+  processingOverlay: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    padding: 24,
+  },
+  processingCard: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  importModeCard: {
+    width: '100%',
+    maxWidth: 360,
+    gap: 16,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  importModeOptionGroup: {
+    gap: 10,
+  },
+  importModeOption: {
+    gap: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
     backgroundColor: colors.background,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  importModeOptionSelected: {
+    borderColor: colors.original,
+    backgroundColor: colors.originalLight,
+  },
+  importModeOptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  importModeOptionTitle: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  importModeOptionHint: {
+    fontSize: 13,
+    color: colors.textMuted,
+    lineHeight: 18,
+    paddingLeft: 28,
+  },
+  importModeActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  importModeCancelButton: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.originalLight,
+    paddingHorizontal: 16,
+  },
+  importModeCancelLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.original,
+  },
+  importModeConfirmButton: {
+    flex: 1,
+  },
+  processingTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+  },
+  processingHint: {
+    fontSize: 13,
+    color: colors.textMuted,
+    lineHeight: 18,
+    textAlign: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -216,20 +496,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  rowText: {
-    flex: 1,
-    gap: 4,
-  },
-  rowTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
   rowHint: {
     fontSize: 13,
     color: colors.textMuted,
@@ -239,30 +505,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
-  },
-  clusterLabel: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  warningText: {
-    fontSize: 13,
-    color: colors.continued,
-    lineHeight: 18,
-  },
-  signedInBox: {
-    gap: 6,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: colors.background,
-  },
-  signedInTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  signedInMeta: {
-    fontSize: 13,
-    color: colors.textMuted,
   },
   primaryButton: {
     minHeight: 48,
@@ -277,26 +519,34 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.surface,
   },
-  secondaryButton: {
-    marginTop: 8,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: colors.originalLight,
-  },
-  secondaryButtonLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.original,
-  },
   buttonDisabled: {
     opacity: 0.55,
   },
-  syncRow: {
+  backupButtonRow: {
     flexDirection: 'row',
+    gap: 12,
+  },
+  backupButton: {
+    flex: 1,
+  },
+  secondaryActionButton: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 12,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    backgroundColor: colors.originalLight,
+    paddingHorizontal: 16,
+  },
+  secondaryActionButtonLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.original,
+  },
+  successText: {
+    fontSize: 13,
+    color: colors.original,
+    lineHeight: 18,
   },
   syncText: {
     fontSize: 13,
