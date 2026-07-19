@@ -9,7 +9,12 @@ import {
   writeSourceToNewFile,
 } from './collectibleFileIO';
 import { normalizeFileUri } from './normalizeFileUri';
-import type { CastleCollectible, CollectibleKind } from '../types/castleCollectible';
+import {
+  isCollectibleKind,
+  isSingleFileCollectibleKind,
+  type CastleCollectible,
+  type CollectibleKind,
+} from '../types/castleCollectible';
 
 const ROOT_DIR_NAME = 'castle-collectibles';
 
@@ -75,6 +80,24 @@ function getStoredFileByteLength(file: File): number {
   }
 }
 
+function getFileCreatedAt(file: File): number {
+  const timestampMatch = file.name.match(/-(\d{10,})/);
+  if (timestampMatch) {
+    return Number(timestampMatch[1]);
+  }
+
+  try {
+    const info = file.info();
+    if (info.modificationTime != null && info.modificationTime > 0) {
+      return info.modificationTime;
+    }
+  } catch {
+    // Fall back to current time when metadata is unavailable.
+  }
+
+  return Date.now();
+}
+
 function parseCollectibleFile(
   castleId: number,
   kind: CollectibleKind,
@@ -88,8 +111,7 @@ function parseCollectibleFile(
     return null;
   }
 
-  const timestampMatch = file.name.match(/-(\d{10,})/);
-  const createdAt = timestampMatch ? Number(timestampMatch[1]) : Date.now();
+  const createdAt = getFileCreatedAt(file);
 
   return {
     id: file.name,
@@ -134,7 +156,7 @@ export function listAllCollectibles(): CastleCollectible[] {
       }
 
       const kind = kindEntry.name;
-      if (kind !== 'goshuin' && kind !== 'castle-card') {
+      if (!isCollectibleKind(kind)) {
         continue;
       }
 
@@ -171,6 +193,26 @@ export function listCastleCollectibles(
     .sort((left, right) => right.createdAt - left.createdAt);
 }
 
+export function clearCastleCollectibleDirectory(
+  castleId: number,
+  kind: CollectibleKind,
+): void {
+  const directory = getCastleCollectibleDirectory(castleId, kind);
+  if (!directory.exists) {
+    return;
+  }
+
+  for (const entry of directory.list()) {
+    if (isCollectibleFile(entry)) {
+      try {
+        entry.delete();
+      } catch {
+        // Continue clearing remaining files.
+      }
+    }
+  }
+}
+
 export async function saveCastleCollectibleFromUri(
   castleId: number,
   kind: CollectibleKind,
@@ -181,7 +223,14 @@ export async function saveCastleCollectibleFromUri(
   const directory = getCastleCollectibleDirectory(castleId, kind);
   const extension =
     extensionFromMimeType(mimeType) ?? extensionFromUri(sourceUri) ?? '.jpg';
-  const filename = `${kind}-${Date.now()}${extension}`;
+
+  if (isSingleFileCollectibleKind(kind)) {
+    clearCastleCollectibleDirectory(castleId, kind);
+  }
+
+  const filename = isSingleFileCollectibleKind(kind)
+    ? `meijo-stamp-${Date.now()}${extension}`
+    : `${kind}-${Date.now()}${extension}`;
   const destination = await writeSourceToNewFile(
     sourceUri,
     directory,
@@ -198,6 +247,16 @@ export async function saveCastleCollectibleFromUri(
   }
 
   return collectible;
+}
+
+export function getCollectibleDisplayUri(item: CastleCollectible): string {
+  const base = getDisplayImageUri(item.uri);
+  if (!isSingleFileCollectibleKind(item.kind)) {
+    return base;
+  }
+
+  const separator = base.includes('?') ? '&' : '?';
+  return `${base}${separator}v=${item.createdAt}`;
 }
 
 export function deleteCastleCollectible(item: CastleCollectible): void {

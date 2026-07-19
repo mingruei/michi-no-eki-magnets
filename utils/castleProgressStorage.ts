@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { File, Paths } from 'expo-file-system';
-import { Platform } from 'react-native';
 
 import type { CastleProgressMap } from '../types/castleProgress';
 import { normalizeProgressMap } from './mergeProgressMap';
@@ -36,15 +35,6 @@ async function migrateFromAsyncStorage(): Promise<CastleProgressMap> {
 }
 
 export async function loadProgressMap(): Promise<CastleProgressMap> {
-  if (Platform.OS === 'web') {
-    try {
-      const legacy = localStorage.getItem(LEGACY_ASYNC_STORAGE_KEY);
-      return normalizeProgressMap(legacy ? JSON.parse(legacy) : {});
-    } catch {
-      return {};
-    }
-  }
-
   try {
     const fromFile = await loadFromDocumentFile();
     if (fromFile) {
@@ -63,11 +53,6 @@ export async function loadProgressMap(): Promise<CastleProgressMap> {
 
 export async function saveProgressMap(map: CastleProgressMap): Promise<void> {
   const payload = JSON.stringify(map);
-
-  if (Platform.OS === 'web') {
-    localStorage.setItem(LEGACY_ASYNC_STORAGE_KEY, payload);
-    return;
-  }
 
   getProgressFile().write(payload);
 }

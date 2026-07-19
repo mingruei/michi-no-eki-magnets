@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, InteractionManager, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import castlesData from './assets/castles.json';
+import { CollectibleUploadSourceModal } from './components/CollectibleUploadSourceModal';
 import { GlobalCollectibleUploadFab } from './components/GlobalCollectibleUploadFab';
 import { CastleDetailScreen } from './components/CastleDetailScreen';
 import { BrowseListHeader } from './components/BrowseListHeader';
@@ -15,8 +16,11 @@ import { CastleProgressProvider, useCastleProgress } from './hooks/useCastleProg
 import { useConditionalPortraitLock } from './hooks/useConditionalPortraitLock';
 import { I18nProvider, useI18n } from './i18n';
 import type { Castle, ProgressFilter, SeriesFilter } from './types/castle';
+import type { CollectibleKind } from './types/castleCollectible';
 import { filterCastles, getAvailablePrefectures } from './utils/filterCastles';
 import { resolveLocalStartupContext } from './utils/localPrefecture';
+import type { CollectibleUploadSource } from './utils/castleCollectibleUpload';
+import { waitForNativePicker } from './utils/waitForNativePicker';
 
 const castles = castlesData as Castle[];
 
@@ -26,6 +30,11 @@ const SettingsScreen = lazy(() =>
 
 type MainScreen = 'browse' | 'map';
 type Screen = MainScreen | 'detail' | 'settings';
+
+type DetailUploadPickerState = {
+  castleId: number;
+  kind: CollectibleKind;
+};
 
 function AppContent() {
   const { t, getPrefectureLabel } = useI18n();
@@ -39,7 +48,11 @@ function AppContent() {
   const [prefecture, setPrefecture] = useState<string | null>(null);
   const [nameQuery, setNameQuery] = useState('');
   const [selectedCastle, setSelectedCastle] = useState<Castle | null>(null);
+  const [detailUploadPicker, setDetailUploadPicker] = useState<DetailUploadPickerState | null>(null);
   const openUploadRef = useRef<(() => void) | null>(null);
+  const detailUploadHandlersRef = useRef(
+    new Map<string, (source: CollectibleUploadSource) => Promise<void>>(),
+  );
 
   const registerOpenUpload = useCallback((open: () => void) => {
     openUploadRef.current = open;
@@ -47,26 +60,28 @@ function AppContent() {
 
   useEffect(() => {
     let active = true;
+    const task = InteractionManager.runAfterInteractions(() => {
+      void resolveLocalStartupContext(castles).then((result) => {
+        if (!active) {
+          return;
+        }
 
-    resolveLocalStartupContext(castles).then((result) => {
-      if (!active) {
-        return;
-      }
+        if (result.filter) {
+          setRegionId(result.filter.regionId);
+          setPrefecture(result.filter.prefecture);
+        }
 
-      if (result.filter) {
-        setRegionId(result.filter.regionId);
-        setPrefecture(result.filter.prefecture);
-      }
-
-      if (result.nearbyCastle) {
-        setReturnScreen('browse');
-        setSelectedCastle(result.nearbyCastle);
-        setScreen('detail');
-      }
+        if (result.nearbyCastle) {
+          setReturnScreen('browse');
+          setSelectedCastle(result.nearbyCastle);
+          setScreen('detail');
+        }
+      });
     });
 
     return () => {
       active = false;
+      task.cancel();
     };
   }, []);
 
@@ -101,12 +116,41 @@ function AppContent() {
   };
 
   const handleBackFromDetail = () => {
+    setDetailUploadPicker(null);
     setScreen(returnScreen);
     setSelectedCastle(null);
   };
 
+  const registerDetailUploadHandler = useCallback(
+    (castleId: number, kind: CollectibleKind, handler: (source: CollectibleUploadSource) => Promise<void>) => {
+      detailUploadHandlersRef.current.set(`${castleId}:${kind}`, handler);
+    },
+    [],
+  );
+
+  const handleDetailUploadSelect = useCallback(
+    async (source: CollectibleUploadSource) => {
+      const picker = detailUploadPicker;
+      setDetailUploadPicker(null);
+      if (!picker) {
+        return;
+      }
+
+      await waitForNativePicker();
+
+      const uploadFromSource = detailUploadHandlersRef.current.get(`${picker.castleId}:${picker.kind}`);
+      if (!uploadFromSource) {
+        return;
+      }
+
+      await uploadFromSource(source);
+    },
+    [detailUploadPicker],
+  );
+
   const closeDetailIfOpen = () => {
     if (screen === 'detail') {
+      setDetailUploadPicker(null);
       setScreen(returnScreen);
       setSelectedCastle(null);
     }
@@ -163,7 +207,7 @@ function AppContent() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       <StatusBar style="dark" />
       <View style={styles.root}>
         <View style={styles.mainContent} pointerEvents={isOverlayOpen ? 'none' : 'auto'}>
@@ -239,7 +283,14 @@ function AppContent() {
 
         {isDetailOpen ? (
           <SafeAreaView style={styles.detailLayer} edges={['top', 'left', 'right', 'bottom']}>
-            <CastleDetailScreen castle={selectedCastle} onBack={handleBackFromDetail} />
+            <CastleDetailScreen
+              castle={selectedCastle}
+              onBack={handleBackFromDetail}
+              onRequestUpload={(kind) =>
+                setDetailUploadPicker({ castleId: selectedCastle.id, kind })
+              }
+              onRegisterUpload={registerDetailUploadHandler}
+            />
           </SafeAreaView>
         ) : null}
 
@@ -263,13 +314,19 @@ function AppContent() {
         enabled={!isOverlayOpen}
         onRegisterOpen={registerOpenUpload}
       />
+
+      <CollectibleUploadSourceModal
+        visible={detailUploadPicker != null}
+        onClose={() => setDetailUploadPicker(null)}
+        onSelect={(source) => void handleDetailUploadSelect(source)}
+      />
     </SafeAreaView>
   );
 }
 
 export default function App() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <I18nProvider>
         <MapProviderProvider>
           <CastleProgressProvider>

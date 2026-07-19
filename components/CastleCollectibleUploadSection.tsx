@@ -1,8 +1,7 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,46 +14,40 @@ import { useCastleCollectibles } from '../hooks/useCastleCollectibles';
 import { useI18n } from '../i18n';
 import type { CollectibleKind } from '../types/castleCollectible';
 import type { CollectibleUploadSource } from '../utils/castleCollectibleUpload';
-import { isImageCollectible } from '../utils/castleCollectibleStorage';
-import { getDisplayImageUri } from '../utils/collectibleFileIO';
+import {
+  isCameraPermissionErrorMessage,
+  isMediaPermissionErrorMessage,
+} from '../utils/collectibleUploadErrors';
+import { isImageCollectible, getCollectibleDisplayUri } from '../utils/castleCollectibleStorage';
 
 type CastleCollectibleUploadSectionProps = {
   castleId: number;
   kind: CollectibleKind;
   title: string;
+  storageHint?: string;
+  onUploadPress: () => void;
+  onRegisterUpload: (uploadFromSource: (source: CollectibleUploadSource) => Promise<void>) => void;
 };
-
-const UPLOAD_SOURCES: CollectibleUploadSource[] = ['scan', 'file', 'gallery'];
 
 const CollectibleGalleryViewer = lazy(async () => {
   const module = await import('./CollectibleGalleryViewer');
   return { default: module.CollectibleGalleryViewer };
 });
 
-function getUploadSourceLabel(
-  source: CollectibleUploadSource,
-  t: (key: string) => string,
-): string {
-  switch (source) {
-    case 'scan':
-      return t('castle.collectibleScan');
-    case 'file':
-      return t('castle.collectibleUploadFile');
-    case 'gallery':
-      return t('castle.collectiblePhotoLibrary');
-  }
-}
-
 function getErrorMessage(error: string | null, t: (key: string) => string): string | null {
   if (!error) {
     return null;
   }
 
+  if (isCameraPermissionErrorMessage(error)) {
+    return t('castle.collectibleCameraPermissionDenied');
+  }
+
+  if (isMediaPermissionErrorMessage(error)) {
+    return t('castle.collectibleMediaPermissionDenied');
+  }
+
   switch (error) {
-    case 'camera-permission-denied':
-      return t('castle.collectibleCameraPermissionDenied');
-    case 'media-permission-denied':
-      return t('castle.collectibleMediaPermissionDenied');
     case 'collectible-load-failed':
       return t('castle.collectibleLoadFailed');
     case 'collectible-upload-failed':
@@ -66,7 +59,7 @@ function getErrorMessage(error: string | null, t: (key: string) => string): stri
     case 'picker-timeout':
       return t('castle.collectibleUploadFailed');
     default:
-      return error;
+      return t('castle.collectibleUploadFailed');
   }
 }
 
@@ -74,18 +67,19 @@ export function CastleCollectibleUploadSection({
   castleId,
   kind,
   title,
+  storageHint,
+  onUploadPress,
+  onRegisterUpload,
 }: CastleCollectibleUploadSectionProps) {
   const { t } = useI18n();
   const { items, loading, uploading, error, uploadFromSource, removeItem } =
     useCastleCollectibles(castleId, kind);
-  const [pickerVisible, setPickerVisible] = useState(false);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
 
-  const handleSelectSource = async (source: CollectibleUploadSource) => {
-    setPickerVisible(false);
-    await uploadFromSource(source);
-  };
+  useEffect(() => {
+    onRegisterUpload(uploadFromSource);
+  }, [onRegisterUpload, uploadFromSource]);
 
   const errorMessage = getErrorMessage(error, t);
 
@@ -96,7 +90,7 @@ export function CastleCollectibleUploadSection({
         <Pressable
           accessibilityRole="button"
           disabled={uploading}
-          onPress={() => setPickerVisible(true)}
+          onPress={onUploadPress}
           style={[styles.uploadButton, uploading && styles.uploadButtonDisabled]}
         >
           {uploading ? (
@@ -107,7 +101,7 @@ export function CastleCollectibleUploadSection({
         </Pressable>
       </View>
 
-      <Text style={styles.hint}>{t('castle.collectibleStorageHint')}</Text>
+      <Text style={styles.hint}>{storageHint ?? t('castle.collectibleStorageHint')}</Text>
 
       {loading ? (
         <ActivityIndicator size="small" color={colors.original} />
@@ -126,7 +120,8 @@ export function CastleCollectibleUploadSection({
             >
               {isImageCollectible(item) ? (
                 <Image
-                  source={{ uri: getDisplayImageUri(item.uri) }}
+                  key={`${item.id}-${item.createdAt}`}
+                  source={{ uri: getCollectibleDisplayUri(item) }}
                   style={styles.thumbnailImage}
                   resizeMode="contain"
                 />
@@ -158,36 +153,6 @@ export function CastleCollectibleUploadSection({
       ) : null}
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-
-      <Modal
-        visible={pickerVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setPickerVisible(false)}
-      >
-        <Pressable style={styles.modalBackdrop} onPress={() => setPickerVisible(false)}>
-          <Pressable style={styles.modalCard} onPress={(event) => event.stopPropagation()}>
-            <Text style={styles.modalTitle}>{t('castle.collectibleChooseSource')}</Text>
-            {UPLOAD_SOURCES.map((source) => (
-              <Pressable
-                key={source}
-                accessibilityRole="button"
-                onPress={() => void handleSelectSource(source)}
-                style={styles.modalOption}
-              >
-                <Text style={styles.modalOptionLabel}>{getUploadSourceLabel(source, t)}</Text>
-              </Pressable>
-            ))}
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setPickerVisible(false)}
-              style={styles.modalCancel}
-            >
-              <Text style={styles.modalCancelLabel}>{t('common.close')}</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </View>
   );
 }
@@ -275,44 +240,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.continued,
     lineHeight: 18,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
-    justifyContent: 'flex-end',
-    padding: 16,
-  },
-  modalCard: {
-    borderRadius: 16,
-    backgroundColor: colors.surface,
-    padding: 16,
-    gap: 8,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  modalOption: {
-    borderRadius: 12,
-    backgroundColor: colors.background,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-  modalOptionLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  modalCancel: {
-    marginTop: 4,
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  modalCancelLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.original,
   },
 });

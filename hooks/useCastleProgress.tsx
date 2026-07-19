@@ -83,13 +83,12 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
 
   const markProgressCollected = useCallback(
     (castleId: number, field: CastleProgressField) => {
-      const previous = progressMap[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
-      if (previous[field]) {
-        return;
-      }
-
       setProgressMap((current) => {
         const entry = current[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
+        if (entry[field]) {
+          return current;
+        }
+
         const next = {
           ...current,
           [castleId]: withFieldUpdate(entry, field, true),
@@ -98,7 +97,7 @@ export function CastleProgressProvider({ children }: { children: ReactNode }) {
         return next;
       });
     },
-    [persist, progressMap],
+    [persist],
   );
 
   const reloadProgressMap = useCallback(async () => {

@@ -1,6 +1,6 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useEffect } from 'react';
-import { Platform, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 
 /**
  * Lock portrait on phones only. Android 16+ ignores orientation locks on large
@@ -12,10 +12,6 @@ export function useConditionalPortraitLock() {
   const isLargeScreen = shortestSide >= 600;
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      return;
-    }
-
     let active = true;
 
     const apply = async () => {

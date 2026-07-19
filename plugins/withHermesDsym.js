@@ -16,9 +16,10 @@ function withHermesDsym(config) {
     fs.copyFileSync(scriptSource, scriptTarget);
     fs.chmodSync(scriptTarget, 0o755);
 
-    const nativeTarget = project.getTarget('app');
-    if (!nativeTarget) {
-      throw new Error('Could not find iOS target "app" for Hermes dSYM script.');
+    const nativeTarget =
+      project.getTarget('com.apple.product-type.application') ?? project.getFirstTarget();
+    if (!nativeTarget?.uuid) {
+      throw new Error('Could not find iOS application target for Hermes dSYM script.');
     }
 
     const buildPhases = project.hash.project.objects.PBXShellScriptBuildPhase ?? {};

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { CheckOption } from '../components/CheckOption';
@@ -10,8 +10,10 @@ import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
+import type { CollectibleKind } from '../types/castleCollectible';
 import type { NavigationPoint } from '../types/navigation';
 import { formatChineseSubtitleLine } from '../utils/castleDisplayName';
+import type { CollectibleUploadSource } from '../utils/castleCollectibleUpload';
 import {
   openGoogleMapsTransit,
   openMapsParkingNavigation,
@@ -22,6 +24,12 @@ import {
 type CastleDetailScreenProps = {
   castle: Castle;
   onBack: () => void;
+  onRequestUpload: (kind: CollectibleKind) => void;
+  onRegisterUpload: (
+    castleId: number,
+    kind: CollectibleKind,
+    uploadFromSource: (source: CollectibleUploadSource) => Promise<void>,
+  ) => void;
 };
 
 function Section({
@@ -95,12 +103,24 @@ function NavigationPointRow({
   );
 }
 
-export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) {
+export function CastleDetailScreen({
+  castle,
+  onBack,
+  onRequestUpload,
+  onRegisterUpload,
+}: CastleDetailScreenProps) {
   const { t, getSeriesLabel } = useI18n();
   const { mapProvider } = useMapProvider();
   const content = useCastleContent(castle);
   const { getProgress, toggleProgress } = useCastleProgress();
   const progress = getProgress(castle.id);
+
+  const registerUpload = useCallback(
+    (kind: CollectibleKind, uploadFromSource: (source: CollectibleUploadSource) => Promise<void>) => {
+      onRegisterUpload(castle.id, kind, uploadFromSource);
+    },
+    [castle.id, onRegisterUpload],
+  );
 
   const badgeColor =
     castle.series === 'original' ? colors.originalLight : colors.continuedLight;
@@ -158,14 +178,27 @@ export function CastleDetailScreen({ castle, onBack }: CastleDetailScreenProps) 
 
         <CastleCollectibleUploadSection
           castleId={castle.id}
+          kind="meijo-stamp"
+          title={t('castle.meijoStampUploadTitle')}
+          storageHint={t('castle.meijoStampUploadHint')}
+          onUploadPress={() => onRequestUpload('meijo-stamp')}
+          onRegisterUpload={(uploadFromSource) => registerUpload('meijo-stamp', uploadFromSource)}
+        />
+
+        <CastleCollectibleUploadSection
+          castleId={castle.id}
           kind="goshuin"
           title={t('castle.goshuinUploadTitle')}
+          onUploadPress={() => onRequestUpload('goshuin')}
+          onRegisterUpload={(uploadFromSource) => registerUpload('goshuin', uploadFromSource)}
         />
 
         <CastleCollectibleUploadSection
           castleId={castle.id}
           kind="castle-card"
           title={t('castle.castleCardUploadTitle')}
+          onUploadPress={() => onRequestUpload('castle-card')}
+          onRegisterUpload={(uploadFromSource) => registerUpload('castle-card', uploadFromSource)}
         />
 
         <Section title={t('common.location')}>

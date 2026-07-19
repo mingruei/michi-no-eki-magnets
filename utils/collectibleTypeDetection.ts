@@ -14,15 +14,15 @@ export function detectCollectibleKind(dimensions: ImageDimensions): CollectibleT
     return { kind: 'goshuin', confidence: 'low' };
   }
 
-  const landscapeRatio = width / height;
+  const aspectRatio = width / height;
 
-  if (landscapeRatio > 1 + ORIENTATION_TOLERANCE) {
+  if (Math.abs(aspectRatio - 1) <= ORIENTATION_TOLERANCE) {
+    return { kind: 'meijo-stamp', confidence: 'high' };
+  }
+
+  if (aspectRatio > 1 + ORIENTATION_TOLERANCE) {
     return { kind: 'castle-card', confidence: 'high' };
   }
 
-  if (landscapeRatio < 1 - ORIENTATION_TOLERANCE) {
-    return { kind: 'goshuin', confidence: 'high' };
-  }
-
-  return { kind: 'goshuin', confidence: 'low' };
+  return { kind: 'goshuin', confidence: 'high' };
 }

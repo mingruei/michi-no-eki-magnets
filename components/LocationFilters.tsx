@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { REGIONS, type RegionId } from '../constants/regions';
 import { colors } from '../constants/theme';
@@ -112,18 +114,26 @@ function PickerModal({
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const insets = useSafeAreaInsets();
+  const bottomInset = Platform.OS === 'android' ? Math.max(insets.bottom, 16) : insets.bottom;
 
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
-        <Pressable style={styles.modalSheet} onPress={(event) => event.stopPropagation()}>
+        <Pressable
+          style={[styles.modalSheet, { paddingBottom: bottomInset }]}
+          onPress={(event) => event.stopPropagation()}
+        >
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{title}</Text>
             <Pressable accessibilityRole="button" onPress={onClose}>
               <Text style={styles.modalClose}>{t('common.close')}</Text>
             </Pressable>
           </View>
-          <ScrollView style={styles.modalList}>
+          <ScrollView
+            style={styles.modalList}
+            contentContainerStyle={{ paddingBottom: bottomInset > 0 ? 8 : 16 }}
+          >
             {options.map((option) => {
               const isSelected = option.value === selectedValue;
               return (
@@ -384,7 +394,6 @@ const styles = StyleSheet.create({
     color: colors.original,
   },
   modalList: {
-    paddingBottom: 24,
   },
   modalOption: {
     paddingHorizontal: 18,

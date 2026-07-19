@@ -24,6 +24,7 @@ export type TranslationDictionary = {
     typeLabel: string;
     typeHintCastleCard: string;
     typeHintGoshuin: string;
+    typeHintMeijoStamp: string;
     castleLabel: string;
     castleSearchPlaceholder: string;
     castleSearchHint: string;
@@ -131,6 +132,8 @@ export type TranslationDictionary = {
     goshuin: string;
     castleCard: string;
     goshuinUploadTitle: string;
+    meijoStampUploadTitle: string;
+    meijoStampUploadHint: string;
     castleCardUploadTitle: string;
     collectibleUpload: string;
     collectibleChooseSource: string;

@@ -1,11 +1,15 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import DocumentScanner, {
   ResponseType,
   ScanDocumentResponseStatus,
 } from 'react-native-document-scanner-plugin';
 
+import {
+  isCameraPermissionErrorMessage,
+  isMediaPermissionErrorMessage,
+} from './collectibleUploadErrors';
 import { normalizeFileUri } from './normalizeFileUri';
 import { waitForNativePicker } from './waitForNativePicker';
 
@@ -54,13 +58,21 @@ function toSelection(
   };
 }
 
-async function ensureAndroidCameraPermission(): Promise<boolean> {
-  if (Platform.OS !== 'android') {
+function toErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return String(error ?? '');
+}
+
+async function ensureCameraPermission(): Promise<boolean> {
+  const current = await ImagePicker.getCameraPermissionsAsync();
+  if (current.granted) {
     return true;
   }
 
-  const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
-  return granted === PermissionsAndroid.RESULTS.GRANTED;
+  const requested = await ImagePicker.requestCameraPermissionsAsync();
+  return requested.granted;
 }
 
 async function ensureMediaLibraryPermission(): Promise<boolean> {
@@ -92,63 +104,71 @@ async function withPickerTimeout<T>(promise: Promise<T>): Promise<T> {
 }
 
 export async function pickCollectibleFromScan(): Promise<CollectibleUploadSelection[]> {
-  if (Platform.OS === 'web') {
-    return pickCollectibleFromFile();
-  }
-
   await waitForNativePicker();
 
-  const cameraGranted = await ensureAndroidCameraPermission();
+  const cameraGranted = await ensureCameraPermission();
   if (!cameraGranted) {
     throw new Error('camera-permission-denied');
   }
 
-  const { scannedImages, status } = await DocumentScanner.scanDocument({
-    croppedImageQuality: 92,
-    responseType: ResponseType.ImageFilePath,
-  });
+  try {
+    const { scannedImages, status } = await DocumentScanner.scanDocument({
+      croppedImageQuality: 92,
+      responseType: ResponseType.ImageFilePath,
+    });
 
-  if (status === ScanDocumentResponseStatus.Cancel || !scannedImages?.length) {
-    return [];
+    if (status === ScanDocumentResponseStatus.Cancel || !scannedImages?.length) {
+      return [];
+    }
+
+    return scannedImages
+      .map((uri) => toSelection(uri, 'image/jpeg'))
+      .filter((selection): selection is CollectibleUploadSelection => selection != null);
+  } catch (error) {
+    if (isCameraPermissionErrorMessage(toErrorMessage(error))) {
+      throw new Error('camera-permission-denied');
+    }
+    throw error;
   }
-
-  return scannedImages
-    .map((uri) => toSelection(uri, 'image/jpeg'))
-    .filter((selection): selection is CollectibleUploadSelection => selection != null);
 }
 
 export async function pickCollectibleFromGallery(): Promise<CollectibleUploadSelection[]> {
-  if (Platform.OS !== 'web') {
-    await waitForNativePicker();
+  await waitForNativePicker();
 
-    const granted = await ensureMediaLibraryPermission();
-    if (!granted) {
+  const granted = await ensureMediaLibraryPermission();
+  if (!granted) {
+    throw new Error('media-permission-denied');
+  }
+
+  try {
+    const result = await withPickerTimeout(
+      ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 1,
+        allowsEditing: false,
+        base64: Platform.OS === 'android',
+      }),
+    );
+
+    if (result.canceled || !result.assets?.[0]) {
+      return [];
+    }
+
+    const asset = result.assets[0];
+    const selection = toSelection(
+      asset.uri,
+      asset.mimeType ?? 'image/jpeg',
+      asset.width,
+      asset.height,
+      asset.base64,
+    );
+    return selection ? [selection] : [];
+  } catch (error) {
+    if (isMediaPermissionErrorMessage(toErrorMessage(error))) {
       throw new Error('media-permission-denied');
     }
+    throw error;
   }
-
-  const result = await withPickerTimeout(
-    ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
-    quality: 1,
-    allowsEditing: false,
-      base64: Platform.OS === 'android',
-    }),
-  );
-
-  if (result.canceled || !result.assets?.[0]) {
-    return [];
-  }
-
-  const asset = result.assets[0];
-  const selection = toSelection(
-    asset.uri,
-    asset.mimeType ?? 'image/jpeg',
-    asset.width,
-    asset.height,
-    asset.base64,
-  );
-  return selection ? [selection] : [];
 }
 
 export async function pickCollectibleFromFile(): Promise<CollectibleUploadSelection[]> {

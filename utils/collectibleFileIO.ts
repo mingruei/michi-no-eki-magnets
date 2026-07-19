@@ -138,10 +138,9 @@ export async function copySourceUriToFile(sourceUri: string, destination: File):
   }
 
   if (
-    Platform.OS !== 'web' &&
-    (sourceUri.startsWith('content://') ||
-      sourceUri.startsWith('file://') ||
-      sourceUri.startsWith('/'))
+    sourceUri.startsWith('content://') ||
+    sourceUri.startsWith('file://') ||
+    sourceUri.startsWith('/')
   ) {
     for (const source of uniqueUriCandidates(sourceUri)) {
       for (const dest of destinationUriCandidates(destination.uri)) {
@@ -270,8 +269,9 @@ export async function writeSourceToFile(
   }
 
   if (
-    Platform.OS !== 'web' &&
-    (sourceUri.startsWith('content://') || sourceUri.startsWith('file://') || sourceUri.startsWith('/'))
+    sourceUri.startsWith('content://') ||
+    sourceUri.startsWith('file://') ||
+    sourceUri.startsWith('/')
   ) {
     const copied = await copyUriToDestination(sourceUri, destination.uri);
     if (copied) {

@@ -23,7 +23,7 @@ import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
 import type { CastleCollectible } from '../types/castleCollectible';
 import { isImageCollectible } from '../utils/castleCollectibleStorage';
-import { getDisplayImageUri } from '../utils/collectibleFileIO';
+import { getCollectibleDisplayUri } from '../utils/castleCollectibleStorage';
 
 type CollectibleGalleryViewerProps = {
   items: CastleCollectible[];
@@ -186,7 +186,8 @@ export function CollectibleGalleryViewer({
           <View pointerEvents="none" style={[styles.page, { height: contentHeight }]}>
             {isImage ? (
               <Image
-                source={{ uri: getDisplayImageUri(currentItem.uri) }}
+                key={`${currentItem.id}-${currentItem.createdAt}`}
+                source={{ uri: getCollectibleDisplayUri(currentItem) }}
                 style={styles.fullImage}
                 resizeMode="contain"
               />

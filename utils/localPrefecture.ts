@@ -1,5 +1,4 @@
 import * as Location from 'expo-location';
-import { Platform } from 'react-native';
 
 import type { RegionId } from '../constants/regions';
 import { getRegionIdForPrefecture } from '../constants/regions';
@@ -166,16 +165,17 @@ async function resolvePrefectureFromReverseGeocode(
 }
 
 async function getCurrentJapanCoordinates(): Promise<JapanCoordinates | null> {
-  if (Platform.OS === 'web') {
-    return null;
-  }
-
-  const permission = await Location.requestForegroundPermissionsAsync();
-  if (permission.status !== 'granted') {
-    return null;
-  }
-
   try {
+    const existing = await Location.getForegroundPermissionsAsync();
+    const permission =
+      existing.status === 'undetermined'
+        ? await Location.requestForegroundPermissionsAsync()
+        : existing;
+
+    if (permission.status !== 'granted') {
+      return null;
+    }
+
     const position = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });

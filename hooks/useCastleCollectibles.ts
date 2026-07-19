@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   COLLECTIBLE_PROGRESS_FIELD,
+  isSingleFileCollectibleKind,
   type CastleCollectible,
   type CollectibleKind,
 } from '../types/castleCollectible';
@@ -38,37 +39,53 @@ export function useCastleCollectibles(
   const [error, setError] = useState<string | null>(null);
 
   const progressField = COLLECTIBLE_PROGRESS_FIELD[kind];
+  const mountedRef = useRef(true);
 
-  const ensureCollected = useCallback(() => {
-    const progress = getProgress(castleId);
-    if (!progress[progressField]) {
-      markProgressCollected(castleId, progressField);
-    }
-  }, [castleId, getProgress, markProgressCollected, progressField]);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const refresh = useCallback(() => {
     setLoading(true);
     try {
       const nextItems = listCastleCollectibles(castleId, kind);
-      setItems(nextItems);
-      if (nextItems.length > 0) {
-        ensureCollected();
+      if (!mountedRef.current) {
+        return;
       }
+      setItems(nextItems);
       setError(null);
     } catch (err) {
+      if (!mountedRef.current) {
+        return;
+      }
       setError(err instanceof Error ? err.message : 'collectible-load-failed');
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
-  }, [castleId, ensureCollected, kind]);
+  }, [castleId, kind]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    if (items.length === 0) {
+      return;
+    }
+
+    const progress = getProgress(castleId);
+    if (!progress[progressField]) {
+      markProgressCollected(castleId, progressField);
+    }
+  }, [castleId, getProgress, items.length, markProgressCollected, progressField]);
+
   const uploadFromSource = useCallback(
     async (source: CollectibleUploadSource) => {
-      setUploading(true);
       setError(null);
 
       try {
@@ -77,9 +94,16 @@ export function useCastleCollectibles(
           return;
         }
 
+        setUploading(true);
+        const toSave = isSingleFileCollectibleKind(kind)
+          ? selections.slice(0, 1)
+          : selections;
         const existingCount = listCastleCollectibles(castleId, kind).length;
 
-        for (const selection of selections) {
+        for (const selection of toSave) {
+          if (!mountedRef.current) {
+            return;
+          }
           const persistedUri = await persistUploadImage(
             selection.uri,
             selection.mimeType ?? 'image/jpeg',
@@ -95,20 +119,32 @@ export function useCastleCollectibles(
         }
 
         const savedItems = listCastleCollectibles(castleId, kind);
-        if (savedItems.length <= existingCount) {
+        const uploadSucceeded = isSingleFileCollectibleKind(kind)
+          ? savedItems.length > 0
+          : savedItems.length > existingCount;
+        if (!uploadSucceeded) {
           throw new Error('collectible-upload-failed');
+        }
+
+        if (!mountedRef.current) {
+          return;
         }
 
         markProgressCollected(castleId, progressField);
         refresh();
       } catch (err) {
+        if (!mountedRef.current) {
+          return;
+        }
         if (err instanceof Error) {
           setError(err.message);
         } else {
           setError('collectible-upload-failed');
         }
       } finally {
-        setUploading(false);
+        if (mountedRef.current) {
+          setUploading(false);
+        }
       }
     },
     [castleId, kind, markProgressCollected, progressField, refresh],

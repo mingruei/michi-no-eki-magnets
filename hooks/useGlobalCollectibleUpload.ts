@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import {
   COLLECTIBLE_PROGRESS_FIELD,
+  isSingleFileCollectibleKind,
   type CollectibleKind,
 } from '../types/castleCollectible';
 import { saveCastleCollectibleFromUri, listCastleCollectibles } from '../utils/castleCollectibleStorage';
@@ -16,6 +17,7 @@ import {
 } from '../utils/castleCollectibleUpload';
 import { resolveSelectionDimensions } from '../utils/getImageDimensions';
 import { persistUploadImage } from '../utils/persistUploadImage';
+import { waitForNativePicker } from '../utils/waitForNativePicker';
 import { useCastleProgress } from './useCastleProgress';
 
 export type GlobalUploadPhase =
@@ -49,25 +51,37 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
 
   const reset = useCallback(() => {
     setPhase('idle');
-    setDraft(null);
     setError(null);
+  }, []);
+
+  const clearDraft = useCallback(() => {
+    setDraft(null);
   }, []);
 
   const openSourcePicker = useCallback(() => {
     setError(null);
-    setDraft(null);
+    clearDraft();
     setPhase('source-picker');
-  }, []);
+  }, [clearDraft]);
 
   const closeFlow = useCallback(() => {
     reset();
-  }, [reset]);
+    clearDraft();
+  }, [clearDraft, reset]);
+
+  const dismissConfirmFlow = useCallback(() => {
+    reset();
+    setTimeout(() => {
+      clearDraft();
+    }, 350);
+  }, [clearDraft, reset]);
 
   const selectSource = useCallback(async (source: CollectibleUploadSource) => {
     setError(null);
-    setPhase('picking');
+    setPhase('idle');
 
     try {
+      await waitForNativePicker();
       const selections = await pickCollectibleBySource(source);
       if (selections.length === 0) {
         setPhase('source-picker');
@@ -82,6 +96,7 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
         return;
       }
 
+      setPhase('picking');
       const persistedUri = await persistUploadImage(
         selection.uri,
         selection.mimeType ?? 'image/jpeg',
@@ -131,12 +146,15 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
         );
 
         const savedItems = listCastleCollectibles(castleId, kind);
-        if (savedItems.length <= existingCount) {
+        const uploadSucceeded = isSingleFileCollectibleKind(kind)
+          ? savedItems.length > 0
+          : savedItems.length > existingCount;
+        if (!uploadSucceeded) {
           throw new Error('global-upload-failed');
         }
 
         markProgressCollected(castleId, COLLECTIBLE_PROGRESS_FIELD[kind]);
-        reset();
+        dismissConfirmFlow();
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -146,7 +164,7 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
         setPhase('confirm');
       }
     },
-    [draft, markProgressCollected, reset],
+    [draft, dismissConfirmFlow, markProgressCollected],
   );
 
   return {

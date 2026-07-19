@@ -30,10 +30,28 @@ type CollectibleUploadConfirmModalProps = {
   onConfirm: (castleId: number, kind: CollectibleKind) => void;
 };
 
-const KIND_OPTIONS: CollectibleKind[] = ['goshuin', 'castle-card'];
+const KIND_OPTIONS: CollectibleKind[] = ['meijo-stamp', 'goshuin', 'castle-card'];
 
 function getKindLabel(kind: CollectibleKind, t: (key: string) => string): string {
-  return kind === 'goshuin' ? t('castle.goshuin') : t('castle.castleCard');
+  switch (kind) {
+    case 'meijo-stamp':
+      return t('castle.meijoStamp');
+    case 'goshuin':
+      return t('castle.goshuin');
+    case 'castle-card':
+      return t('castle.castleCard');
+  }
+}
+
+function getTypeHint(kind: CollectibleKind, t: (key: string) => string): string {
+  switch (kind) {
+    case 'meijo-stamp':
+      return t('globalUpload.typeHintMeijoStamp');
+    case 'castle-card':
+      return t('globalUpload.typeHintCastleCard');
+    case 'goshuin':
+      return t('globalUpload.typeHintGoshuin');
+  }
 }
 
 export function CollectibleUploadConfirmModal({
@@ -106,11 +124,7 @@ export function CollectibleUploadConfirmModal({
               );
             })}
           </View>
-          <Text style={styles.hint}>
-            {draft.typeSuggestion.kind === 'castle-card'
-              ? t('globalUpload.typeHintCastleCard')
-              : t('globalUpload.typeHintGoshuin')}
-          </Text>
+          <Text style={styles.hint}>{getTypeHint(selectedKind, t)}</Text>
 
           <Text style={styles.sectionLabel}>{t('globalUpload.castleLabel')}</Text>
           <Text style={styles.hint}>{t('globalUpload.castleSearchHint')}</Text>

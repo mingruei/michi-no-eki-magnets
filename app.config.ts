@@ -1,15 +1,18 @@
 import type { ExpoConfig } from 'expo/config';
 
-const locationPermissionMessage = '用於依您目前位置自動篩選所在地方與府縣。';
-const photoPermissionMessage = '用於上傳御城印與城卡照片。';
-const cameraPermissionMessage = '用於掃描御城印與城卡。';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const permissionMessages = require('./plugins/permissionMessages') as {
+  location: string;
+  photo: string;
+  camera: string;
+};
 
 const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
 
 const config: ExpoConfig = {
   name: '攻城師',
   slug: 'japan-castles-map',
-  version: '1.1.0',
+  version: '1.2.0',
   orientation: 'default',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
@@ -20,20 +23,20 @@ const config: ExpoConfig = {
     [
       'expo-location',
       {
-        locationWhenInUsePermission: locationPermissionMessage,
+        locationWhenInUsePermission: permissionMessages.location,
       },
     ],
     [
       'expo-image-picker',
       {
-        photosPermission: photoPermissionMessage,
-        cameraPermission: cameraPermissionMessage,
+        photosPermission: permissionMessages.photo,
+        cameraPermission: permissionMessages.camera,
       },
     ],
     [
       'react-native-document-scanner-plugin',
       {
-        cameraPermission: cameraPermissionMessage,
+        cameraPermission: permissionMessages.camera,
       },
     ],
     [
@@ -50,7 +53,9 @@ const config: ExpoConfig = {
       },
     ],
     './plugins/withFmtXcode26Fix.js',
+    './plugins/withIosUsageDescriptions.js',
     './plugins/withHermesDsym.js',
+    './plugins/withAndroidReleaseFileName.js',
   ],
   extra: {
     eas: {
@@ -60,17 +65,20 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.japancastles.map',
+    buildNumber: '3',
     infoPlist: {
-      NSLocationWhenInUseUsageDescription: locationPermissionMessage,
-      NSPhotoLibraryUsageDescription: photoPermissionMessage,
-      NSCameraUsageDescription: cameraPermissionMessage,
+      NSLocationWhenInUseUsageDescription: permissionMessages.location,
+      NSLocationAlwaysUsageDescription: permissionMessages.location,
+      NSLocationAlwaysAndWhenInUseUsageDescription: permissionMessages.location,
+      NSPhotoLibraryUsageDescription: permissionMessages.photo,
+      NSCameraUsageDescription: permissionMessages.camera,
       LSApplicationQueriesSchemes: ['comgooglemaps', 'comgooglemapsurl'],
       ITSAppUsesNonExemptEncryption: false,
     },
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 38,
+    versionCode: 41,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',
@@ -86,18 +94,6 @@ const config: ExpoConfig = {
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
-  },
-  web: {
-    favicon: './assets/favicon.png',
-    name: '攻城師',
-    shortName: '攻城師',
-    description: '日本100名城 + 續日本100名城',
-    themeColor: '#1A2744',
-    backgroundColor: '#F8FAFC',
-    display: 'standalone',
-    orientation: 'portrait',
-    lang: 'zh-Hant',
-    bundler: 'metro',
   },
 };
 
