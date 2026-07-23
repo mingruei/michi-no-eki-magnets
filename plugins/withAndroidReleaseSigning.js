@@ -1,7 +1,15 @@
 const { withAppBuildGradle } = require('@expo/config-plugins');
 
 const MARKER = 'android-release-signing-from-keystore-properties';
+const DEFAULT_HOME_KEYSTORE_NAME = 'upload-keystore.jks';
 
+/**
+ * Release signing for local Play uploads.
+ *
+ * IMPORTANT: Never pass "~/…" through Gradle's file()/storeFile DSL — it becomes
+ * android/app/~/… . Always build an absolute java.io.File under user.home first,
+ * then assign signingConfig.storeFile = that File.
+ */
 const RELEASE_SIGNING_HELPERS = `
 // @generated begin ${MARKER}
 def japanCastlesKeystorePropertiesFile = rootProject.file("keystore.properties")
@@ -12,57 +20,88 @@ if (japanCastlesKeystorePropertiesFile.exists()) {
     }
 }
 
-ext.japanCastlesResolveStoreFile = { Object rawPath ->
-    if (rawPath == null) {
-        return null
+ext.japanCastlesHomeKeystore = {
+    def home = System.getProperty("user.home") ?: System.getenv("HOME")
+    if (home == null || home.toString().trim().isEmpty()) {
+        throw new GradleException("user.home / HOME is unset; cannot resolve release keystore")
     }
+    return new File(home.toString(), "${DEFAULT_HOME_KEYSTORE_NAME}")
+}
+
+ext.japanCastlesResolveStoreFile = { Object rawPath ->
+    def homeFile = japanCastlesHomeKeystore()
+
+    if (rawPath == null) {
+        return homeFile
+    }
+
     def path = rawPath.toString().trim()
     if ((path.startsWith('"') && path.endsWith('"')) || (path.startsWith("'") && path.endsWith("'"))) {
         path = path.substring(1, path.length() - 1).trim()
     }
     if (path.isEmpty()) {
-        return null
+        return homeFile
     }
 
-    // Gradle file('~/…') resolves under android/app/ and produces
-    // …/android/app/~/upload-keystore.jks. Expand before that happens.
-    if (path.startsWith("~")) {
+    // Already-corrupted Gradle path: .../android/app/~/upload-keystore.jks
+    def corrupted = path.indexOf("/~/")
+    if (corrupted >= 0) {
+        def after = path.substring(corrupted + 3) // strip leading "/~/"
         def home = System.getProperty("user.home") ?: System.getenv("HOME")
-        if (home == null || home.toString().trim().isEmpty()) {
-            throw new GradleException("Cannot resolve keystore path '\${path}': user.home / HOME is unset")
+        return new File(home.toString(), after)
+    }
+
+    if (path == "~" || path.startsWith("~/")) {
+        def home = System.getProperty("user.home") ?: System.getenv("HOME")
+        def relative = path == "~" ? "${DEFAULT_HOME_KEYSTORE_NAME}" : path.substring(2)
+        if (relative.isEmpty()) {
+            relative = "${DEFAULT_HOME_KEYSTORE_NAME}"
         }
-        def relative = path.replaceFirst(/^~\\/?/, "")
         return new File(home.toString(), relative)
+    }
+
+    // Bare filename => home directory (avoids android/app relative resolution)
+    if (!path.contains("/") && !path.contains("\\\\")) {
+        def home = System.getProperty("user.home") ?: System.getenv("HOME")
+        return new File(home.toString(), path)
     }
 
     def candidate = new File(path)
     if (candidate.isAbsolute()) {
         return candidate
     }
+
+    // Relative non-bare paths: resolve from android/ (project root for this module)
     return rootProject.file(path)
 }
 
 ext.japanCastlesApplyReleaseSigning = {
     if (!japanCastlesKeystorePropertiesFile.exists()) {
+        logger.lifecycle("android/keystore.properties not found; leave release signing unchanged")
         return false
     }
 
     def resolvedStoreFile = japanCastlesResolveStoreFile(japanCastlesKeystoreProperties["storeFile"])
-    if (resolvedStoreFile == null) {
+    if (resolvedStoreFile == null || !resolvedStoreFile.isFile()) {
         throw new GradleException(
-            "android/keystore.properties is missing storeFile (expected e.g. ~/upload-keystore.jks)"
+            "Release keystore not found.\\n" +
+            "  keystore.properties storeFile=\${japanCastlesKeystoreProperties['storeFile']}\\n" +
+            "  resolved=\${resolvedStoreFile?.absolutePath}\\n" +
+            "Run: ./scripts/setup-android-release-keystore.sh"
         )
     }
-    if (!resolvedStoreFile.isFile()) {
-        throw new GradleException(
-            "Release keystore not found: \${japanCastlesKeystoreProperties['storeFile']} (resolved: \${resolvedStoreFile.absolutePath})"
-        )
+
+    // Guard: never allow a literal ~/ segment into the signing config.
+    if (resolvedStoreFile.absolutePath.contains("/~/")) {
+        resolvedStoreFile = japanCastlesHomeKeystore()
     }
 
     def releaseSigning = android.signingConfigs.findByName("release")
     if (releaseSigning == null) {
         releaseSigning = android.signingConfigs.create("release")
     }
+
+    // Assign the File property directly — do not call storeFile(file(...)).
     releaseSigning.storeFile = resolvedStoreFile
     releaseSigning.storePassword = japanCastlesKeystoreProperties["storePassword"]
     releaseSigning.keyAlias = japanCastlesKeystoreProperties["keyAlias"]
@@ -81,29 +120,13 @@ afterEvaluate {
 }
 
 tasks.configureEach { task ->
-    if (task.name == "validateSigningRelease" || task.name == "packageRelease" || task.name == "bundleRelease") {
+    if (task.name.toLowerCase().contains("sign") || task.name == "packageRelease" || task.name == "bundleRelease" || task.name == "validateSigningRelease") {
         task.doFirst {
             japanCastlesApplyReleaseSigning()
         }
     }
 }
 // @generated end android-release-signing-hooks
-`;
-
-const INLINE_RELEASE_SIGNING_CONFIG = `
-        // @generated begin japan-castles-release-signing-config
-        release {
-            if (japanCastlesKeystorePropertiesFile.exists()) {
-                def _jcStoreFile = japanCastlesResolveStoreFile(japanCastlesKeystoreProperties["storeFile"])
-                if (_jcStoreFile != null) {
-                    storeFile _jcStoreFile
-                    storePassword japanCastlesKeystoreProperties["storePassword"]
-                    keyAlias japanCastlesKeystoreProperties["keyAlias"]
-                    keyPassword japanCastlesKeystoreProperties["keyPassword"]
-                }
-            }
-        }
-        // @generated end japan-castles-release-signing-config
 `;
 
 function stripGeneratedBlocks(contents) {
@@ -123,8 +146,6 @@ function stripGeneratedBlocks(contents) {
 }
 
 function injectHelpersNearTop(contents) {
-  // Place helpers after plugin applies so rootProject / ext are available,
-  // but before the android { } block evaluates storeFile.
   const applyPluginPattern = /((?:apply plugin:.*\n)+)/;
   if (applyPluginPattern.test(contents)) {
     return contents.replace(applyPluginPattern, `$1\n${RELEASE_SIGNING_HELPERS}\n`);
@@ -132,15 +153,30 @@ function injectHelpersNearTop(contents) {
   return `${RELEASE_SIGNING_HELPERS}\n${contents}`;
 }
 
-function injectInlineReleaseSigningConfig(contents) {
-  const debugBlockPattern =
-    /(signingConfigs\s*\{\s*debug\s*\{[\s\S]*?storeFile file\('debug\.keystore'\)[\s\S]*?\n\s*\})/;
+/**
+ * Remove any existing signingConfigs.release { ... } so hand-edited
+ * storeFile file('~/…') cannot win, then create ours via afterEvaluate only.
+ */
+function stripExistingReleaseSigningConfig(contents) {
+  return contents.replace(
+    /(signingConfigs\s*\{)([\s\S]*?)(\n\s*\}\s*\n\s*buildTypes)/,
+    (full, start, inner, end) => {
+      const withoutRelease = inner.replace(/\n[ \t]*release\s*\{[\s\S]*?\n[ \t]*\}/g, '\n');
+      return `${start}${withoutRelease}${end}`;
+    },
+  );
+}
 
-  if (debugBlockPattern.test(contents)) {
-    return contents.replace(debugBlockPattern, `$1${INLINE_RELEASE_SIGNING_CONFIG}`);
-  }
-
-  return contents;
+function rewriteDangerousStoreFileCalls(contents) {
+  return contents
+    .replace(
+      /storeFile\s+file\(\s*keystoreProperties\[['\"]storeFile['\"]\]\s*\)/g,
+      '/* rewritten */ storeFile = japanCastlesResolveStoreFile(keystoreProperties[\'storeFile\'])',
+    )
+    .replace(
+      /storeFile\s+file\(\s*['"]~\/[^'"]+['"]\s*\)/g,
+      '/* rewritten */ storeFile = japanCastlesHomeKeystore()',
+    );
 }
 
 function preferReleaseSigningInBuildTypes(contents) {
@@ -157,14 +193,9 @@ function withAndroidReleaseSigning(config) {
     }
 
     let contents = stripGeneratedBlocks(config.modResults.contents);
-
-    contents = contents.replace(
-      /storeFile\s+file\(\s*keystoreProperties\[['\"]storeFile['\"]\]\s*\)/g,
-      'storeFile japanCastlesResolveStoreFile(keystoreProperties[\'storeFile\'])',
-    );
-
+    contents = rewriteDangerousStoreFileCalls(contents);
+    contents = stripExistingReleaseSigningConfig(contents);
     contents = injectHelpersNearTop(contents);
-    contents = injectInlineReleaseSigningConfig(contents);
     contents = preferReleaseSigningInBuildTypes(contents);
     contents += `\n${RELEASE_SIGNING_HOOKS}\n`;
 

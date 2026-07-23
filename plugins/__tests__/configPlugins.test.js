@@ -214,7 +214,7 @@ describe('withAndroidReleaseFileName', () => {
 });
 
 describe('withAndroidReleaseSigning', () => {
-  it('appends keystore.properties signing helpers with home-path support', () => {
+  it('injects home-safe keystore helpers and signing hooks', () => {
     withAndroidReleaseSigning({ name: 'test', slug: 'test' });
 
     expect(withAppBuildGradle).toHaveBeenCalled();
@@ -230,6 +230,9 @@ describe('withAndroidReleaseSigning', () => {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('~/upload-keystore.jks')
+        }
     }
     buildTypes {
         release {
@@ -244,15 +247,16 @@ describe('withAndroidReleaseSigning', () => {
       'android-release-signing-from-keystore-properties',
     );
     expect(result.modResults.contents).toContain('japanCastlesResolveStoreFile');
-    expect(result.modResults.contents).toContain('japan-castles-release-signing-config');
-    expect(result.modResults.contents).toContain('user.home');
+    expect(result.modResults.contents).toContain('japanCastlesHomeKeystore');
     expect(result.modResults.contents).toContain('validateSigningRelease');
     expect(result.modResults.contents).toContain(
       'signingConfig signingConfigs.findByName("release") ?: signingConfigs.debug',
     );
+    // Dangerous literal ~/ storeFile calls are rewritten or release block stripped.
+    expect(result.modResults.contents).not.toContain("storeFile file('~/upload-keystore.jks')");
   });
 
-  it('rewrites file(keystoreProperties[storeFile]) to expand home paths', () => {
+  it('rewrites file(keystoreProperties[storeFile]) away from Gradle file()', () => {
     withAndroidReleaseSigning({ name: 'legacy', slug: 'legacy' });
     const callback = withAppBuildGradle.mock.calls.at(-1)[1];
     const result = callback({
@@ -278,9 +282,7 @@ android {
       },
     });
 
-    expect(result.modResults.contents).toContain(
-      "storeFile japanCastlesResolveStoreFile(keystoreProperties['storeFile'])",
-    );
+    expect(result.modResults.contents).toContain('japanCastlesResolveStoreFile');
     expect(result.modResults.contents).not.toContain(
       "storeFile file(keystoreProperties['storeFile'])",
     );
