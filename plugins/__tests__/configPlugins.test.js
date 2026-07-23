@@ -37,6 +37,7 @@ const path = require('path');
 const { withAppBuildGradle, withInfoPlist, withXcodeProject } = require('@expo/config-plugins');
 const permissionMessages = require('../permissionMessages');
 const withAndroidReleaseFileName = require('../withAndroidReleaseFileName');
+const withAndroidReleaseSigning = require('../withAndroidReleaseSigning');
 const withFmtXcode26Fix = require('../withFmtXcode26Fix');
 const withIosUsageDescriptions = require('../withIosUsageDescriptions');
 const withHermesDsym = require('../withHermesDsym');
@@ -208,6 +209,48 @@ describe('withAndroidReleaseFileName', () => {
     });
     expect(dedupeResult.modResults.contents).toBe(
       '// @generated begin release-artifact-file-name',
+    );
+  });
+});
+
+describe('withAndroidReleaseSigning', () => {
+  it('appends keystore.properties signing snippet with home-path support', () => {
+    withAndroidReleaseSigning({ name: 'test', slug: 'test' });
+
+    expect(withAppBuildGradle).toHaveBeenCalled();
+    const callback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const result = callback({
+      modResults: {
+        language: 'groovy',
+        contents: 'android { defaultConfig { versionCode 1 } }',
+      },
+    });
+
+    expect(result.modResults.contents).toContain(
+      'android-release-signing-from-keystore-properties',
+    );
+    expect(result.modResults.contents).toContain('japanCastlesResolveStoreFile');
+    expect(result.modResults.contents).toContain('user.home');
+  });
+
+  it('skips non-groovy gradle files and duplicate snippets', () => {
+    withAndroidReleaseSigning({ name: 'kotlin', slug: 'kotlin' });
+    const kotlinCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const kotlinResult = kotlinCallback({
+      modResults: { language: 'kotlin', contents: 'plugins {}' },
+    });
+    expect(kotlinResult.modResults.contents).toBe('plugins {}');
+
+    withAndroidReleaseSigning({ name: 'dedupe', slug: 'dedupe' });
+    const dedupeCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const dedupeResult = dedupeCallback({
+      modResults: {
+        language: 'groovy',
+        contents: '// @generated begin android-release-signing-from-keystore-properties',
+      },
+    });
+    expect(dedupeResult.modResults.contents).toBe(
+      '// @generated begin android-release-signing-from-keystore-properties',
     );
   });
 });

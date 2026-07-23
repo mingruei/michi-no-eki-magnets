@@ -91,6 +91,14 @@ Debug SHA-1 (local builds):
 keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
 ```
 
+For local Play Store `.aab` builds, copy `android-keystore.properties.example` to `android/keystore.properties` after `prebuild`. Prefer:
+
+```properties
+storeFile=~/upload-keystore.jks
+```
+
+(`~` is expanded to your home directory by the release signing config plugin.)
+
 For Play Store builds, also add the **App signing key certificate** SHA-1 from Google Play Console.
 
 ### 3. Enable Google in Supabase
