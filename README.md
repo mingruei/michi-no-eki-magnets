@@ -91,13 +91,17 @@ Debug SHA-1 (local builds):
 keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
 ```
 
-For local Play Store `.aab` builds, after `prebuild` run:
+For local Play Store `.aab` builds, after `prebuild` create a **machine-local**
+`android/keystore.properties` (not committed) with an absolute `storeFile`:
 
-```bash
-./scripts/setup-android-release-keystore.sh
+```properties
+storeFile=/Users/YOUR_USERNAME/upload-keystore.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
 ```
 
-This writes `android/keystore.properties` with an **absolute** `storeFile` (Gradle does not expand `~`). Default keystore path: `~/upload-keystore.jks`.
+See `android-keystore.properties.example`. Do not use `~/` in `storeFile`.
 
 For Play Store builds, also add the **App signing key certificate** SHA-1 from Google Play Console.
 
