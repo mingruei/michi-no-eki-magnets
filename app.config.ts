@@ -56,6 +56,8 @@ const config: ExpoConfig = {
     './plugins/withIosUsageDescriptions.js',
     './plugins/withHermesDsym.js',
     './plugins/withAndroidReleaseFileName.js',
+    './plugins/withAndroidReleaseSigning.js',
+    'expo-iap',
   ],
   extra: {
     eas: {
@@ -78,7 +80,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 41,
+    versionCode: 43,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',

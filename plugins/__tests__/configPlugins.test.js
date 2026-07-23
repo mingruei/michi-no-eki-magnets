@@ -37,6 +37,7 @@ const path = require('path');
 const { withAppBuildGradle, withInfoPlist, withXcodeProject } = require('@expo/config-plugins');
 const permissionMessages = require('../permissionMessages');
 const withAndroidReleaseFileName = require('../withAndroidReleaseFileName');
+const withAndroidReleaseSigning = require('../withAndroidReleaseSigning');
 const withFmtXcode26Fix = require('../withFmtXcode26Fix');
 const withIosUsageDescriptions = require('../withIosUsageDescriptions');
 const withHermesDsym = require('../withHermesDsym');
@@ -208,6 +209,62 @@ describe('withAndroidReleaseFileName', () => {
     });
     expect(dedupeResult.modResults.contents).toBe(
       '// @generated begin release-artifact-file-name',
+    );
+  });
+});
+
+describe('withAndroidReleaseSigning', () => {
+  it('wires release builds to android/keystore.properties', () => {
+    withAndroidReleaseSigning({ name: 'test', slug: 'test' });
+
+    expect(withAppBuildGradle).toHaveBeenCalled();
+    const callback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const config = {
+      modResults: {
+        language: 'groovy',
+        contents: [
+          'android {',
+          '    signingConfigs {',
+          '        debug {',
+          "            storeFile file('debug.keystore')",
+          '        }',
+          '    }',
+          '    buildTypes {',
+          '        release {',
+          '            signingConfig = signingConfigs.debug',
+          '        }',
+          '    }',
+          '}',
+        ].join('\n'),
+      },
+    };
+
+    const result = callback(config);
+    expect(result.modResults.contents).toContain('release-signing-config');
+    expect(result.modResults.contents).toContain('releaseKeystorePropertiesFile');
+    expect(result.modResults.contents).toContain('signingConfig signingConfigs.release');
+    expect(result.modResults.contents).toContain('gradle.taskGraph.whenReady');
+    expect(result.modResults.contents).not.toContain('signingConfig = signingConfigs.debug');
+  });
+
+  it('skips non-groovy gradle files and duplicate snippets', () => {
+    withAndroidReleaseSigning({ name: 'kotlin', slug: 'kotlin' });
+    const kotlinCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const kotlinResult = kotlinCallback({
+      modResults: { language: 'kotlin', contents: 'plugins {}' },
+    });
+    expect(kotlinResult.modResults.contents).toBe('plugins {}');
+
+    withAndroidReleaseSigning({ name: 'dedupe', slug: 'dedupe' });
+    const dedupeCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const dedupeResult = dedupeCallback({
+      modResults: {
+        language: 'groovy',
+        contents: '// @generated begin release-signing-config',
+      },
+    });
+    expect(dedupeResult.modResults.contents).toBe(
+      '// @generated begin release-signing-config',
     );
   });
 });

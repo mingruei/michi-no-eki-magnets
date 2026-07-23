@@ -66,6 +66,12 @@ export type TranslationDictionary = {
     collectibleImportModeMergeNewerHint: string;
     collectibleImportModeConfirm: string;
     collectibleImportModeCancel: string;
+    tipJarTitle: string;
+    tipJarHint: string;
+    tipJarButtonFallback: string;
+    tipJarThanks: string;
+    tipJarFailed: string;
+    tipJarUnavailable: string;
   };
   filter: {
     region: string;
