@@ -214,7 +214,7 @@ describe('withAndroidReleaseFileName', () => {
 });
 
 describe('withAndroidReleaseSigning', () => {
-  it('appends keystore.properties signing snippet with home-path support', () => {
+  it('appends keystore.properties signing helpers with home-path support', () => {
     withAndroidReleaseSigning({ name: 'test', slug: 'test' });
 
     expect(withAppBuildGradle).toHaveBeenCalled();
@@ -222,7 +222,21 @@ describe('withAndroidReleaseSigning', () => {
     const result = callback({
       modResults: {
         language: 'groovy',
-        contents: 'android { defaultConfig { versionCode 1 } }',
+        contents: `android {
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}`,
       },
     });
 
@@ -230,10 +244,49 @@ describe('withAndroidReleaseSigning', () => {
       'android-release-signing-from-keystore-properties',
     );
     expect(result.modResults.contents).toContain('japanCastlesResolveStoreFile');
+    expect(result.modResults.contents).toContain('japan-castles-release-signing-config');
     expect(result.modResults.contents).toContain('user.home');
+    expect(result.modResults.contents).toContain('validateSigningRelease');
+    expect(result.modResults.contents).toContain(
+      'signingConfig signingConfigs.findByName("release") ?: signingConfigs.debug',
+    );
   });
 
-  it('skips non-groovy gradle files and duplicate snippets', () => {
+  it('rewrites file(keystoreProperties[storeFile]) to expand home paths', () => {
+    withAndroidReleaseSigning({ name: 'legacy', slug: 'legacy' });
+    const callback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const result = callback({
+      modResults: {
+        language: 'groovy',
+        contents: `
+android {
+  signingConfigs {
+    debug {
+      storeFile file('debug.keystore')
+    }
+    release {
+      storeFile file(keystoreProperties['storeFile'])
+    }
+  }
+  buildTypes {
+    release {
+      signingConfig signingConfigs.debug
+    }
+  }
+}
+`,
+      },
+    });
+
+    expect(result.modResults.contents).toContain(
+      "storeFile japanCastlesResolveStoreFile(keystoreProperties['storeFile'])",
+    );
+    expect(result.modResults.contents).not.toContain(
+      "storeFile file(keystoreProperties['storeFile'])",
+    );
+  });
+
+  it('skips non-groovy gradle files and replaces prior generated snippets', () => {
     withAndroidReleaseSigning({ name: 'kotlin', slug: 'kotlin' });
     const kotlinCallback = withAppBuildGradle.mock.calls.at(-1)[1];
     const kotlinResult = kotlinCallback({
@@ -241,17 +294,32 @@ describe('withAndroidReleaseSigning', () => {
     });
     expect(kotlinResult.modResults.contents).toBe('plugins {}');
 
-    withAndroidReleaseSigning({ name: 'dedupe', slug: 'dedupe' });
-    const dedupeCallback = withAppBuildGradle.mock.calls.at(-1)[1];
-    const dedupeResult = dedupeCallback({
+    withAndroidReleaseSigning({ name: 'replace', slug: 'replace' });
+    const replaceCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const replaceResult = replaceCallback({
       modResults: {
         language: 'groovy',
-        contents: '// @generated begin android-release-signing-from-keystore-properties',
+        contents: `android {
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+// @generated begin android-release-signing-from-keystore-properties
+OLD_SNIPPET
+// @generated end android-release-signing-from-keystore-properties
+`,
       },
     });
-    expect(dedupeResult.modResults.contents).toBe(
-      '// @generated begin android-release-signing-from-keystore-properties',
-    );
+    expect(replaceResult.modResults.contents).not.toContain('OLD_SNIPPET');
+    expect(replaceResult.modResults.contents).toContain('japanCastlesApplyReleaseSigning');
   });
 });
 
