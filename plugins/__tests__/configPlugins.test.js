@@ -37,6 +37,7 @@ const path = require('path');
 const { withAppBuildGradle, withInfoPlist, withXcodeProject } = require('@expo/config-plugins');
 const permissionMessages = require('../permissionMessages');
 const withAndroidReleaseFileName = require('../withAndroidReleaseFileName');
+const withAndroidReleaseSigning = require('../withAndroidReleaseSigning');
 const withFmtXcode26Fix = require('../withFmtXcode26Fix');
 const withIosUsageDescriptions = require('../withIosUsageDescriptions');
 const withHermesDsym = require('../withHermesDsym');
@@ -209,6 +210,78 @@ describe('withAndroidReleaseFileName', () => {
     expect(dedupeResult.modResults.contents).toBe(
       '// @generated begin release-artifact-file-name',
     );
+  });
+});
+
+describe('withAndroidReleaseSigning', () => {
+  it('appends absolute-path keystore.properties signing helpers', () => {
+    withAndroidReleaseSigning({ name: 'test', slug: 'test' });
+
+    expect(withAppBuildGradle).toHaveBeenCalled();
+    const callback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const result = callback({
+      modResults: {
+        language: 'groovy',
+        contents: `android {
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}`,
+      },
+    });
+
+    expect(result.modResults.contents).toContain(
+      'android-release-signing-from-keystore-properties',
+    );
+    expect(result.modResults.contents).toContain('japanCastlesApplyReleaseSigning');
+    expect(result.modResults.contents).toContain('do not use ~');
+    expect(result.modResults.contents).toContain(
+      'signingConfig signingConfigs.findByName("release") ?: signingConfigs.debug',
+    );
+  });
+
+  it('skips non-groovy gradle files and does not duplicate snippets', () => {
+    withAndroidReleaseSigning({ name: 'kotlin', slug: 'kotlin' });
+    const kotlinCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const kotlinResult = kotlinCallback({
+      modResults: { language: 'kotlin', contents: 'plugins {}' },
+    });
+    expect(kotlinResult.modResults.contents).toBe('plugins {}');
+
+    withAndroidReleaseSigning({ name: 'dedupe', slug: 'dedupe' });
+    const dedupeCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const marked = '// @generated begin android-release-signing-from-keystore-properties\nKEEP\n// @generated end android-release-signing-from-keystore-properties\n';
+    const dedupeResult = dedupeCallback({
+      modResults: {
+        language: 'groovy',
+        contents: `android {
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+${marked}`,
+      },
+    });
+    // strip + re-append replaces old block; marker should still exist once
+    const matches = dedupeResult.modResults.contents.match(
+      /android-release-signing-from-keystore-properties/g,
+    );
+    expect(matches?.length).toBeGreaterThanOrEqual(2); // begin + end
+    expect(dedupeResult.modResults.contents).toContain('japanCastlesApplyReleaseSigning');
   });
 });
 

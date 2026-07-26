@@ -21,6 +21,7 @@ describe('app.config', () => {
 
     expect(pluginIds).toContain('./plugins/withIosUsageDescriptions.js');
     expect(pluginIds).toContain('./plugins/withHermesDsym.js');
+    expect(pluginIds).toContain('./plugins/withAndroidReleaseSigning.js');
     expect(pluginIds).toContain('expo-location');
   });
 });
