@@ -2,6 +2,11 @@ const { withAppBuildGradle } = require('@expo/config-plugins');
 
 const MARKER = 'release-artifact-file-name';
 
+/**
+ * Copy (do not rename/delete) the AGP output artifact to a friendlier name.
+ * Renaming app-release.aab breaks later tasks such as
+ * produceReleaseBundleIdeListingFile that still expect the original path.
+ */
 const RELEASE_FILE_NAME_SNIPPET = `
 // @generated begin ${MARKER}
 afterEvaluate {
@@ -10,19 +15,18 @@ afterEvaluate {
             def artifactBaseName =
                 "japan-castles-map-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
             def outputDir = file("\${layout.buildDirectory.get()}/outputs/bundle/release")
-            def bundleFile = outputDir.listFiles()?.find { it.name.endsWith(".aab") }
+            def bundleFile = outputDir.listFiles()?.find {
+                it.name.endsWith(".aab") && it.name != "\${artifactBaseName}.aab"
+            }
             if (bundleFile != null) {
                 def targetFile = new File(outputDir, "\${artifactBaseName}.aab")
                 if (targetFile.exists()) {
                     targetFile.delete()
                 }
-                if (!bundleFile.renameTo(targetFile)) {
-                    bundleFile.withInputStream { input ->
-                        targetFile.withOutputStream { output -> output << input }
-                    }
-                    bundleFile.delete()
+                bundleFile.withInputStream { input ->
+                    targetFile.withOutputStream { output -> output << input }
                 }
-                logger.lifecycle("Release bundle: \${targetFile.name}")
+                logger.lifecycle("Release bundle copy: \${targetFile.name} (kept \${bundleFile.name})")
             }
         }
     }
@@ -36,19 +40,18 @@ afterEvaluate {
                 return
             }
 
-            outputDir.listFiles()?.findAll { it.name.endsWith(".apk") }?.each { apkFile ->
+            outputDir.listFiles()?.findAll {
+                it.name.endsWith(".apk") && it.name != "\${artifactBaseName}.apk"
+            }?.each { apkFile ->
                 def targetFile = new File(outputDir, "\${artifactBaseName}.apk")
                 if (targetFile.exists() && targetFile.absolutePath != apkFile.absolutePath) {
                     targetFile.delete()
                 }
-                if (apkFile.name != targetFile.name) {
-                    if (!apkFile.renameTo(targetFile)) {
-                        apkFile.withInputStream { input ->
-                            targetFile.withOutputStream { output -> output << input }
-                        }
-                        apkFile.delete()
+                if (apkFile.absolutePath != targetFile.absolutePath) {
+                    apkFile.withInputStream { input ->
+                        targetFile.withOutputStream { output -> output << input }
                     }
-                    logger.lifecycle("Release apk: \${targetFile.name}")
+                    logger.lifecycle("Release apk copy: \${targetFile.name} (kept \${apkFile.name})")
                 }
             }
         }
@@ -57,17 +60,22 @@ afterEvaluate {
 // @generated end ${MARKER}
 `;
 
+function stripGeneratedBlock(contents) {
+  return contents.replace(
+    /\n?\/\/ @generated begin release-artifact-file-name[\s\S]*?\/\/ @generated end release-artifact-file-name\n?/g,
+    '\n',
+  );
+}
+
 function withAndroidReleaseFileName(config) {
   return withAppBuildGradle(config, (config) => {
     if (config.modResults.language !== 'groovy') {
       return config;
     }
 
-    if (config.modResults.contents.includes(MARKER)) {
-      return config;
-    }
-
-    config.modResults.contents += `\n${RELEASE_FILE_NAME_SNIPPET}\n`;
+    let contents = stripGeneratedBlock(config.modResults.contents);
+    contents += `\n${RELEASE_FILE_NAME_SNIPPET}\n`;
+    config.modResults.contents = contents;
     return config;
   });
 }
