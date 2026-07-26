@@ -2,6 +2,7 @@ import * as Location from 'expo-location';
 
 import type { RegionId } from '../constants/regions';
 import { getRegionIdForPrefecture } from '../constants/regions';
+import { normalizePrefectureKey } from '../constants/prefectureKeys';
 import type { Castle } from '../types/castle';
 
 export const NEARBY_CASTLE_RADIUS_METERS = 1000;
@@ -126,7 +127,65 @@ function findNearestPrefecture(
   return nearestPrefecture;
 }
 
-function normalizePrefectureName(value: string | null | undefined): string | null {
+/** English / alternate labels commonly returned by reverse geocoders. */
+const PREFECTURE_NAME_ALIASES: Record<string, string> = {
+  hokkaido: '北海道',
+  aomori: '青森県',
+  iwate: '岩手県',
+  miyagi: '宮城県',
+  akita: '秋田県',
+  yamagata: '山形県',
+  fukushima: '福島県',
+  ibaraki: '茨城県',
+  tochigi: '栃木県',
+  gunma: '群馬県',
+  saitama: '埼玉県',
+  chiba: '千葉県',
+  tokyo: '東京都',
+  kanagawa: '神奈川県',
+  niigata: '新潟県',
+  toyama: '富山県',
+  ishikawa: '石川県',
+  fukui: '福井県',
+  yamanashi: '山梨県',
+  nagano: '長野県',
+  gifu: '岐阜県',
+  shizuoka: '静岡県',
+  aichi: '愛知県',
+  mie: '三重県',
+  shiga: '滋賀県',
+  kyoto: '京都府',
+  osaka: '大阪府',
+  hyogo: '兵庫県',
+  nara: '奈良県',
+  wakayama: '和歌山県',
+  tottori: '鳥取県',
+  shimane: '島根県',
+  okayama: '岡山県',
+  hiroshima: '広島県',
+  yamaguchi: '山口県',
+  tokushima: '徳島県',
+  kagawa: '香川県',
+  ehime: '愛媛県',
+  kochi: '高知県',
+  fukuoka: '福岡県',
+  saga: '佐賀県',
+  nagasaki: '長崎県',
+  kumamoto: '熊本県',
+  oita: '大分県',
+  miyazaki: '宮崎県',
+  kagoshima: '鹿児島県',
+  okinawa: '沖縄県',
+};
+
+function stripPrefectureSuffix(value: string): string {
+  return value
+    .replace(/(都|道|府|県|縣)$/u, '')
+    .replace(/[-\s]*(prefecture|fu|ken|to|do)$/iu, '')
+    .trim();
+}
+
+export function normalizePrefectureName(value: string | null | undefined): string | null {
   if (!value) {
     return null;
   }
@@ -136,11 +195,30 @@ function normalizePrefectureName(value: string | null | undefined): string | nul
     return null;
   }
 
-  if (trimmed.endsWith('県') || trimmed.endsWith('府') || trimmed.endsWith('都') || trimmed === '北海道') {
-    return trimmed;
+  // Traditional Chinese labels (島根縣) → Japanese keys (島根県)
+  const fromLocaleKey = normalizePrefectureKey(trimmed);
+  if (getRegionIdForPrefecture(fromLocaleKey)) {
+    return fromLocaleKey;
   }
 
-  return `${trimmed}県`;
+  // English / romanized labels from Apple/Google reverse geocode
+  const aliasKey = stripPrefectureSuffix(trimmed).toLowerCase().replace(/\s+/g, '');
+  const fromAlias = PREFECTURE_NAME_ALIASES[aliasKey];
+  if (fromAlias) {
+    return fromAlias;
+  }
+
+  if (
+    trimmed.endsWith('県') ||
+    trimmed.endsWith('府') ||
+    trimmed.endsWith('都') ||
+    trimmed === '北海道'
+  ) {
+    return getRegionIdForPrefecture(trimmed) ? trimmed : null;
+  }
+
+  const withKen = `${trimmed}県`;
+  return getRegionIdForPrefecture(withKen) ? withKen : null;
 }
 
 async function resolvePrefectureFromReverseGeocode(
@@ -191,32 +269,55 @@ async function getCurrentJapanCoordinates(): Promise<JapanCoordinates | null> {
   }
 }
 
+function filterFromPrefecture(prefecture: string | null | undefined): LocalPrefectureFilter | null {
+  if (!prefecture) {
+    return null;
+  }
+
+  const canonical = normalizePrefectureName(prefecture) ?? normalizePrefectureKey(prefecture);
+  const regionId = getRegionIdForPrefecture(canonical);
+  if (!regionId) {
+    return null;
+  }
+
+  return { regionId, prefecture: canonical };
+}
+
 async function resolvePrefectureFilter(
   castles: readonly Castle[],
   latitude: number,
   longitude: number,
 ): Promise<LocalPrefectureFilter | null> {
-  const centroids = buildPrefectureCentroids(castles);
-  if (centroids.length === 0) {
+  if (castles.length === 0) {
     return null;
   }
 
+  // 1) Administrative reverse geocode is the source of truth for "which prefecture
+  // am I in?". Nearest-castle heuristics mislabel border towns when the closest
+  // famous castle sits across a prefecture line.
   const geocodedPrefecture = await resolvePrefectureFromReverseGeocode(latitude, longitude);
-  const prefecture =
-    geocodedPrefecture && getRegionIdForPrefecture(geocodedPrefecture)
-      ? geocodedPrefecture
-      : findNearestPrefecture(latitude, longitude, centroids);
-
-  if (!prefecture) {
-    return null;
+  const fromGeocode = filterFromPrefecture(geocodedPrefecture);
+  if (fromGeocode) {
+    return fromGeocode;
   }
 
-  const regionId = getRegionIdForPrefecture(prefecture);
-  if (!regionId) {
-    return null;
+  // 2) If geocoding fails, prefer the nearest castle's prefecture over averaging
+  // all castles in a prefecture (Shimane centroid is near Matsue, so Tsuwano was
+  // wrongly labeled Yamaguchi).
+  const nearestCastle = findNearestCastleWithinRadius(
+    castles,
+    latitude,
+    longitude,
+    Number.POSITIVE_INFINITY,
+  );
+  const fromNearestCastle = filterFromPrefecture(nearestCastle?.prefecture);
+  if (fromNearestCastle) {
+    return fromNearestCastle;
   }
 
-  return { regionId, prefecture };
+  // 3) Last resort: prefecture castle-centroid distance.
+  const centroids = buildPrefectureCentroids(castles);
+  return filterFromPrefecture(findNearestPrefecture(latitude, longitude, centroids));
 }
 
 export function findNearestCastleWithinRadius(
