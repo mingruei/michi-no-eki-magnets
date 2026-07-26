@@ -79,7 +79,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 45,
+    versionCode: 46,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',
