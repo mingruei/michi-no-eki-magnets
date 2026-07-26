@@ -84,7 +84,7 @@ describe('localPrefecture', () => {
       expect(result.nearbyCastle?.id).toBe(1);
     });
 
-    it('falls back to nearest prefecture centroid when geocoding fails', async () => {
+    it('falls back to nearest castle prefecture when geocoding fails', async () => {
       const castles = [
         createCastle({ id: 1, prefecture: '京都府', latitude: 35.0116, longitude: 135.7681 }),
         createCastle({ id: 2, prefecture: '大阪府', latitude: 34.6937, longitude: 135.5023 }),
@@ -99,6 +99,52 @@ describe('localPrefecture', () => {
       const result = await resolveLocalStartupContext(castles, 100);
 
       expect(result.filter?.prefecture).toBe('京都府');
+    });
+
+    it('uses the nearby castle prefecture on prefecture borders (Tsuwano / Shimane)', async () => {
+      // Shimane centroid is pulled toward Matsue; Yamaguchi centroid is much closer to
+      // Tsuwano. Reverse geocode may also return Yamaguchi near the border.
+      const castles = [
+        createCastle({
+          id: 1,
+          name: '松江城',
+          prefecture: '島根県',
+          latitude: 35.475,
+          longitude: 133.0506,
+        }),
+        createCastle({
+          id: 2,
+          name: '津和野城',
+          prefecture: '島根県',
+          latitude: 34.460833,
+          longitude: 131.764167,
+        }),
+        createCastle({
+          id: 3,
+          name: '萩城',
+          prefecture: '山口県',
+          latitude: 34.4222,
+          longitude: 131.3981,
+        }),
+        createCastle({
+          id: 4,
+          name: '岩国城',
+          prefecture: '山口県',
+          latitude: 34.1753,
+          longitude: 132.1744,
+        }),
+      ];
+
+      mockedGetPermissions.mockResolvedValue({ status: 'granted' } as never);
+      mockedGetPosition.mockResolvedValue({
+        coords: { latitude: 34.460833, longitude: 131.764167 },
+      } as never);
+      mockedReverseGeocode.mockResolvedValue([{ region: '山口県' }] as never);
+
+      const result = await resolveLocalStartupContext(castles, 100);
+
+      expect(result.filter?.prefecture).toBe('島根県');
+      expect(result.nearbyCastle?.name).toBe('津和野城');
     });
   });
 });

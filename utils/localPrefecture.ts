@@ -6,6 +6,9 @@ import type { Castle } from '../types/castle';
 
 export const NEARBY_CASTLE_RADIUS_METERS = 50;
 
+/** Prefer the nearest castle's prefecture within this range (border towns like 津和野). */
+export const PREFECTURE_FROM_NEAREST_CASTLE_METERS = 50_000;
+
 export type LocalPrefectureFilter = {
   regionId: RegionId;
   prefecture: string;
@@ -191,22 +194,7 @@ async function getCurrentJapanCoordinates(): Promise<JapanCoordinates | null> {
   }
 }
 
-async function resolvePrefectureFilter(
-  castles: readonly Castle[],
-  latitude: number,
-  longitude: number,
-): Promise<LocalPrefectureFilter | null> {
-  const centroids = buildPrefectureCentroids(castles);
-  if (centroids.length === 0) {
-    return null;
-  }
-
-  const geocodedPrefecture = await resolvePrefectureFromReverseGeocode(latitude, longitude);
-  const prefecture =
-    geocodedPrefecture && getRegionIdForPrefecture(geocodedPrefecture)
-      ? geocodedPrefecture
-      : findNearestPrefecture(latitude, longitude, centroids);
-
+function filterFromPrefecture(prefecture: string | null | undefined): LocalPrefectureFilter | null {
   if (!prefecture) {
     return null;
   }
@@ -217,6 +205,50 @@ async function resolvePrefectureFilter(
   }
 
   return { regionId, prefecture };
+}
+
+async function resolvePrefectureFilter(
+  castles: readonly Castle[],
+  latitude: number,
+  longitude: number,
+): Promise<LocalPrefectureFilter | null> {
+  if (castles.length === 0) {
+    return null;
+  }
+
+  // Near a castle (e.g. 津和野 on the Shimane/Yamaguchi border): trust the castle's
+  // prefecture. Prefecture centroids are biased toward distant castle clusters and
+  // mis-label border towns (Tsuwano → Yamaguchi).
+  const nearbyNamedCastle = findNearestCastleWithinRadius(
+    castles,
+    latitude,
+    longitude,
+    PREFECTURE_FROM_NEAREST_CASTLE_METERS,
+  );
+  const fromNearbyCastle = filterFromPrefecture(nearbyNamedCastle?.prefecture);
+  if (fromNearbyCastle) {
+    return fromNearbyCastle;
+  }
+
+  const geocodedPrefecture = await resolvePrefectureFromReverseGeocode(latitude, longitude);
+  const fromGeocode = filterFromPrefecture(geocodedPrefecture);
+  if (fromGeocode) {
+    return fromGeocode;
+  }
+
+  const nearestCastle = findNearestCastleWithinRadius(
+    castles,
+    latitude,
+    longitude,
+    Number.POSITIVE_INFINITY,
+  );
+  const fromNearestCastle = filterFromPrefecture(nearestCastle?.prefecture);
+  if (fromNearestCastle) {
+    return fromNearestCastle;
+  }
+
+  const centroids = buildPrefectureCentroids(castles);
+  return filterFromPrefecture(findNearestPrefecture(latitude, longitude, centroids));
 }
 
 export function findNearestCastleWithinRadius(
