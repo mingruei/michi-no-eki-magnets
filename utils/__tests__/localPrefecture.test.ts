@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 import {
   distanceInMeters,
   findNearestCastleWithinRadius,
-  resolveLocalPrefectureFilter,
+  normalizePrefectureName,
   resolveLocalStartupContext,
 } from '../localPrefecture';
 import { createCastle } from './fixtures';
@@ -23,6 +23,24 @@ const mockedReverseGeocode = Location.reverseGeocodeAsync as jest.MockedFunction
 >;
 
 describe('localPrefecture', () => {
+  describe('normalizePrefectureName', () => {
+    it('keeps canonical Japanese prefecture names', () => {
+      expect(normalizePrefectureName('島根県')).toBe('島根県');
+      expect(normalizePrefectureName('京都府')).toBe('京都府');
+      expect(normalizePrefectureName('北海道')).toBe('北海道');
+    });
+
+    it('maps English reverse-geocode labels to Japanese keys', () => {
+      expect(normalizePrefectureName('Shimane')).toBe('島根県');
+      expect(normalizePrefectureName('Shimane Prefecture')).toBe('島根県');
+      expect(normalizePrefectureName('Yamaguchi-ken')).toBe('山口県');
+    });
+
+    it('maps Traditional Chinese labels to Japanese keys', () => {
+      expect(normalizePrefectureName('島根縣')).toBe('島根県');
+    });
+  });
+
   describe('distanceInMeters', () => {
     it('returns zero for identical coordinates', () => {
       expect(distanceInMeters(35.0116, 135.7681, 35.0116, 135.7681)).toBe(0);
@@ -101,9 +119,73 @@ describe('localPrefecture', () => {
       expect(result.filter?.prefecture).toBe('京都府');
     });
 
-    it('uses the nearby castle prefecture on prefecture borders (Tsuwano / Shimane)', async () => {
-      // Shimane centroid is pulled toward Matsue; Yamaguchi centroid is much closer to
-      // Tsuwano. Reverse geocode may also return Yamaguchi near the border.
+    it('accepts English reverse-geocode labels at Tsuwano / Shimane', async () => {
+      const castles = [
+        createCastle({
+          id: 1,
+          name: '松江城',
+          prefecture: '島根県',
+          latitude: 35.475,
+          longitude: 133.0506,
+        }),
+        createCastle({
+          id: 2,
+          name: '津和野城',
+          prefecture: '島根県',
+          latitude: 34.460833,
+          longitude: 131.764167,
+        }),
+        createCastle({
+          id: 3,
+          name: '萩城',
+          prefecture: '山口県',
+          latitude: 34.4222,
+          longitude: 131.3981,
+        }),
+      ];
+
+      mockedGetPermissions.mockResolvedValue({ status: 'granted' } as never);
+      mockedGetPosition.mockResolvedValue({
+        coords: { latitude: 34.460833, longitude: 131.764167 },
+      } as never);
+      mockedReverseGeocode.mockResolvedValue([{ region: 'Shimane Prefecture' }] as never);
+
+      const result = await resolveLocalStartupContext(castles, 100);
+
+      expect(result.filter?.prefecture).toBe('島根県');
+    });
+
+    it('trusts reverse geocode over a nearer castle across the prefecture border', async () => {
+      // Standing in Yamaguchi, closer to Tsuwano (Shimane) than to Hagi.
+      const castles = [
+        createCastle({
+          id: 1,
+          name: '津和野城',
+          prefecture: '島根県',
+          latitude: 34.460833,
+          longitude: 131.764167,
+        }),
+        createCastle({
+          id: 2,
+          name: '萩城',
+          prefecture: '山口県',
+          latitude: 34.4222,
+          longitude: 131.3981,
+        }),
+      ];
+
+      mockedGetPermissions.mockResolvedValue({ status: 'granted' } as never);
+      mockedGetPosition.mockResolvedValue({
+        coords: { latitude: 34.43, longitude: 131.70 },
+      } as never);
+      mockedReverseGeocode.mockResolvedValue([{ region: '山口県' }] as never);
+
+      const result = await resolveLocalStartupContext(castles, 100);
+
+      expect(result.filter?.prefecture).toBe('山口県');
+    });
+
+    it('falls back to Tsuwano/Shimane when geocoding fails near the border', async () => {
       const castles = [
         createCastle({
           id: 1,
@@ -139,7 +221,7 @@ describe('localPrefecture', () => {
       mockedGetPosition.mockResolvedValue({
         coords: { latitude: 34.460833, longitude: 131.764167 },
       } as never);
-      mockedReverseGeocode.mockResolvedValue([{ region: '山口県' }] as never);
+      mockedReverseGeocode.mockResolvedValue([] as never);
 
       const result = await resolveLocalStartupContext(castles, 100);
 
