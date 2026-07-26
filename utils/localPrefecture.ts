@@ -4,7 +4,7 @@ import type { RegionId } from '../constants/regions';
 import { getRegionIdForPrefecture } from '../constants/regions';
 import type { Castle } from '../types/castle';
 
-export const NEARBY_CASTLE_RADIUS_METERS = 50;
+export const NEARBY_CASTLE_RADIUS_METERS = 1000;
 
 export type LocalPrefectureFilter = {
   regionId: RegionId;
