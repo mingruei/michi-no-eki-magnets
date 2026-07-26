@@ -174,7 +174,7 @@ describe('withHermesDsym', () => {
 });
 
 describe('withAndroidReleaseFileName', () => {
-  it('appends release artifact renaming snippet to build.gradle', () => {
+  it('appends release artifact copy snippet to build.gradle', () => {
     withAndroidReleaseFileName({ name: 'test', slug: 'test' });
 
     expect(withAppBuildGradle).toHaveBeenCalled();
@@ -189,9 +189,11 @@ describe('withAndroidReleaseFileName', () => {
     const result = callback(config);
     expect(result.modResults.contents).toContain('release-artifact-file-name');
     expect(result.modResults.contents).toContain('bundleRelease');
+    expect(result.modResults.contents).toContain('kept');
+    expect(result.modResults.contents).not.toContain('renameTo');
   });
 
-  it('skips non-groovy gradle files and duplicate snippets', () => {
+  it('skips non-groovy gradle files and replaces prior generated snippets', () => {
     withAndroidReleaseFileName({ name: 'kotlin', slug: 'kotlin' });
     const kotlinCallback = withAppBuildGradle.mock.calls.at(-1)[1];
     const kotlinResult = kotlinCallback({
@@ -199,17 +201,16 @@ describe('withAndroidReleaseFileName', () => {
     });
     expect(kotlinResult.modResults.contents).toBe('plugins {}');
 
-    withAndroidReleaseFileName({ name: 'dedupe', slug: 'dedupe' });
-    const dedupeCallback = withAppBuildGradle.mock.calls.at(-1)[1];
-    const dedupeResult = dedupeCallback({
+    withAndroidReleaseFileName({ name: 'replace', slug: 'replace' });
+    const replaceCallback = withAppBuildGradle.mock.calls.at(-1)[1];
+    const replaceResult = replaceCallback({
       modResults: {
         language: 'groovy',
-        contents: '// @generated begin release-artifact-file-name',
+        contents: `android {}\n// @generated begin release-artifact-file-name\nOLD\n// @generated end release-artifact-file-name\n`,
       },
     });
-    expect(dedupeResult.modResults.contents).toBe(
-      '// @generated begin release-artifact-file-name',
-    );
+    expect(replaceResult.modResults.contents).not.toContain('OLD');
+    expect(replaceResult.modResults.contents).toContain('Release bundle copy');
   });
 });
 
