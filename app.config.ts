@@ -65,7 +65,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.japancastles.map',
-    buildNumber: '3',
+    buildNumber: '7',
     infoPlist: {
       NSLocationWhenInUseUsageDescription: permissionMessages.location,
       NSLocationAlwaysUsageDescription: permissionMessages.location,
@@ -78,7 +78,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 41,
+    versionCode: 45,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',
