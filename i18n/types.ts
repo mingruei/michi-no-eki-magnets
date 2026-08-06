@@ -26,7 +26,11 @@ export type TranslationDictionary = {
     nameLabel: string;
     namePlaceholder: string;
     unnamed: string;
-    selectedTitle: string;
+    joinedTitle: string;
+    joinedHint: string;
+    addHint: string;
+    addCastle: string;
+    remove: string;
     filterTitle: string;
     castleListTitle: string;
     castleCount: string;

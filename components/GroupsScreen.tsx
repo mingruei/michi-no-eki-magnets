@@ -16,7 +16,6 @@ import { useI18n } from '../i18n';
 import type { Castle, ProgressFilter, SeriesFilter } from '../types/castle';
 import type { CastleGroup } from '../types/castleGroup';
 import { filterCastles, getAvailablePrefectures } from '../utils/filterCastles';
-import { CheckOption } from './CheckOption';
 import { LocationFilters } from './LocationFilters';
 
 type GroupsScreenProps = {
@@ -68,6 +67,8 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
     ];
   }, [castles, getPrefectureLabel, regionId, series, t]);
 
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+
   const filteredCastles = useMemo(
     () =>
       filterCastles(castles, {
@@ -77,11 +78,20 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
         nameQuery,
         progressFilter,
         progressMap,
-      }).sort((left, right) => left.number - right.number),
-    [castles, nameQuery, prefecture, progressFilter, progressMap, regionId, series],
+      })
+        .filter((castle) => !selectedIdSet.has(castle.id))
+        .sort((left, right) => left.number - right.number),
+    [
+      castles,
+      nameQuery,
+      prefecture,
+      progressFilter,
+      progressMap,
+      regionId,
+      selectedIdSet,
+      series,
+    ],
   );
-
-  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
   const openCreate = () => {
     setSelectedIds([]);
@@ -102,12 +112,14 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
     onBack();
   };
 
-  const toggleCastle = (castleId: number) => {
+  const addCastle = (castleId: number) => {
     setSelectedIds((current) =>
-      current.includes(castleId)
-        ? current.filter((id) => id !== castleId)
-        : [...current, castleId],
+      current.includes(castleId) ? current : [...current, castleId],
     );
+  };
+
+  const removeCastle = (castleId: number) => {
+    setSelectedIds((current) => current.filter((id) => id !== castleId));
   };
 
   const handleSave = async () => {
@@ -162,30 +174,38 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             <View style={styles.createHeader}>
-              <Text style={styles.fieldLabel}>{t('group.nameLabel')}</Text>
-              <TextInput
-                value={groupName}
-                onChangeText={setGroupName}
-                placeholder={t('group.namePlaceholder')}
-                placeholderTextColor={colors.textMuted}
-                style={styles.nameInput}
-              />
+              <View style={styles.joinedSection}>
+                <Text style={styles.fieldLabel}>{t('group.nameLabel')}</Text>
+                <TextInput
+                  value={groupName}
+                  onChangeText={setGroupName}
+                  placeholder={t('group.namePlaceholder')}
+                  placeholderTextColor={colors.textMuted}
+                  style={styles.nameInput}
+                />
 
-              {selectedCastles.length > 0 ? (
-                <View style={styles.selectedSection}>
-                  <Text style={styles.sectionTitle}>
-                    {t('group.selectedTitle', { count: selectedCastles.length })}
-                  </Text>
-                  {selectedCastles.map((castle) => (
-                    <CheckOption
-                      key={castle.id}
-                      label={`${castle.number} ${castle.name}`}
-                      checked
-                      onToggle={() => toggleCastle(castle.id)}
-                    />
-                  ))}
-                </View>
-              ) : null}
+                {selectedCastles.length > 0 ? (
+                  <View style={styles.joinedList}>
+                    <Text style={styles.joinedTitle}>
+                      {t('group.joinedTitle', { count: selectedCastles.length })}
+                    </Text>
+                    <Text style={styles.joinedHint}>{t('group.joinedHint')}</Text>
+                    {selectedCastles.map((castle) => (
+                      <Pressable
+                        key={castle.id}
+                        accessibilityRole="button"
+                        onPress={() => removeCastle(castle.id)}
+                        style={styles.castleRow}
+                      >
+                        <Text style={styles.castleRowLabel}>
+                          {castle.number} {castle.name}
+                        </Text>
+                        <Text style={styles.castleRowAction}>{t('group.remove')}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                ) : null}
+              </View>
 
               <View style={styles.filterSection}>
                 <Text style={[styles.sectionTitle, styles.filterSectionTitle]}>
@@ -228,14 +248,20 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
               </View>
 
               <Text style={styles.sectionTitle}>{t('group.castleListTitle')}</Text>
+              <Text style={styles.joinedHint}>{t('group.addHint')}</Text>
             </View>
           }
           renderItem={({ item }) => (
-            <CheckOption
-              label={`${item.number} ${item.name}（${getSeriesLabel(item.series)}）`}
-              checked={selectedIdSet.has(item.id)}
-              onToggle={() => toggleCastle(item.id)}
-            />
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => addCastle(item.id)}
+              style={styles.castleRow}
+            >
+              <Text style={styles.castleRowLabel}>
+                {item.number} {item.name}（{getSeriesLabel(item.series)}）
+              </Text>
+              <Text style={styles.castleRowActionAdd}>{t('group.addCastle')}</Text>
+            </Pressable>
           )}
           ListFooterComponent={
             <Pressable
@@ -390,16 +416,55 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 16,
     color: colors.text,
-    backgroundColor: colors.surface,
-    marginBottom: 8,
+    backgroundColor: colors.background,
+    marginBottom: 4,
   },
-  selectedSection: {
+  joinedSection: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
     padding: 12,
     marginBottom: 8,
+  },
+  joinedList: {
+    marginTop: 8,
+    gap: 4,
+  },
+  joinedTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  joinedHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginBottom: 8,
+  },
+  castleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  castleRowLabel: {
+    flex: 1,
+    fontSize: 15,
+    color: colors.text,
+  },
+  castleRowAction: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.continued,
+  },
+  castleRowActionAdd: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.original,
   },
   filterSection: {
     backgroundColor: colors.surface,
