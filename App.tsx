@@ -12,6 +12,7 @@ import { CastleMap } from './components/CastleMap';
 import type { RegionId } from './constants/regions';
 import { colors } from './constants/theme';
 import { MapProviderProvider } from './hooks/useMapProvider';
+import { CastleGroupsProvider } from './hooks/useCastleGroups';
 import { CastleProgressProvider, useCastleProgress } from './hooks/useCastleProgress';
 import { useConditionalPortraitLock } from './hooks/useConditionalPortraitLock';
 import { I18nProvider, useI18n } from './i18n';
@@ -27,9 +28,12 @@ const castles = castlesData as Castle[];
 const SettingsScreen = lazy(() =>
   import('./components/SettingsScreen').then((module) => ({ default: module.SettingsScreen })),
 );
+const GroupsScreen = lazy(() =>
+  import('./components/GroupsScreen').then((module) => ({ default: module.GroupsScreen })),
+);
 
 type MainScreen = 'browse' | 'map';
-type Screen = MainScreen | 'detail' | 'settings';
+type Screen = MainScreen | 'detail' | 'settings' | 'groups';
 
 type DetailUploadPickerState = {
   castleId: number;
@@ -192,7 +196,8 @@ function AppContent() {
 
   const isDetailOpen = screen === 'detail' && selectedCastle !== null;
   const isSettingsOpen = screen === 'settings';
-  const isOverlayOpen = isDetailOpen || isSettingsOpen;
+  const isGroupsOpen = screen === 'groups';
+  const isOverlayOpen = isDetailOpen || isSettingsOpen || isGroupsOpen;
   const activeMainScreen: MainScreen =
     screen === 'browse' || screen === 'map' ? screen : returnScreen;
 
@@ -202,7 +207,17 @@ function AppContent() {
     setSelectedCastle(null);
   };
 
+  const openGroups = () => {
+    setReturnScreen(activeMainScreen);
+    setScreen('groups');
+    setSelectedCastle(null);
+  };
+
   const handleBackFromSettings = () => {
+    setScreen(returnScreen);
+  };
+
+  const handleBackFromGroups = () => {
     setScreen(returnScreen);
   };
 
@@ -247,6 +262,9 @@ function AppContent() {
                   >
                     {t('screen.map')}
                   </Text>
+                </Pressable>
+                <Pressable accessibilityRole="button" onPress={openGroups} style={styles.headerButton}>
+                  <Text style={styles.headerButtonLabel}>{t('screen.group')}</Text>
                 </Pressable>
                 <Pressable accessibilityRole="button" onPress={openSettings} style={styles.headerButton}>
                   <Text style={styles.headerButtonLabel}>{t('screen.settings')}</Text>
@@ -307,6 +325,20 @@ function AppContent() {
             </Suspense>
           </SafeAreaView>
         ) : null}
+
+        {isGroupsOpen ? (
+          <SafeAreaView style={styles.detailLayer} edges={['top', 'left', 'right', 'bottom']}>
+            <Suspense
+              fallback={
+                <View style={styles.settingsLoading}>
+                  <ActivityIndicator size="large" color={colors.original} />
+                </View>
+              }
+            >
+              <GroupsScreen castles={castles} onBack={handleBackFromGroups} />
+            </Suspense>
+          </SafeAreaView>
+        ) : null}
       </View>
 
       <GlobalCollectibleUploadFab
@@ -330,7 +362,9 @@ export default function App() {
       <I18nProvider>
         <MapProviderProvider>
           <CastleProgressProvider>
-            <AppContent />
+            <CastleGroupsProvider>
+              <AppContent />
+            </CastleGroupsProvider>
           </CastleProgressProvider>
         </MapProviderProvider>
       </I18nProvider>

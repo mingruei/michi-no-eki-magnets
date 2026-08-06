@@ -16,6 +16,21 @@ export type TranslationDictionary = {
     map: string;
     list: string;
     settings: string;
+    group: string;
+  };
+  group: {
+    title: string;
+    listTitle: string;
+    add: string;
+    createTitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    unnamed: string;
+    selectedTitle: string;
+    filterTitle: string;
+    castleListTitle: string;
+    castleCount: string;
+    save: string;
   };
   globalUpload: {
     fabLabel: string;
