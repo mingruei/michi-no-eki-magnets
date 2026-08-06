@@ -13,6 +13,16 @@ describe('app.config', () => {
     expect(infoPlist.NSLocationWhenInUseUsageDescription).toBeTruthy();
     expect(infoPlist.NSCameraUsageDescription).toBeTruthy();
     expect(infoPlist.NSPhotoLibraryUsageDescription).toBeTruthy();
+    expect(infoPlist.NSMicrophoneUsageDescription).toBeUndefined();
+  });
+
+  it('disables expo-image-picker microphone permission', () => {
+    const plugins = config.plugins ?? [];
+    const imagePicker = plugins.find(
+      (plugin) => Array.isArray(plugin) && plugin[0] === 'expo-image-picker',
+    ) as [string, Record<string, unknown>] | undefined;
+
+    expect(imagePicker?.[1]?.microphonePermission).toBe(false);
   });
 
   it('registers native config plugins that guard against recent regressions', () => {

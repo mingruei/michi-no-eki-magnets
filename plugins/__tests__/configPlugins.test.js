@@ -56,7 +56,11 @@ describe('withIosUsageDescriptions', () => {
 
     expect(withInfoPlist).toHaveBeenCalled();
     const callback = withInfoPlist.mock.calls[0][1];
-    const result = callback({ modResults: {} });
+    const result = callback({
+      modResults: {
+        NSMicrophoneUsageDescription: 'Allow app to access your microphone',
+      },
+    });
 
     expect(result.modResults.NSLocationWhenInUseUsageDescription).toBe(permissionMessages.location);
     expect(result.modResults.NSLocationAlwaysUsageDescription).toBe(permissionMessages.location);
@@ -65,6 +69,7 @@ describe('withIosUsageDescriptions', () => {
     );
     expect(result.modResults.NSPhotoLibraryUsageDescription).toBe(permissionMessages.photo);
     expect(result.modResults.NSCameraUsageDescription).toBe(permissionMessages.camera);
+    expect(result.modResults.NSMicrophoneUsageDescription).toBeUndefined();
   });
 });
 
