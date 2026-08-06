@@ -68,7 +68,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.japancastles.map',
-    buildNumber: '21',
+    buildNumber: '2',
     infoPlist: {
       NSLocationWhenInUseUsageDescription: permissionMessages.location,
       NSLocationAlwaysUsageDescription: permissionMessages.location,
