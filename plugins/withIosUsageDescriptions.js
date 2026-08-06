@@ -8,6 +8,9 @@ function withIosUsageDescriptions(config) {
     config.modResults.NSLocationAlwaysAndWhenInUseUsageDescription = messages.location;
     config.modResults.NSPhotoLibraryUsageDescription = messages.photo;
     config.modResults.NSCameraUsageDescription = messages.camera;
+    // App does not use the microphone; remove any placeholder string that
+    // dependencies (e.g. expo-image-picker defaults) may have injected.
+    delete config.modResults.NSMicrophoneUsageDescription;
     return config;
   });
 }

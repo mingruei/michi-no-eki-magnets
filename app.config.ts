@@ -31,6 +31,8 @@ const config: ExpoConfig = {
       {
         photosPermission: permissionMessages.photo,
         cameraPermission: permissionMessages.camera,
+        // App only picks/captures still images for 御城印 / 城卡 — no video/audio.
+        microphonePermission: false,
       },
     ],
     [
@@ -66,7 +68,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.japancastles.map',
-    buildNumber: '8',
+    buildNumber: '9',
     infoPlist: {
       NSLocationWhenInUseUsageDescription: permissionMessages.location,
       NSLocationAlwaysUsageDescription: permissionMessages.location,
