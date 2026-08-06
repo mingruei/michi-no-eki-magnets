@@ -85,6 +85,8 @@ export type TranslationDictionary = {
     collectibleImportModeMergeNewerHint: string;
     collectibleImportModeConfirm: string;
     collectibleImportModeCancel: string;
+    version: string;
+    versionValue: string;
   };
   filter: {
     region: string;

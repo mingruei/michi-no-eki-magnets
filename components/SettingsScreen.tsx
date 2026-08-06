@@ -16,6 +16,7 @@ import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { MapProvider } from '../types/mapProvider';
 import type { CollectibleImportMode } from '../types/collectibleBackup';
+import { getAppVersionInfo } from '../utils/appVersion';
 
 type SettingsScreenProps = {
   onBack: () => void;
@@ -183,6 +184,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     { id: 'apple', labelKey: 'settings.mapProviderApple' },
     { id: 'google', labelKey: 'settings.mapProviderGoogle' },
   ];
+
+  const appVersion = getAppVersionInfo();
 
   return (
     <View style={styles.container}>
@@ -357,6 +360,16 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           ) : null}
           {collectibleMessage ? <Text style={styles.successText}>{collectibleMessage}</Text> : null}
           {collectibleError ? <Text style={styles.errorText}>{collectibleError}</Text> : null}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>{t('settings.version')}</Text>
+          <Text style={styles.versionValue}>
+            {t('settings.versionValue', {
+              version: appVersion.version,
+              build: appVersion.build,
+            })}
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -556,6 +569,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.continued,
     lineHeight: 18,
+  },
+  versionValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
   },
   optionGroup: {
     gap: 8,

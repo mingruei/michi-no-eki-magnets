@@ -90,6 +90,8 @@ export const zhHant: TranslationDictionary = {
       '登城紀錄各欄位以時間戳較新的為準合併；本機已有的圖檔則略過不覆蓋。',
     collectibleImportModeConfirm: '開始匯入',
     collectibleImportModeCancel: '取消',
+    version: '版本資訊',
+    versionValue: '{{version}}（{{build}}）',
   },
   filter: {
     region: '地方',
