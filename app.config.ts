@@ -59,6 +59,7 @@ const config: ExpoConfig = {
     './plugins/withHermesDsym.js',
     './plugins/withAndroidReleaseFileName.js',
     './plugins/withAndroidReleaseSigning.js',
+    'expo-iap',
   ],
   extra: {
     eas: {

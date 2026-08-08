@@ -87,6 +87,12 @@ export type TranslationDictionary = {
     collectibleImportModeCancel: string;
     version: string;
     versionValue: string;
+    tipJarTitle: string;
+    tipJarHint: string;
+    tipJarButtonFallback: string;
+    tipJarThanks: string;
+    tipJarFailed: string;
+    tipJarUnavailable: string;
   };
   filter: {
     region: string;

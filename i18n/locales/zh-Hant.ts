@@ -92,6 +92,13 @@ export const zhHant: TranslationDictionary = {
     collectibleImportModeCancel: '取消',
     version: '版本資訊',
     versionValue: '{{version}}（{{build}}）',
+    tipJarTitle: '支持開發者',
+    tipJarHint:
+      '若你喜歡這個 App，可以請開發者喝杯咖啡。此為自願性打賞，不會解鎖任何功能。',
+    tipJarButtonFallback: '小額支持（NT$30）',
+    tipJarThanks: '感謝你的支持！',
+    tipJarFailed: '購買失敗，請稍後再試。',
+    tipJarUnavailable: '目前無法載入打賞項目，請確認 App 已更新並稍後再試。',
   },
   filter: {
     region: '地方',

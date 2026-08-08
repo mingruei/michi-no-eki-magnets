@@ -24,3 +24,14 @@ jest.mock('react-native-document-scanner-plugin', () => ({
   ResponseType: { ImageFilePath: 'imageFilePath' },
   ScanDocumentResponseStatus: { Cancel: 'cancel', Success: 'success' },
 }));
+
+jest.mock('expo-iap', () => ({
+  ErrorCode: { UserCancelled: 'user-cancelled' },
+  useIAP: jest.fn(() => ({
+    connected: false,
+    products: [],
+    fetchProducts: jest.fn(async () => undefined),
+    requestPurchase: jest.fn(async () => undefined),
+    finishTransaction: jest.fn(async () => undefined),
+  })),
+}));

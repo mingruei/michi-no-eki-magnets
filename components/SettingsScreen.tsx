@@ -17,6 +17,7 @@ import { useI18n } from '../i18n';
 import type { MapProvider } from '../types/mapProvider';
 import type { CollectibleImportMode } from '../types/collectibleBackup';
 import { getAppVersionInfo } from '../utils/appVersion';
+import { TipJarSection } from './TipJarSection';
 
 type SettingsScreenProps = {
   onBack: () => void;
@@ -361,6 +362,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           {collectibleMessage ? <Text style={styles.successText}>{collectibleMessage}</Text> : null}
           {collectibleError ? <Text style={styles.errorText}>{collectibleError}</Text> : null}
         </View>
+
+        <TipJarSection />
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t('settings.version')}</Text>
