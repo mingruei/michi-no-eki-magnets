@@ -28,6 +28,9 @@ type LocationFiltersProps = {
   progressFilter: ProgressFilter;
   nameQuery: string;
   prefectureOptions: readonly Option[];
+  groupOptions?: readonly Option[];
+  groupId?: string | null;
+  onGroupChange?: (groupId: string | null) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onSeriesChange: (series: SeriesFilter) => void;
@@ -35,7 +38,7 @@ type LocationFiltersProps = {
   onNameQueryChange: (nameQuery: string) => void;
 };
 
-type ActivePicker = 'region' | 'prefecture' | 'series' | 'progress' | null;
+type ActivePicker = 'region' | 'prefecture' | 'series' | 'progress' | 'group' | null;
 
 function FilterField({
   label,
@@ -138,7 +141,7 @@ function PickerModal({
               const isSelected = option.value === selectedValue;
               return (
                 <Pressable
-                  key={option.label}
+                  key={option.value ?? option.label}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isSelected }}
                   onPress={() => {
@@ -167,6 +170,9 @@ export function LocationFilters({
   progressFilter,
   nameQuery,
   prefectureOptions,
+  groupOptions,
+  groupId = null,
+  onGroupChange,
   onRegionChange,
   onPrefectureChange,
   onSeriesChange,
@@ -219,6 +225,9 @@ export function LocationFilters({
     seriesOptions.find((option) => option.value === series)?.label ?? t('common.all');
   const progressLabel =
     progressOptions.find((option) => option.value === progressFilter)?.label ?? t('common.all');
+  const groupLabel =
+    groupOptions?.find((option) => option.value === groupId)?.label ?? t('common.all');
+  const showGroupFilter = groupOptions != null && groupOptions.length > 1;
 
   return (
     <View style={styles.container}>
@@ -262,6 +271,23 @@ export function LocationFilters({
         label={t('filter.progress')}
         value={progressLabel}
         onPress={() => setActivePicker('progress')}
+      />
+
+      {showGroupFilter ? (
+        <FilterField
+          label={t('filter.group')}
+          value={groupLabel}
+          onPress={() => setActivePicker('group')}
+        />
+      ) : null}
+
+      <PickerModal
+        visible={activePicker === 'group'}
+        title={t('filter.selectGroup')}
+        options={groupOptions ?? []}
+        selectedValue={groupId}
+        onSelect={(value) => onGroupChange?.(value)}
+        onClose={() => setActivePicker(null)}
       />
 
       <PickerModal

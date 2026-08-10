@@ -12,6 +12,7 @@ import { normalizeFileUri } from './normalizeFileUri';
 import {
   isCollectibleKind,
   isSingleFileCollectibleKind,
+  COLLECTIBLE_KINDS,
   type CastleCollectible,
   type CollectibleKind,
 } from '../types/castleCollectible';
@@ -174,6 +175,21 @@ export function listAllCollectibles(): CastleCollectible[] {
   }
 
   return results.sort((left, right) => right.createdAt - left.createdAt);
+}
+
+export function listCollectiblesForCastleIds(
+  castleIds: readonly number[],
+): CastleCollectible[] {
+  const uniqueIds = [...new Set(castleIds)];
+  const results: CastleCollectible[] = [];
+
+  for (const castleId of uniqueIds) {
+    for (const kind of COLLECTIBLE_KINDS) {
+      results.push(...listCastleCollectibles(castleId, kind));
+    }
+  }
+
+  return results;
 }
 
 export function listCastleCollectibles(

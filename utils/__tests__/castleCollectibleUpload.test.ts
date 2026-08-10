@@ -14,6 +14,7 @@ import DocumentScanner, {
 
 import {
   pickCollectibleBySource,
+  pickCollectibleFromCamera,
   pickCollectibleFromFile,
   pickCollectibleFromGallery,
   pickCollectibleFromScan,
@@ -67,6 +68,38 @@ describe('castleCollectibleUpload', () => {
       mockedScanner.scanDocument.mockRejectedValue(new Error('User denied access to the camera'));
 
       await expect(pickCollectibleFromScan()).rejects.toThrow('camera-permission-denied');
+    });
+  });
+
+  describe('pickCollectibleFromCamera', () => {
+    it('throws camera-permission-denied when camera access is rejected', async () => {
+      mockedImagePicker.getCameraPermissionsAsync.mockResolvedValue({ granted: false } as never);
+      mockedImagePicker.requestCameraPermissionsAsync.mockResolvedValue({ granted: false } as never);
+
+      await expect(pickCollectibleFromCamera()).rejects.toThrow('camera-permission-denied');
+    });
+
+    it('returns selected camera photo', async () => {
+      mockedImagePicker.launchCameraAsync.mockResolvedValue({
+        canceled: false,
+        assets: [
+          {
+            uri: 'file:///tmp/camera.jpg',
+            mimeType: 'image/jpeg',
+            width: 1200,
+            height: 1600,
+          },
+        ],
+      } as never);
+
+      await expect(pickCollectibleFromCamera()).resolves.toEqual([
+        expect.objectContaining({
+          uri: 'file:///tmp/camera.jpg',
+          mimeType: 'image/jpeg',
+          width: 1200,
+          height: 1600,
+        }),
+      ]);
     });
   });
 
@@ -150,6 +183,16 @@ describe('castleCollectibleUpload', () => {
 
       await pickCollectibleBySource('file');
       expect(mockedDocumentPicker.getDocumentAsync).toHaveBeenCalled();
+    });
+
+    it('routes to camera picker', async () => {
+      mockedImagePicker.launchCameraAsync.mockResolvedValue({
+        canceled: true,
+        assets: null,
+      } as never);
+
+      await pickCollectibleBySource('camera');
+      expect(mockedImagePicker.launchCameraAsync).toHaveBeenCalled();
     });
   });
 });

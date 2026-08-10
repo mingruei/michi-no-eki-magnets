@@ -1,3 +1,12 @@
+jest.mock('react-native-view-shot', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: React.forwardRef(({ children }: { children: React.ReactNode }, _ref: unknown) => children),
+    captureRef: jest.fn(async () => 'file:///tmp/mock-export.jpg'),
+  };
+});
+
 jest.mock('expo-location', () => ({
   Accuracy: { Balanced: 3 },
   getForegroundPermissionsAsync: jest.fn(async () => ({ status: 'denied' })),
@@ -14,6 +23,7 @@ jest.mock('expo-image-picker', () => ({
   getMediaLibraryPermissionsAsync: jest.fn(async () => ({ granted: true })),
   requestMediaLibraryPermissionsAsync: jest.fn(async () => ({ granted: true })),
   launchImageLibraryAsync: jest.fn(async () => ({ canceled: true, assets: null })),
+  launchCameraAsync: jest.fn(async () => ({ canceled: true, assets: null })),
 }));
 
 jest.mock('react-native-document-scanner-plugin', () => ({

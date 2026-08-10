@@ -28,7 +28,19 @@ const DOCUMENT_PICKER_TYPES =
       ] as const)
     : (['image/*', 'application/pdf'] as const);
 
-export type CollectibleUploadSource = 'scan' | 'file' | 'gallery';
+export type CollectibleUploadSource = 'scan' | 'file' | 'gallery' | 'camera';
+
+export const DEFAULT_COLLECTIBLE_UPLOAD_SOURCES: CollectibleUploadSource[] = [
+  'scan',
+  'file',
+  'gallery',
+];
+
+export const VISIT_RECORD_UPLOAD_SOURCES: CollectibleUploadSource[] = [
+  'camera',
+  'file',
+  'gallery',
+];
 
 export type CollectibleUploadSelection = {
   uri: string;
@@ -132,6 +144,45 @@ export async function pickCollectibleFromScan(): Promise<CollectibleUploadSelect
   }
 }
 
+export async function pickCollectibleFromCamera(): Promise<CollectibleUploadSelection[]> {
+  await waitForNativePicker();
+
+  const granted = await ensureCameraPermission();
+  if (!granted) {
+    throw new Error('camera-permission-denied');
+  }
+
+  try {
+    const result = await withPickerTimeout(
+      ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        quality: 0.92,
+        allowsEditing: false,
+        base64: Platform.OS === 'android',
+      }),
+    );
+
+    if (result.canceled || !result.assets?.[0]) {
+      return [];
+    }
+
+    const asset = result.assets[0];
+    const selection = toSelection(
+      asset.uri,
+      asset.mimeType ?? 'image/jpeg',
+      asset.width,
+      asset.height,
+      asset.base64,
+    );
+    return selection ? [selection] : [];
+  } catch (error) {
+    if (isCameraPermissionErrorMessage(toErrorMessage(error))) {
+      throw new Error('camera-permission-denied');
+    }
+    throw error;
+  }
+}
+
 export async function pickCollectibleFromGallery(): Promise<CollectibleUploadSelection[]> {
   await waitForNativePicker();
 
@@ -201,5 +252,7 @@ export async function pickCollectibleBySource(
       return pickCollectibleFromFile();
     case 'gallery':
       return pickCollectibleFromGallery();
+    case 'camera':
+      return pickCollectibleFromCamera();
   }
 }

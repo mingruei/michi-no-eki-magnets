@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { colors } from '../constants/theme';
+import { useCastleData } from '../hooks/useCastleData';
 import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
@@ -39,6 +40,14 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { t } = useI18n();
   const { mapProvider, setMapProvider } = useMapProvider();
   const { reloadProgressMap } = useCastleProgress();
+  const {
+    version: castleDataVersion,
+    updatedAt: castleDataUpdatedAt,
+    source: castleDataSource,
+    bundledVersion,
+    remoteSyncConfigured,
+    ready: castleDataReady,
+  } = useCastleData();
   const [exportingCollectibles, setExportingCollectibles] = useState(false);
   const [importPhase, setImportPhase] = useState<CollectibleImportPhase | null>(null);
   const [pendingImportUri, setPendingImportUri] = useState<string | null>(null);
@@ -187,6 +196,28 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   ];
 
   const appVersion = getAppVersionInfo();
+
+  const castleDataSourceLabel =
+    castleDataSource === 'remote'
+      ? t('settings.castleDataSourceRemote')
+      : castleDataSource === 'cache'
+        ? t('settings.castleDataSourceCache')
+        : t('settings.castleDataSourceBundled');
+
+  const formattedCastleDataUpdatedAt = (() => {
+    const parsed = Date.parse(castleDataUpdatedAt);
+    if (Number.isNaN(parsed)) {
+      return castleDataUpdatedAt;
+    }
+
+    return new Date(parsed).toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  })();
 
   return (
     <View style={styles.container}>
@@ -364,6 +395,38 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </View>
 
         <TipJarSection />
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>{t('settings.castleData')}</Text>
+          <Text style={styles.rowHint}>{t('settings.castleDataHint')}</Text>
+          {castleDataReady ? (
+            <>
+              <Text style={styles.versionValue}>
+                {t('settings.castleDataVersionValue', {
+                  version: castleDataVersion,
+                  source: castleDataSourceLabel,
+                })}
+              </Text>
+              <Text style={styles.rowHint}>
+                {t('settings.castleDataUpdatedAtValue', {
+                  updatedAt: formattedCastleDataUpdatedAt,
+                })}
+              </Text>
+              <Text style={styles.rowHint}>
+                {t('settings.castleDataBundledVersionValue', {
+                  version: bundledVersion,
+                })}
+              </Text>
+              <Text style={styles.rowHint}>
+                {remoteSyncConfigured
+                  ? t('settings.castleDataRemoteSyncEnabled')
+                  : t('settings.castleDataRemoteSyncDisabled')}
+              </Text>
+            </>
+          ) : (
+            <ActivityIndicator size="small" color={colors.original} />
+          )}
+        </View>
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t('settings.version')}</Text>

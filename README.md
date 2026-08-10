@@ -183,6 +183,23 @@ python3 scripts/build-castles-json.py
 
 This writes `data-source/castles.generated.json` only. It does **not** overwrite `assets/castles.json` or `assets/i18n/castle-content.zh-Hant.json`.
 
+### Remote castle data (Supabase Storage)
+
+The app ships with bundled castle JSON and checks Supabase Storage on launch for a newer full bundle. If the network is slow or unavailable, it keeps the current data and tries again next launch.
+
+1. In Supabase Dashboard → **Storage**, create a **public** bucket named `castle-data`.
+2. Upload these three files from the repo:
+   - `assets/castles.json`
+   - `assets/i18n/castle-content.zh-Hant.json`
+   - `assets/data-manifest.json`
+3. Whenever you publish new data, edit the JSON files, bump `"version"` in `assets/data-manifest.json` (or run `npm run generate:castle-data-manifest` and increment version manually), then re-upload all three files.
+
+The app reads from:
+
+`{EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/castle-data/...`
+
+No partial updates: a successful sync replaces the full castles list and zh-Hant content overlay together.
+
 ## Project structure
 
 ```

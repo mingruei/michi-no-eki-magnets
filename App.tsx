@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } fro
 import { ActivityIndicator, InteractionManager, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import castlesData from './assets/castles.json';
 import { CollectibleUploadSourceModal } from './components/CollectibleUploadSourceModal';
 import { GlobalCollectibleUploadFab } from './components/GlobalCollectibleUploadFab';
 import { CastleDetailScreen } from './components/CastleDetailScreen';
@@ -12,7 +11,8 @@ import { CastleMap } from './components/CastleMap';
 import type { RegionId } from './constants/regions';
 import { colors } from './constants/theme';
 import { MapProviderProvider } from './hooks/useMapProvider';
-import { CastleGroupsProvider } from './hooks/useCastleGroups';
+import { CastleGroupsProvider, useCastleGroups } from './hooks/useCastleGroups';
+import { CastleDataProvider, useCastles } from './hooks/useCastleData';
 import { CastleProgressProvider, useCastleProgress } from './hooks/useCastleProgress';
 import { useConditionalPortraitLock } from './hooks/useConditionalPortraitLock';
 import { I18nProvider, useI18n } from './i18n';
@@ -20,10 +20,11 @@ import type { Castle, ProgressFilter, SeriesFilter } from './types/castle';
 import type { CollectibleKind } from './types/castleCollectible';
 import { filterCastles, getAvailablePrefectures } from './utils/filterCastles';
 import { resolveLocalStartupContext } from './utils/localPrefecture';
-import type { CollectibleUploadSource } from './utils/castleCollectibleUpload';
+import {
+  VISIT_RECORD_UPLOAD_SOURCES,
+  type CollectibleUploadSource,
+} from './utils/castleCollectibleUpload';
 import { waitForNativePicker } from './utils/waitForNativePicker';
-
-const castles = castlesData as Castle[];
 
 const SettingsScreen = lazy(() =>
   import('./components/SettingsScreen').then((module) => ({ default: module.SettingsScreen })),
@@ -42,12 +43,15 @@ type DetailUploadPickerState = {
 
 function AppContent() {
   const { t, getPrefectureLabel } = useI18n();
+  const castles = useCastles();
   const { progressMap } = useCastleProgress();
+  const { groups } = useCastleGroups();
   useConditionalPortraitLock();
   const [screen, setScreen] = useState<Screen>('browse');
   const [returnScreen, setReturnScreen] = useState<MainScreen>('browse');
   const [series, setSeries] = useState<SeriesFilter>('all');
   const [progressFilter, setProgressFilter] = useState<ProgressFilter>('all');
+  const [groupFilterId, setGroupFilterId] = useState<string | null>(null);
   const [regionId, setRegionId] = useState<RegionId | null>(null);
   const [prefecture, setPrefecture] = useState<string | null>(null);
   const [nameQuery, setNameQuery] = useState('');
@@ -63,6 +67,10 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
+    if (castles.length === 0) {
+      return;
+    }
+
     let active = true;
     const task = InteractionManager.runAfterInteractions(() => {
       void resolveLocalStartupContext(castles).then((result) => {
@@ -87,7 +95,40 @@ function AppContent() {
       active = false;
       task.cancel();
     };
-  }, []);
+  }, [castles]);
+
+  useEffect(() => {
+    if (groupFilterId && !groups.some((group) => group.id === groupFilterId)) {
+      setGroupFilterId(null);
+    }
+  }, [groupFilterId, groups]);
+
+  const groupOptions = useMemo(() => {
+    if (groups.length === 0) {
+      return undefined;
+    }
+
+    return [
+      { value: null, label: t('common.all') },
+      ...groups.map((group) => ({
+        value: group.id,
+        label: group.name,
+      })),
+    ];
+  }, [groups, t]);
+
+  const groupCastleIdSet = useMemo(() => {
+    if (!groupFilterId) {
+      return undefined;
+    }
+
+    const group = groups.find((item) => item.id === groupFilterId);
+    if (!group) {
+      return undefined;
+    }
+
+    return new Set(group.castleIds);
+  }, [groupFilterId, groups]);
 
   const prefectureOptions = useMemo(() => {
     const prefectures = getAvailablePrefectures(castles, regionId, series);
@@ -109,8 +150,9 @@ function AppContent() {
         nameQuery,
         progressFilter,
         progressMap,
+        groupCastleIdSet,
       }).sort((left, right) => left.number - right.number),
-    [nameQuery, prefecture, progressFilter, progressMap, regionId, series],
+    [groupCastleIdSet, nameQuery, prefecture, progressFilter, progressMap, regionId, series],
   );
 
   const openCastleDetail = (castle: Castle) => {
@@ -181,6 +223,11 @@ function AppContent() {
 
   const handleProgressFilterChange = (nextProgressFilter: ProgressFilter) => {
     setProgressFilter(nextProgressFilter);
+    closeDetailIfOpen();
+  };
+
+  const handleGroupFilterChange = (nextGroupId: string | null) => {
+    setGroupFilterId(nextGroupId);
     closeDetailIfOpen();
   };
 
@@ -285,9 +332,12 @@ function AppContent() {
                   prefecture={prefecture}
                   nameQuery={nameQuery}
                   prefectureOptions={prefectureOptions}
+                  groupOptions={groupOptions}
+                  groupId={groupFilterId}
                   resultCount={filteredCastles.length}
                   onSeriesChange={handleSeriesChange}
                   onProgressFilterChange={handleProgressFilterChange}
+                  onGroupChange={handleGroupFilterChange}
                   onRegionChange={handleRegionChange}
                   onPrefectureChange={handlePrefectureChange}
                   onNameQueryChange={handleNameQueryChange}
@@ -349,6 +399,11 @@ function AppContent() {
 
       <CollectibleUploadSourceModal
         visible={detailUploadPicker != null}
+        sources={
+          detailUploadPicker?.kind === 'visit-record'
+            ? VISIT_RECORD_UPLOAD_SOURCES
+            : undefined
+        }
         onClose={() => setDetailUploadPicker(null)}
         onSelect={(source) => void handleDetailUploadSelect(source)}
       />
@@ -360,13 +415,15 @@ export default function App() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <I18nProvider>
-        <MapProviderProvider>
-          <CastleProgressProvider>
-            <CastleGroupsProvider>
-              <AppContent />
-            </CastleGroupsProvider>
-          </CastleProgressProvider>
-        </MapProviderProvider>
+        <CastleDataProvider>
+          <MapProviderProvider>
+            <CastleProgressProvider>
+              <CastleGroupsProvider>
+                <AppContent />
+              </CastleGroupsProvider>
+            </CastleProgressProvider>
+          </MapProviderProvider>
+        </CastleDataProvider>
       </I18nProvider>
     </SafeAreaProvider>
   );

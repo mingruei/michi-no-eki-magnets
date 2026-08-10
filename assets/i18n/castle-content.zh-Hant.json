@@ -5953,14 +5953,14 @@
         "googleLabel": "三原駅",
         "latitude": 34.400556,
         "longitude": 133.083333,
-        "businessHours": "請洽詢三原觀光協会或三原市歷史民俗資料館"
+        "businessHours": "09:00–18:00"
       },
       {
         "label": "三原歷史民俗資料館服務台櫃檯",
         "googleLabel": "三原市歴史民俗資料館",
         "latitude": 34.403889,
         "longitude": 133.079444,
-        "businessHours": "請洽詢三原觀光協会或三原市歷史民俗資料館"
+        "businessHours": "10:00–16:00（星期一休息）"
       }
     ],
     "driving": {
@@ -6015,10 +6015,10 @@
     "castleCardLocations": [
       {
         "label": "本郷町觀光協會",
-        "googleLabel": "本郷生涯学習センター",
+        "googleLabel": "本郷町観光協会",
         "latitude": 34.409167,
         "longitude": 132.995833,
-        "businessHours": "平日午前のみ"
+        "businessHours": "平日上午9時～12時"
       }
     ]
   },

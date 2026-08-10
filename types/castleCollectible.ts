@@ -1,6 +1,10 @@
-export const COLLECTIBLE_KINDS = ['meijo-stamp', 'goshuin', 'castle-card'] as const;
+export const COLLECTIBLE_KINDS = ['meijo-stamp', 'goshuin', 'castle-card', 'visit-record'] as const;
 
 export type CollectibleKind = (typeof COLLECTIBLE_KINDS)[number];
+
+export const MEDIA_COLLECTIBLE_KINDS = ['meijo-stamp', 'goshuin', 'castle-card'] as const;
+
+export type MediaCollectibleKind = (typeof MEDIA_COLLECTIBLE_KINDS)[number];
 
 export type CastleCollectible = {
   id: string;
@@ -14,11 +18,12 @@ export type CastleCollectible = {
 
 export const COLLECTIBLE_PROGRESS_FIELD: Record<
   CollectibleKind,
-  'meijoStamp' | 'goshuin' | 'castleCard'
+  'meijoStamp' | 'goshuin' | 'castleCard' | 'visited'
 > = {
   'meijo-stamp': 'meijoStamp',
   goshuin: 'goshuin',
   'castle-card': 'castleCard',
+  'visit-record': 'visited',
 };
 
 export function isCollectibleKind(value: string): value is CollectibleKind {

@@ -6,7 +6,7 @@ const MARKER = 'android-release-signing-from-keystore-properties';
  * Loads android/keystore.properties for local release signing.
  * storeFile must be an absolute path (each machine keeps its own local file).
  */
-const RELEASE_SIGNING_SNIPPET = `
+const TOP_SNIPPET = `
 // @generated begin ${MARKER}
 def japanCastlesKeystorePropertiesFile = rootProject.file("keystore.properties")
 def japanCastlesKeystoreProperties = new Properties()
@@ -16,9 +16,9 @@ if (japanCastlesKeystorePropertiesFile.exists()) {
     }
 }
 
-ext.japanCastlesApplyReleaseSigning = {
+def japanCastlesResolveReleaseKeystoreFile = {
     if (!japanCastlesKeystorePropertiesFile.exists()) {
-        return false
+        return null
     }
 
     def rawPath = (japanCastlesKeystoreProperties["storeFile"] ?: "").toString().trim()
@@ -45,24 +45,21 @@ ext.japanCastlesApplyReleaseSigning = {
         throw new GradleException("Release keystore not found: \${store.absolutePath}")
     }
 
-    def releaseSigning = android.signingConfigs.findByName("release")
-    if (releaseSigning == null) {
-        releaseSigning = android.signingConfigs.create("release")
-    }
-    releaseSigning.storeFile = store
-    releaseSigning.storePassword = japanCastlesKeystoreProperties["storePassword"]
-    releaseSigning.keyAlias = japanCastlesKeystoreProperties["keyAlias"]
-    releaseSigning.keyPassword = japanCastlesKeystoreProperties["keyPassword"]
-    android.buildTypes.release.signingConfig = releaseSigning
-    logger.lifecycle("Using release keystore: \${store.absolutePath}")
-    return true
-}
-
-afterEvaluate {
-    japanCastlesApplyReleaseSigning()
+    return store
 }
 // @generated end ${MARKER}
 `;
+
+const RELEASE_SIGNING_CONFIG_BLOCK = `
+        release {
+            def japanCastlesStore = japanCastlesResolveReleaseKeystoreFile()
+            if (japanCastlesStore != null) {
+                storeFile japanCastlesStore
+                storePassword japanCastlesKeystoreProperties["storePassword"]
+                keyAlias japanCastlesKeystoreProperties["keyAlias"]
+                keyPassword japanCastlesKeystoreProperties["keyPassword"]
+            }
+        }`;
 
 function stripGeneratedBlocks(contents) {
   return contents
@@ -77,6 +74,14 @@ function stripGeneratedBlocks(contents) {
     .replace(
       /\n?\s*\/\/ @generated begin japan-castles-release-signing-config[\s\S]*?\/\/ @generated end japan-castles-release-signing-config\n?/g,
       '\n',
+    )
+    .replace(
+      /\n?\/\/ @generated begin release-signing-config[\s\S]*?\/\/ @generated end release-signing-config\n?/g,
+      '\n',
+    )
+    .replace(
+      /\n?\/\/ @generated begin release-signing-config-task-validation[\s\S]*?\/\/ @generated end release-signing-config-task-validation\n?/g,
+      '\n',
     );
 }
 
@@ -87,6 +92,51 @@ function preferReleaseSigningInBuildTypes(contents) {
   );
 }
 
+function injectTopSnippet(contents) {
+  if (contents.includes(MARKER)) {
+    return contents;
+  }
+
+  const androidIndex = contents.search(/\nandroid\s*\{/);
+  if (androidIndex === -1) {
+    return `${contents.trimEnd()}\n${TOP_SNIPPET}\n`;
+  }
+
+  return `${contents.slice(0, androidIndex)}\n${TOP_SNIPPET}${contents.slice(androidIndex)}`;
+}
+
+function injectReleaseSigningConfig(contents) {
+  const signingConfigsStart = contents.search(/\bsigningConfigs\s*\{/);
+  if (signingConfigsStart === -1) {
+    return contents;
+  }
+
+  const buildTypesStart = contents.indexOf('buildTypes', signingConfigsStart);
+  const signingConfigsEnd = buildTypesStart === -1 ? contents.length : buildTypesStart;
+  const signingSection = contents.slice(signingConfigsStart, signingConfigsEnd);
+  const rest = contents.slice(signingConfigsEnd);
+
+  let updatedSection = signingSection;
+  if (signingSection.includes('japanCastlesResolveReleaseKeystoreFile')) {
+    updatedSection = signingSection.replace(
+      /\s*release\s*\{[\s\S]*?japanCastlesResolveReleaseKeystoreFile[\s\S]*?\}\s*/,
+      `\n${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
+    );
+  } else if (/\brelease\s*\{/.test(signingSection)) {
+    updatedSection = signingSection.replace(
+      /\s*release\s*\{[^}]*\}\s*/,
+      `\n${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
+    );
+  } else {
+    updatedSection = signingSection.replace(
+      /(debug\s*\{[\s\S]*?\}\s*)/,
+      `$1${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
+    );
+  }
+
+  return contents.slice(0, signingConfigsStart) + updatedSection + rest;
+}
+
 function withAndroidReleaseSigning(config) {
   return withAppBuildGradle(config, (config) => {
     if (config.modResults.language !== 'groovy') {
@@ -95,10 +145,8 @@ function withAndroidReleaseSigning(config) {
 
     let contents = stripGeneratedBlocks(config.modResults.contents);
     contents = preferReleaseSigningInBuildTypes(contents);
-
-    if (!contents.includes(MARKER)) {
-      contents += `\n${RELEASE_SIGNING_SNIPPET}\n`;
-    }
+    contents = injectTopSnippet(contents);
+    contents = injectReleaseSigningConfig(contents);
 
     config.modResults.contents = contents;
     return config;

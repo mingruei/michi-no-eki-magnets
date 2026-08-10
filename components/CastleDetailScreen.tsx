@@ -129,6 +129,7 @@ export function CastleDetailScreen({
   const chineseSubtitleLine = content.subtitle
     ? formatChineseSubtitleLine(content.subtitle, content.alias)
     : null;
+  const hasCastleCardSales = content.castleCardLocations.length > 0;
 
   return (
     <View style={styles.container}>
@@ -178,6 +179,15 @@ export function CastleDetailScreen({
 
         <CastleCollectibleUploadSection
           castleId={castle.id}
+          kind="visit-record"
+          title={t('castle.visitRecordUploadTitle')}
+          storageHint={t('castle.visitRecordUploadHint')}
+          onUploadPress={() => onRequestUpload('visit-record')}
+          onRegisterUpload={(uploadFromSource) => registerUpload('visit-record', uploadFromSource)}
+        />
+
+        <CastleCollectibleUploadSection
+          castleId={castle.id}
           kind="meijo-stamp"
           title={t('castle.meijoStampUploadTitle')}
           storageHint={t('castle.meijoStampUploadHint')}
@@ -193,13 +203,19 @@ export function CastleDetailScreen({
           onRegisterUpload={(uploadFromSource) => registerUpload('goshuin', uploadFromSource)}
         />
 
-        <CastleCollectibleUploadSection
-          castleId={castle.id}
-          kind="castle-card"
-          title={t('castle.castleCardUploadTitle')}
-          onUploadPress={() => onRequestUpload('castle-card')}
-          onRegisterUpload={(uploadFromSource) => registerUpload('castle-card', uploadFromSource)}
-        />
+        {hasCastleCardSales ? (
+          <CastleCollectibleUploadSection
+            castleId={castle.id}
+            kind="castle-card"
+            title={t('castle.castleCardUploadTitle')}
+            onUploadPress={() => onRequestUpload('castle-card')}
+            onRegisterUpload={(uploadFromSource) => registerUpload('castle-card', uploadFromSource)}
+          />
+        ) : (
+          <Section title={t('castle.castleCardUploadTitle')}>
+            <Text style={styles.body}>{t('castle.noCastleCardLocation')}</Text>
+          </Section>
+        )}
 
         <Section title={t('common.location')}>
           <Text style={styles.body}>{content.locationLabel}</Text>

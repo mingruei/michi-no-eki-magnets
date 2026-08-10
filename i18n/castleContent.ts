@@ -28,7 +28,7 @@ type CastlePublicTransitOverlay = {
   destinationLongitude?: number;
 };
 
-type CastleContentOverlay = {
+export type CastleContentOverlay = {
   subtitle?: string | null;
   alias?: string | null;
   description?: string;
@@ -40,9 +40,25 @@ type CastleContentOverlay = {
   publicTransit?: CastlePublicTransitOverlay;
 };
 
-const castleContentByLocale: Record<Locale, Record<string, CastleContentOverlay>> = {
+let castleContentByLocale: Record<Locale, Record<string, CastleContentOverlay>> = {
   'zh-Hant': castleContentZhHant as Record<string, CastleContentOverlay>,
 };
+
+function rebuildCastleContentIndexes() {
+  castleContentSubtitlesByCastleId = collectCastleContentSubtitles();
+  castleContentAliasesByCastleId = collectCastleContentAliases();
+}
+
+export function setCastleContentForLocale(
+  locale: Locale,
+  content: Record<string, CastleContentOverlay>,
+): void {
+  castleContentByLocale = {
+    ...castleContentByLocale,
+    [locale]: content,
+  };
+  rebuildCastleContentIndexes();
+}
 
 function collectCastleContentSubtitles(): Readonly<Record<number, readonly string[]>> {
   const subtitlesByCastleId = new Map<number, Set<string>>();
@@ -67,7 +83,12 @@ function collectCastleContentSubtitles(): Readonly<Record<number, readonly strin
   );
 }
 
-const castleContentSubtitlesByCastleId = collectCastleContentSubtitles();
+let castleContentSubtitlesByCastleId = collectCastleContentSubtitles();
+
+export function hasCastleCardSalesLocation(castleId: number, locale: Locale = 'zh-Hant'): boolean {
+  const overlay = castleContentByLocale[locale][String(castleId)];
+  return (overlay?.castleCardLocations?.length ?? 0) > 0;
+}
 
 export function getCastleContentSubtitles(castleId: number): readonly string[] {
   return castleContentSubtitlesByCastleId[castleId] ?? [];
@@ -203,7 +224,7 @@ function collectCastleContentAliases(): Readonly<Record<number, string>> {
   return Object.fromEntries(aliasesByCastleId.entries());
 }
 
-const castleContentAliasesByCastleId = collectCastleContentAliases();
+let castleContentAliasesByCastleId = collectCastleContentAliases();
 
 export function getCastleContentAlias(castleId: number): string | null {
   return castleContentAliasesByCastleId[castleId] ?? null;

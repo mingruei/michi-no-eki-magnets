@@ -194,7 +194,7 @@ describe('withAndroidReleaseFileName', () => {
     const result = callback(config);
     expect(result.modResults.contents).toContain('release-artifact-file-name');
     expect(result.modResults.contents).toContain('bundleRelease');
-    expect(result.modResults.contents).toContain('kept');
+    expect(result.modResults.contents).toContain('app-release.aab');
     expect(result.modResults.contents).not.toContain('renameTo');
   });
 
@@ -246,8 +246,9 @@ describe('withAndroidReleaseSigning', () => {
     expect(result.modResults.contents).toContain(
       'android-release-signing-from-keystore-properties',
     );
-    expect(result.modResults.contents).toContain('japanCastlesApplyReleaseSigning');
+    expect(result.modResults.contents).toContain('japanCastlesResolveReleaseKeystoreFile');
     expect(result.modResults.contents).toContain('do not use ~');
+    expect(result.modResults.contents).not.toContain('afterEvaluate');
     expect(result.modResults.contents).toContain(
       'signingConfig signingConfigs.findByName("release") ?: signingConfigs.debug',
     );
@@ -282,12 +283,10 @@ describe('withAndroidReleaseSigning', () => {
 ${marked}`,
       },
     });
-    // strip + re-append replaces old block; marker should still exist once
-    const matches = dedupeResult.modResults.contents.match(
-      /android-release-signing-from-keystore-properties/g,
+    expect(dedupeResult.modResults.contents).toContain('japanCastlesResolveReleaseKeystoreFile');
+    expect(dedupeResult.modResults.contents).toContain(
+      '// @generated begin android-release-signing-from-keystore-properties',
     );
-    expect(matches?.length).toBeGreaterThanOrEqual(2); // begin + end
-    expect(dedupeResult.modResults.contents).toContain('japanCastlesApplyReleaseSigning');
   });
 });
 

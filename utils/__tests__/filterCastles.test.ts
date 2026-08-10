@@ -24,6 +24,19 @@ describe('filterCastles', () => {
     }),
   ];
 
+  it('filters by group membership', () => {
+    const result = filterCastles(castles, {
+      regionId: null,
+      prefecture: null,
+      series: 'all',
+      nameQuery: '',
+      progressFilter: 'all',
+      groupCastleIdSet: new Set([2, 3]),
+    });
+
+    expect(result.map((castle) => castle.id)).toEqual([2, 3]);
+  });
+
   it('filters by series and prefecture', () => {
     const result = filterCastles(castles, {
       regionId: null,

@@ -19,9 +19,12 @@ type BrowseListHeaderProps = {
   prefecture: string | null;
   nameQuery: string;
   prefectureOptions: readonly Option[];
+  groupOptions?: readonly Option[];
+  groupId?: string | null;
   resultCount: number;
   onSeriesChange: (series: SeriesFilter) => void;
   onProgressFilterChange: (progressFilter: ProgressFilter) => void;
+  onGroupChange?: (groupId: string | null) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onNameQueryChange: (nameQuery: string) => void;
@@ -34,9 +37,12 @@ export function BrowseListHeader({
   prefecture,
   nameQuery,
   prefectureOptions,
+  groupOptions,
+  groupId,
   resultCount,
   onSeriesChange,
   onProgressFilterChange,
+  onGroupChange,
   onRegionChange,
   onPrefectureChange,
   onNameQueryChange,
@@ -54,8 +60,11 @@ export function BrowseListHeader({
         prefecture={prefecture}
         nameQuery={nameQuery}
         prefectureOptions={prefectureOptions}
+        groupOptions={groupOptions}
+        groupId={groupId}
         onSeriesChange={onSeriesChange}
         onProgressFilterChange={onProgressFilterChange}
+        onGroupChange={onGroupChange}
         onRegionChange={onRegionChange}
         onPrefectureChange={onPrefectureChange}
         onNameQueryChange={onNameQueryChange}

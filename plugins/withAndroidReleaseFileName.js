@@ -4,8 +4,8 @@ const MARKER = 'release-artifact-file-name';
 
 /**
  * Copy (do not rename/delete) the AGP output artifact to a friendlier name.
- * Renaming app-release.aab breaks later tasks such as
- * produceReleaseBundleIdeListingFile that still expect the original path.
+ * Always copy from app-release.* so stale japan-castles-map-* artifacts cannot
+ * be picked up when versionCode changes.
  */
 const RELEASE_FILE_NAME_SNIPPET = `
 // @generated begin ${MARKER}
@@ -15,19 +15,20 @@ afterEvaluate {
             def artifactBaseName =
                 "japan-castles-map-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
             def outputDir = file("\${layout.buildDirectory.get()}/outputs/bundle/release")
-            def bundleFile = outputDir.listFiles()?.find {
-                it.name.endsWith(".aab") && it.name != "\${artifactBaseName}.aab"
+            def bundleFile = new File(outputDir, "app-release.aab")
+            if (!bundleFile.isFile()) {
+                logger.lifecycle("Release bundle copy skipped: app-release.aab not found")
+                return
             }
-            if (bundleFile != null) {
-                def targetFile = new File(outputDir, "\${artifactBaseName}.aab")
-                if (targetFile.exists()) {
-                    targetFile.delete()
-                }
-                bundleFile.withInputStream { input ->
-                    targetFile.withOutputStream { output -> output << input }
-                }
-                logger.lifecycle("Release bundle copy: \${targetFile.name} (kept \${bundleFile.name})")
+
+            def targetFile = new File(outputDir, "\${artifactBaseName}.aab")
+            if (targetFile.exists()) {
+                targetFile.delete()
             }
+            bundleFile.withInputStream { input ->
+                targetFile.withOutputStream { output -> output << input }
+            }
+            logger.lifecycle("Release bundle copy: \${targetFile.name} (from \${bundleFile.name})")
         }
     }
 
@@ -36,23 +37,20 @@ afterEvaluate {
             def artifactBaseName =
                 "japan-castles-map-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
             def outputDir = file("\${layout.buildDirectory.get()}/outputs/apk/release")
-            if (!outputDir.exists()) {
+            def apkFile = new File(outputDir, "app-release.apk")
+            if (!apkFile.isFile()) {
                 return
             }
 
-            outputDir.listFiles()?.findAll {
-                it.name.endsWith(".apk") && it.name != "\${artifactBaseName}.apk"
-            }?.each { apkFile ->
-                def targetFile = new File(outputDir, "\${artifactBaseName}.apk")
-                if (targetFile.exists() && targetFile.absolutePath != apkFile.absolutePath) {
-                    targetFile.delete()
+            def targetFile = new File(outputDir, "\${artifactBaseName}.apk")
+            if (targetFile.exists() && targetFile.absolutePath != apkFile.absolutePath) {
+                targetFile.delete()
+            }
+            if (apkFile.absolutePath != targetFile.absolutePath) {
+                apkFile.withInputStream { input ->
+                    targetFile.withOutputStream { output -> output << input }
                 }
-                if (apkFile.absolutePath != targetFile.absolutePath) {
-                    apkFile.withInputStream { input ->
-                        targetFile.withOutputStream { output -> output << input }
-                    }
-                    logger.lifecycle("Release apk copy: \${targetFile.name} (kept \${apkFile.name})")
-                }
+                logger.lifecycle("Release apk copy: \${targetFile.name} (from \${apkFile.name})")
             }
         }
     }

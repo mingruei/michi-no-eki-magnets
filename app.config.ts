@@ -12,7 +12,7 @@ const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
 const config: ExpoConfig = {
   name: '攻城師',
   slug: 'japan-castles-map',
-  version: '1.3.0',
+  version: '1.4.0',
   orientation: 'default',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
@@ -69,7 +69,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.japancastles.map',
-    buildNumber: '2',
+    buildNumber: '12',
     infoPlist: {
       NSLocationWhenInUseUsageDescription: permissionMessages.location,
       NSLocationAlwaysUsageDescription: permissionMessages.location,
@@ -82,7 +82,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.japancastles.map',
-    versionCode: 46,
+    versionCode: 49,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',

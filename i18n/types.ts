@@ -25,6 +25,7 @@ export type TranslationDictionary = {
     createTitle: string;
     nameLabel: string;
     namePlaceholder: string;
+    nameRequired: string;
     unnamed: string;
     joinedTitle: string;
     joinedHint: string;
@@ -35,6 +36,14 @@ export type TranslationDictionary = {
     castleListTitle: string;
     castleCount: string;
     save: string;
+    edit: string;
+    show: string;
+    showNoCastles: string;
+    visitRecordTitle: string;
+    exportJpg: string;
+    exportJpgFailed: string;
+    exportJpgNotReady: string;
+    exportJpgShareUnavailable: string;
   };
   globalUpload: {
     fabLabel: string;
@@ -87,6 +96,19 @@ export type TranslationDictionary = {
     collectibleImportModeCancel: string;
     version: string;
     versionValue: string;
+    castleData: string;
+    castleDataHint: string;
+    castleDataVersion: string;
+    castleDataVersionValue: string;
+    castleDataUpdatedAt: string;
+    castleDataUpdatedAtValue: string;
+    castleDataBundledVersion: string;
+    castleDataBundledVersionValue: string;
+    castleDataSourceBundled: string;
+    castleDataSourceCache: string;
+    castleDataSourceRemote: string;
+    castleDataRemoteSyncEnabled: string;
+    castleDataRemoteSyncDisabled: string;
     tipJarTitle: string;
     tipJarHint: string;
     tipJarButtonFallback: string;
@@ -113,6 +135,8 @@ export type TranslationDictionary = {
     progressNoGoshuin: string;
     progressHasCastleCard: string;
     progressNoCastleCard: string;
+    group: string;
+    selectGroup: string;
     resultHint: string;
   };
   stats: {
@@ -162,9 +186,12 @@ export type TranslationDictionary = {
     meijoStampUploadTitle: string;
     meijoStampUploadHint: string;
     castleCardUploadTitle: string;
+    visitRecordUploadTitle: string;
+    visitRecordUploadHint: string;
     collectibleUpload: string;
     collectibleChooseSource: string;
     collectibleScan: string;
+    collectibleCamera: string;
     collectibleUploadFile: string;
     collectiblePhotoLibrary: string;
     collectibleEmpty: string;

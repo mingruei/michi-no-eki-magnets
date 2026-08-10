@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../constants/theme';
 import type { GlobalUploadDraft } from '../hooks/useGlobalCollectibleUpload';
+import { hasCastleCardSalesLocation } from '../i18n/castleContent';
 import { useI18n } from '../i18n';
 import type { CollectibleKind } from '../types/castleCollectible';
 import type { Castle } from '../types/castle';
@@ -78,7 +79,24 @@ export function CollectibleUploadConfirmModal({
     return filterCastlesByQuery(castles, trimmedQuery).slice(0, 30);
   }, [castles, searchQuery]);
 
-  const canConfirm = selectedCastleId != null && !saving;
+  const kindOptions = useMemo(() => {
+    if (selectedCastleId == null || hasCastleCardSalesLocation(selectedCastleId)) {
+      return KIND_OPTIONS;
+    }
+
+    return KIND_OPTIONS.filter((kind) => kind !== 'castle-card');
+  }, [selectedCastleId]);
+
+  useEffect(() => {
+    if (selectedCastleId != null && selectedKind === 'castle-card' && !hasCastleCardSalesLocation(selectedCastleId)) {
+      setSelectedKind('meijo-stamp');
+    }
+  }, [selectedCastleId, selectedKind]);
+
+  const canConfirm =
+    selectedCastleId != null
+    && !saving
+    && (selectedKind !== 'castle-card' || hasCastleCardSalesLocation(selectedCastleId));
 
   return (
     <Modal
@@ -104,7 +122,7 @@ export function CollectibleUploadConfirmModal({
 
           <Text style={styles.sectionLabel}>{t('globalUpload.typeLabel')}</Text>
           <View style={styles.kindRow}>
-            {KIND_OPTIONS.map((kind) => {
+            {kindOptions.map((kind) => {
               const selected = selectedKind === kind;
               const suggested = draft.typeSuggestion.kind === kind;
               return (

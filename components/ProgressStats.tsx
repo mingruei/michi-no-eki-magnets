@@ -1,13 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import castlesData from '../assets/castles.json';
 import { colors } from '../constants/theme';
+import { useCastles } from '../hooks/useCastleData';
 import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useI18n } from '../i18n';
 import type { Castle } from '../types/castle';
 import { computeProgressStats } from '../utils/progressStats';
-
-const castles = castlesData as Castle[];
 
 type StatsRowProps = {
   label: string;
@@ -32,6 +30,7 @@ function StatsRow({ label, visited, meijoStamp, goshuin, castleCard, highlight =
 
 export function ProgressStats() {
   const { t } = useI18n();
+  const castles = useCastles();
   const { progressMap } = useCastleProgress();
   const stats = computeProgressStats(castles, progressMap);
 

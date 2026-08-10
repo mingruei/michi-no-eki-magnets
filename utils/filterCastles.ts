@@ -15,6 +15,7 @@ export type CastleFilters = {
   nameQuery: string;
   progressFilter: ProgressFilter;
   progressMap?: CastleProgressMap;
+  groupCastleIdSet?: ReadonlySet<number>;
 };
 
 function normalizeSearchQuery(raw: string): string {
@@ -114,11 +115,23 @@ function matchesProgressFilter(
   }
 }
 
+function matchesGroupFilter(
+  castleId: number,
+  groupCastleIdSet: ReadonlySet<number> | undefined,
+): boolean {
+  if (!groupCastleIdSet) {
+    return true;
+  }
+
+  return groupCastleIdSet.has(castleId);
+}
+
 function applyCastleFilters(castles: readonly Castle[], filters: CastleFilters): Castle[] {
   return castles.filter(
     (castle) =>
       matchesLocationFilters(castle, filters) &&
-      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap) &&
+      matchesGroupFilter(castle.id, filters.groupCastleIdSet),
   );
 }
 
@@ -137,14 +150,16 @@ export function filterCastles(
     return castles.filter(
       (castle) =>
         matchesExactNumberQuery(castle, numberQuery) &&
-        matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+        matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap) &&
+        matchesGroupFilter(castle.id, filters.groupCastleIdSet),
     );
   }
 
   return castles.filter(
     (castle) =>
       matchesTextQuery(castle, query) &&
-      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap),
+      matchesProgressFilter(castle.id, filters.progressFilter, filters.progressMap) &&
+      matchesGroupFilter(castle.id, filters.groupCastleIdSet),
   );
 }
 
