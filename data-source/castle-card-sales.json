@@ -1,9 +1,9 @@
 {
   "sources": {
-    "original": "https://jokaku.jp/wp-content/uploads/2026/04/43e49121c6e6bd207690f7da6e0418d6-1.pdf",
+    "original": "https://jokaku.jp/wp-content/uploads/2026/07/6fc4dd08a8be88de3cd11b9da555cc65-1.pdf",
     "continued": "https://jokaku.jp/wp-content/uploads/2026/06/e201d17d81f33f8cf13beca7a9327f06.pdf"
   },
-  "updated": "2026-06",
+  "updated": "2026-07",
   "series": {
     "original": {
       "2": [
@@ -11,6 +11,11 @@
           "googleLabel": "箱館奉行所",
           "label": "箱館奉行所",
           "businessHours": "請洽詢五稜郭公園管理事務所"
+        },
+        {
+          "googleLabel": "お休処いたくら柳野",
+          "label": "お休処 いたくら柳野",
+          "businessHours": null
         }
       ],
       "3": [
@@ -98,8 +103,13 @@
       ],
       "28": [
         {
-          "googleLabel": "小諸城址 懐古園",
-          "label": "小諸城址懷古園",
+          "googleLabel": "小諸城址徴古館",
+          "label": "小諸城址徴古館",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "懐古神社",
+          "label": "懐古神社社務所",
           "businessHours": null
         }
       ],
@@ -466,8 +476,18 @@
       ],
       "86": [
         {
-          "googleLabel": "大野城",
-          "label": "大野城（各自治體圖案不同，請洽詢現場）",
+          "googleLabel": "太宰府展示館",
+          "label": "太宰府展示館（太宰府市）",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "心のふるさと館",
+          "label": "心のふるさと館1樓 ここふるショップ（大野城市）",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "宇美町立歴史民俗資料館",
+          "label": "宇美町立歴史民俗資料館（宇美町）",
           "businessHours": null
         }
       ],
@@ -515,6 +535,11 @@
         {
           "googleLabel": "鹿児島県歴史資料センター黎明館",
           "label": "黎明館1樓 CHIN JUKAN POTTERY 喫茶室",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "鹿児島まち歩き観光ステーション",
+          "label": "鹿児島まち歩き観光ステーション",
           "businessHours": null
         }
       ],
@@ -593,7 +618,7 @@
           "businessHours": null
         },
         {
-          "googleLabel": "行田市",
+          "googleLabel": "観光物産ぷらっと♪ぎょうだ",
           "label": "觀光物產ぷらっと♪ぎょうだ",
           "businessHours": null
         },
@@ -619,15 +644,30 @@
       ],
       "131": [
         {
-          "googleLabel": "村上市郷土資料館",
-          "label": "村上市鄉土資料館大廳",
+          "googleLabel": "村上市郷土資料ロビー",
+          "label": "村上市郷土資料ロビー",
           "businessHours": null
         }
       ],
       "135": [
         {
+          "googleLabel": "道の駅砺波",
+          "label": "道の駅砺波 となみ野の郷",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "砺波駅",
+          "label": "砺波駅観光案内所",
+          "businessHours": null
+        },
+        {
           "googleLabel": "砺波市埋蔵文化財センター",
           "label": "砺波市埋蔵文化財センター",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "せんだんのHILL",
+          "label": "せんだんのHILL",
           "businessHours": null
         }
       ],
@@ -661,7 +701,7 @@
       ],
       "143": [
         {
-          "googleLabel": "可児市戦国山城ミュージアム",
+          "googleLabel": "可児市山城ミュージアム",
           "label": "可児市山城博物館",
           "businessHours": null
         }
@@ -675,7 +715,7 @@
       ],
       "149": [
         {
-          "googleLabel": "小牧市歴史館",
+          "googleLabel": "小牧山城史跡情報館",
           "label": "小牧山城史跡情報館（れきしるこまき）",
           "businessHours": null
         },
@@ -714,6 +754,11 @@
           "googleLabel": "岸和田城",
           "label": "岸和田だんじり会館",
           "businessHours": null
+        },
+        {
+          "googleLabel": "二の丸広場観光交流センター",
+          "label": "二の丸広場観光交流センター",
+          "businessHours": null
         }
       ],
       "162": [
@@ -733,12 +778,12 @@
       "165": [
         {
           "googleLabel": "柳沢文庫",
-          "label": "柳沢文庫",
+          "label": "柳沢文庫窓口",
           "businessHours": null
         },
         {
           "googleLabel": "大和郡山市観光協会",
-          "label": "柳澤文庫前庭園內「番屋カフェ」（文庫休業日）",
+          "label": "柳澤文庫前庭園內「番屋カフェ」",
           "businessHours": null
         }
       ],
@@ -751,15 +796,15 @@
       ],
       "167": [
         {
-          "googleLabel": "新宮市立歴史民俗資料館",
+          "googleLabel": "新宮市観光協会",
           "label": "新宮市觀光協會",
           "businessHours": null
         }
       ],
       "168": [
         {
-          "googleLabel": "若桜町観光案内所",
-          "label": "若桜町観光案内所",
+          "googleLabel": "若桜町観光協会",
+          "label": "若桜町觀光協會",
           "businessHours": null
         }
       ],
@@ -784,7 +829,7 @@
       ],
       "173": [
         {
-          "googleLabel": "本郷町観光協会",
+          "googleLabel": "本郷生涯学習センター",
           "label": "本郷町觀光協會",
           "businessHours": "平日午前のみ"
         }
@@ -819,14 +864,19 @@
       ],
       "182": [
         {
-          "googleLabel": "水城館",
-          "label": "水城館",
+          "googleLabel": "太宰府展示館",
+          "label": "太宰府展示館（太宰府市）",
+          "businessHours": null
+        },
+        {
+          "googleLabel": "心のふるさと館",
+          "label": "ここふるショップ（心のふるさと館1樓・大野城市）",
           "businessHours": null
         }
       ],
       "187": [
         {
-          "googleLabel": "五島市観光歴史資料館",
+          "googleLabel": "五島市観光協会",
           "label": "五島市觀光協會",
           "businessHours": null
         }
@@ -838,16 +888,9 @@
           "businessHours": null
         }
       ],
-      "195": [
-        {
-          "googleLabel": "延岡城跡",
-          "label": "二之丸廣場觀光交流中心",
-          "businessHours": null
-        }
-      ],
       "199": [
         {
-          "googleLabel": "ユンタンザミュージアム",
+          "googleLabel": "世界遺産座喜味城跡",
           "label": "世界遺產座喜味城跡ユンタンザミュージアム",
           "businessHours": null
         }

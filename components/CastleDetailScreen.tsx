@@ -170,11 +170,13 @@ export function CastleDetailScreen({
             checked={progress.goshuin}
             onToggle={() => toggleProgress(castle.id, 'goshuin')}
           />
-          <CheckOption
-            label={t('castle.castleCard')}
-            checked={progress.castleCard}
-            onToggle={() => toggleProgress(castle.id, 'castleCard')}
-          />
+          {hasCastleCardSales ? (
+            <CheckOption
+              label={t('castle.castleCard')}
+              checked={progress.castleCard}
+              onToggle={() => toggleProgress(castle.id, 'castleCard')}
+            />
+          ) : null}
         </Section>
 
         <CastleCollectibleUploadSection

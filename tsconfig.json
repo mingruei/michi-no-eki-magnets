@@ -3,5 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "resolveJsonModule": true
-  }
+  },
+  "exclude": [
+    "**/__tests__/**",
+    "scripts/**"
+  ]
 }

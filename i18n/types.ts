@@ -115,6 +115,9 @@ export type TranslationDictionary = {
     tipJarThanks: string;
     tipJarFailed: string;
     tipJarUnavailable: string;
+    feedback: string;
+    feedbackHint: string;
+    feedbackUnavailable: string;
   };
   filter: {
     region: string;

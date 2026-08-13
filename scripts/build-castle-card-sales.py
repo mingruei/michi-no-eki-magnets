@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = ROOT / "data-source" / "castle-card-sales.json"
 
 SOURCES = {
-    "original": "https://jokaku.jp/wp-content/uploads/2026/04/43e49121c6e6bd207690f7da6e0418d6-1.pdf",
+    "original": "https://jokaku.jp/wp-content/uploads/2026/07/6fc4dd08a8be88de3cd11b9da555cc65-1.pdf",
     "continued": "https://jokaku.jp/wp-content/uploads/2026/06/e201d17d81f33f8cf13beca7a9327f06.pdf",
 }
 
@@ -20,7 +20,10 @@ SOURCES = {
 # Each location: googleLabel (JP), optional businessHours (zh-Hant), optional label (zh-Hant override)
 CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
     "original": {
-        2: [{"googleLabel": "箱館奉行所", "businessHours": "請洽詢五稜郭公園管理事務所"}],
+        2: [
+            {"googleLabel": "箱館奉行所", "businessHours": "請洽詢五稜郭公園管理事務所"},
+            {"googleLabel": "お休処いたくら柳野", "label": "お休処 いたくら柳野"},
+        ],
         3: [{"googleLabel": "松前観光案内所"}],
         4: [
             {"googleLabel": "弘前城天守内売店", "businessHours": "4月1日～11月23日"},
@@ -40,7 +43,10 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
         ],
         23: [{"googleLabel": "小田原城天守閣", "label": "天守閣1樓博物館商店"}],
         27: [{"googleLabel": "上田市観光会館", "label": "上田市觀光會館賣店"}],
-        28: [{"googleLabel": "小諸城址 懐古園", "label": "小諸城址懷古園"}],
+        28: [
+            {"googleLabel": "小諸城址徴古館", "label": "小諸城址徴古館"},
+            {"googleLabel": "懐古神社", "label": "懐古神社社務所"},
+        ],
         29: [{"googleLabel": "松本城", "label": "松本城賣店（付費區內）"}],
         30: [{"googleLabel": "伊那市立高遠町歴史博物館"}],
         31: [
@@ -125,7 +131,14 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
         82: [{"googleLabel": "大洲城", "label": "大洲城受理旁商品角落"}],
         83: [{"googleLabel": "宇和島城", "label": "宇和島城天守受理"}],
         84: [{"googleLabel": "高知城", "label": "懷德館櫃檯"}],
-        86: [{"googleLabel": "大野城", "label": "大野城（各自治體圖案不同，請洽詢現場）"}],
+        86: [
+            {"googleLabel": "太宰府展示館", "label": "太宰府展示館（太宰府市）"},
+            {
+                "googleLabel": "心のふるさと館",
+                "label": "心のふるさと館1樓 ここふるショップ（大野城市）",
+            },
+            {"googleLabel": "宇美町立歴史民俗資料館", "label": "宇美町立歴史民俗資料館（宇美町）"},
+        ],
         87: [{"googleLabel": "佐賀県立名護屋城博物館"}],
         88: [{"googleLabel": "吉野ヶ里歴史公園", "label": "吉野ヶ里歷史公園東口賣店"}],
         89: [{"googleLabel": "佐賀城本丸歴史館"}],
@@ -135,7 +148,11 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
             {"googleLabel": "熊本城", "label": "二之丸休憩處"},
         ],
         97: [
-            {"googleLabel": "鹿児島県歴史資料センター黎明館", "label": "黎明館1樓 CHIN JUKAN POTTERY 喫茶室"}
+            {
+                "googleLabel": "鹿児島県歴史資料センター黎明館",
+                "label": "黎明館1樓 CHIN JUKAN POTTERY 喫茶室",
+            },
+            {"googleLabel": "鹿児島まち歩き観光ステーション", "label": "鹿児島まち歩き観光ステーション"},
         ],
         98: [{"googleLabel": "今帰仁城跡", "label": "今歸仁城跡售票處"}],
         99: [
@@ -153,21 +170,26 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
         113: [{"googleLabel": "土浦まちかど蔵大徳", "label": "土浦まちかど蔵「大徳」"}],
         118: [
             {"googleLabel": "行田市郷土博物館", "label": "行田市鄉土博物館博物館商店"},
-            {"googleLabel": "行田市", "label": "觀光物產ぷらっと♪ぎょうだ"},
+            {"googleLabel": "観光物産ぷらっと♪ぎょうだ", "label": "觀光物產ぷらっと♪ぎょうだ"},
             {"googleLabel": "忍城", "label": "忍城巴士總站觀光案內所"},
         ],
         120: [{"googleLabel": "嵐山史跡の博物館", "label": "埼玉縣立嵐山史跡博物館受理"}],
         126: [{"googleLabel": "小田原城天守閣", "label": "小田原城天守閣賣店"}],
-        131: [{"googleLabel": "村上市郷土資料館", "label": "村上市鄉土資料館大廳"}],
-        135: [{"googleLabel": "砺波市埋蔵文化財センター"}],
+        131: [{"googleLabel": "村上市郷土資料ロビー", "label": "村上市郷土資料ロビー"}],
+        135: [
+            {"googleLabel": "道の駅砺波", "label": "道の駅砺波 となみ野の郷"},
+            {"googleLabel": "砺波駅", "label": "砺波駅観光案内所"},
+            {"googleLabel": "砺波市埋蔵文化財センター"},
+            {"googleLabel": "せんだんのHILL"},
+        ],
         138: [{"googleLabel": "越前大野城", "label": "越前おおの結楽座"}],
         139: [{"googleLabel": "若狭国吉城歴史資料館"}],
         141: [{"googleLabel": "郡上八幡城", "label": "郡上八幡城賣店"}],
         142: [{"googleLabel": "中津川市苗木遠山史料館"}],
-        143: [{"googleLabel": "可児市戦国山城ミュージアム", "label": "可児市山城博物館"}],
+        143: [{"googleLabel": "可児市山城ミュージアム", "label": "可児市山城博物館"}],
         144: [{"googleLabel": "大垣城", "label": "大垣城天守"}],
         149: [
-            {"googleLabel": "小牧市歴史館", "label": "小牧山城史跡情報館（れきしるこまき）"},
+            {"googleLabel": "小牧山城史跡情報館", "label": "小牧山城史跡情報館（れきしるこまき）"},
             {"googleLabel": "小牧山歴史館"},
         ],
         155: [
@@ -178,16 +200,22 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
             {"googleLabel": "大東市立歴史民俗資料館", "label": "飯盛城（大東市）"},
             {"googleLabel": "四條畷市 歴史民俗資料館", "label": "飯盛城（四條畷市）"},
         ],
-        161: [{"googleLabel": "岸和田城", "label": "岸和田だんじり会館"}],
+        161: [
+            {"googleLabel": "岸和田城", "label": "岸和田だんじり会館"},
+            {"googleLabel": "二の丸広場観光交流センター"},
+        ],
         162: [{"googleLabel": "いずし観光センター", "label": "出石觀光案內所"}],
         164: [{"googleLabel": "洲本市立淡路文化史料館"}],
         165: [
-            {"googleLabel": "柳沢文庫"},
-            {"googleLabel": "大和郡山市観光協会", "label": "柳澤文庫前庭園內「番屋カフェ」（文庫休業日）"},
+            {"googleLabel": "柳沢文庫", "label": "柳沢文庫窓口"},
+            {
+                "googleLabel": "大和郡山市観光協会",
+                "label": "柳澤文庫前庭園內「番屋カフェ」",
+            },
         ],
         166: [{"googleLabel": "宇陀市松山地区まちかどラボ"}],
-        167: [{"googleLabel": "新宮市立歴史民俗資料館", "label": "新宮市觀光協會"}],
-        168: [{"googleLabel": "若桜町観光案内所"}],
+        167: [{"googleLabel": "新宮市観光協会", "label": "新宮市觀光協會"}],
+        168: [{"googleLabel": "若桜町観光協会", "label": "若桜町觀光協會"}],
         169: [
             {"googleLabel": "米子市立山陰歴史館"},
             {"googleLabel": "米子まちなか観光案内所"},
@@ -198,11 +226,21 @@ CURATED: dict[str, dict[int, list[dict[str, str | None]]]] = {
         178: [{"googleLabel": "今治市村上海賊ミュージアム", "label": "JiBaカフェ能島（村上海賊博物館）"}],
         180: [{"googleLabel": "高知県立歴史民俗資料館", "label": "高知縣立歷史民俗資料館博物館商店"}],
         181: [{"googleLabel": "小倉城", "label": "しろテラス"}],
-        182: [{"googleLabel": "水城館"}],
-        187: [{"googleLabel": "五島市観光歴史資料館", "label": "五島市觀光協會"}],
+        182: [
+            {"googleLabel": "太宰府展示館", "label": "太宰府展示館（太宰府市）"},
+            {
+                "googleLabel": "心のふるさと館",
+                "label": "ここふるショップ（心のふるさと館1樓・大野城市）",
+            },
+        ],
+        187: [{"googleLabel": "五島市観光協会", "label": "五島市觀光協會"}],
         194: [{"googleLabel": "佐伯市歴史資料館"}],
-        195: [{"googleLabel": "延岡城跡", "label": "二之丸廣場觀光交流中心"}],
-        199: [{"googleLabel": "ユンタンザミュージアム", "label": "世界遺產座喜味城跡ユンタンザミュージアム"}],
+        199: [
+            {
+                "googleLabel": "世界遺産座喜味城跡",
+                "label": "世界遺產座喜味城跡ユンタンザミュージアム",
+            },
+        ],
         200: [{"googleLabel": "勝連城", "businessHours": "調整中，販售時期未定", "label": "勝連城（調整中）"}],
     },
 }
@@ -227,7 +265,7 @@ def normalize_hours(value: str | None) -> str | None:
 def main() -> int:
     payload = {
         "sources": SOURCES,
-        "updated": "2026-06",
+        "updated": "2026-07",
         "series": {},
     }
 

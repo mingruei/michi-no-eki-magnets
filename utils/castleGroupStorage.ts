@@ -41,6 +41,14 @@ export async function saveCastleGroups(groups: readonly CastleGroup[]): Promise<
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
 }
 
+export function normalizeCastleGroups(raw: unknown): CastleGroup[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  return raw.filter(isCastleGroup);
+}
+
 export function createCastleGroupId(): string {
   return `group-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }

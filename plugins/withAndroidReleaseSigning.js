@@ -105,6 +105,31 @@ function injectTopSnippet(contents) {
   return `${contents.slice(0, androidIndex)}\n${TOP_SNIPPET}${contents.slice(androidIndex)}`;
 }
 
+function replaceReleaseBlock(signingSection, replacementBlock) {
+  const releaseStart = signingSection.search(/\brelease\s*\{/);
+  if (releaseStart === -1) {
+    return signingSection.replace(/(debug\s*\{[\s\S]*?\}\s*)/, `$1${replacementBlock}\n`);
+  }
+
+  const openBrace = signingSection.indexOf('{', releaseStart);
+  let depth = 0;
+  let end = openBrace;
+  for (let i = openBrace; i < signingSection.length; i += 1) {
+    const ch = signingSection[i];
+    if (ch === '{') {
+      depth += 1;
+    } else if (ch === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        end = i + 1;
+        break;
+      }
+    }
+  }
+
+  return `${signingSection.slice(0, releaseStart)}${replacementBlock}\n${signingSection.slice(end)}`;
+}
+
 function injectReleaseSigningConfig(contents) {
   const signingConfigsStart = contents.search(/\bsigningConfigs\s*\{/);
   if (signingConfigsStart === -1) {
@@ -116,23 +141,11 @@ function injectReleaseSigningConfig(contents) {
   const signingSection = contents.slice(signingConfigsStart, signingConfigsEnd);
   const rest = contents.slice(signingConfigsEnd);
 
-  let updatedSection = signingSection;
   if (signingSection.includes('japanCastlesResolveReleaseKeystoreFile')) {
-    updatedSection = signingSection.replace(
-      /\s*release\s*\{[\s\S]*?japanCastlesResolveReleaseKeystoreFile[\s\S]*?\}\s*/,
-      `\n${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
-    );
-  } else if (/\brelease\s*\{/.test(signingSection)) {
-    updatedSection = signingSection.replace(
-      /\s*release\s*\{[^}]*\}\s*/,
-      `\n${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
-    );
-  } else {
-    updatedSection = signingSection.replace(
-      /(debug\s*\{[\s\S]*?\}\s*)/,
-      `$1${RELEASE_SIGNING_CONFIG_BLOCK}\n`,
-    );
+    return contents;
   }
+
+  const updatedSection = replaceReleaseBlock(signingSection, RELEASE_SIGNING_CONFIG_BLOCK);
 
   return contents.slice(0, signingConfigsStart) + updatedSection + rest;
 }

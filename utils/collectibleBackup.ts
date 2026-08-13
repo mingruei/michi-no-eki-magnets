@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 import { unzip as unzipNativeArchive } from 'react-native-zip-archive';
 
 import {
+  COLLECTIBLE_BACKUP_GROUPS_NAME,
   COLLECTIBLE_BACKUP_MANIFEST_NAME,
   COLLECTIBLE_BACKUP_PROGRESS_NAME,
   COLLECTIBLE_BACKUP_VERSION,
@@ -17,6 +18,7 @@ import {
   type CollectibleImportResult,
 } from '../types/collectibleBackup';
 import { COLLECTIBLE_PROGRESS_FIELD } from '../types/castleCollectible';
+import type { CastleGroup } from '../types/castleGroup';
 import {
   CASTLE_PROGRESS_FIELDS,
   EMPTY_CASTLE_PROGRESS_ENTRY,
@@ -39,6 +41,11 @@ import {
   readSourceBytes,
 } from './collectibleFileIO';
 import { loadProgressMap, saveProgressMap } from './castleProgressStorage';
+import {
+  loadCastleGroups,
+  normalizeCastleGroups,
+  saveCastleGroups,
+} from './castleGroupStorage';
 import {
   normalizeZipEntryPath,
   validateManifest,
@@ -94,6 +101,61 @@ function countChangedProgressCastles(before: CastleProgressMap, after: CastlePro
   }
 
   return changed;
+}
+
+function castleGroupsEqual(left: CastleGroup, right: CastleGroup): boolean {
+  return (
+    left.id === right.id &&
+    left.name === right.name &&
+    left.createdAt === right.createdAt &&
+    left.updatedAt === right.updatedAt &&
+    left.castleIds.length === right.castleIds.length &&
+    left.castleIds.every((castleId, index) => castleId === right.castleIds[index])
+  );
+}
+
+function countChangedCastleGroups(before: readonly CastleGroup[], after: readonly CastleGroup[]): number {
+  const beforeById = new Map(before.map((group) => [group.id, group]));
+  const afterById = new Map(after.map((group) => [group.id, group]));
+  const ids = new Set([...beforeById.keys(), ...afterById.keys()]);
+  let changed = 0;
+
+  for (const id of ids) {
+    const previous = beforeById.get(id);
+    const next = afterById.get(id);
+
+    if (!previous || !next || !castleGroupsEqual(previous, next)) {
+      changed += 1;
+    }
+  }
+
+  return changed;
+}
+
+function mergeCastleGroups(
+  localGroups: readonly CastleGroup[],
+  importedGroups: readonly CastleGroup[],
+  mode: CollectibleImportMode,
+): CastleGroup[] {
+  if (mode === 'replace') {
+    return [...importedGroups];
+  }
+
+  const mergedById = new Map(localGroups.map((group) => [group.id, group]));
+
+  for (const importedGroup of importedGroups) {
+    const existing = mergedById.get(importedGroup.id);
+    if (!existing) {
+      mergedById.set(importedGroup.id, importedGroup);
+      continue;
+    }
+
+    if (Date.parse(importedGroup.updatedAt) >= Date.parse(existing.updatedAt)) {
+      mergedById.set(importedGroup.id, importedGroup);
+    }
+  }
+
+  return [...mergedById.values()];
 }
 
 async function stageImportArchive(sourceUri: string): Promise<File> {
@@ -215,7 +277,8 @@ async function readManifestFromExtractDir(
   extractDir: Directory,
 ): Promise<CollectibleBackupManifest> {
   const progressFile = new File(extractDir, COLLECTIBLE_BACKUP_PROGRESS_NAME);
-  const allowEmptyCollectibles = progressFile.exists;
+  const groupsFile = new File(extractDir, COLLECTIBLE_BACKUP_GROUPS_NAME);
+  const allowEmptyCollectibles = progressFile.exists || groupsFile.exists;
   const manifestFile = new File(extractDir, COLLECTIBLE_BACKUP_MANIFEST_NAME);
   if (manifestFile.exists) {
     try {
@@ -266,8 +329,14 @@ async function extractArchiveOnDevice(zipFile: File): Promise<Directory> {
 
   const manifestFile = new File(extractDir, COLLECTIBLE_BACKUP_MANIFEST_NAME);
   const progressFile = new File(extractDir, COLLECTIBLE_BACKUP_PROGRESS_NAME);
+  const groupsFile = new File(extractDir, COLLECTIBLE_BACKUP_GROUPS_NAME);
   const collectiblesRoot = new Directory(extractDir, COLLECTIBLE_BACKUP_ZIP_PREFIX);
-  if (!manifestFile.exists && !collectiblesRoot.exists && !progressFile.exists) {
+  if (
+    !manifestFile.exists &&
+    !collectiblesRoot.exists &&
+    !progressFile.exists &&
+    !groupsFile.exists
+  ) {
     throw new Error('collectible-backup-invalid-archive');
   }
 
@@ -313,6 +382,25 @@ async function readImportedProgress(extractDir: Directory): Promise<CastleProgre
   return importedProgress;
 }
 
+async function readImportedGroups(extractDir: Directory): Promise<CastleGroup[] | null> {
+  const groupsFile = new File(extractDir, COLLECTIBLE_BACKUP_GROUPS_NAME);
+  if (!groupsFile.exists) {
+    return null;
+  }
+
+  let text = await groupsFile.text();
+  if (text.charCodeAt(0) === 0xfeff) {
+    text = text.slice(1);
+  }
+
+  const importedGroups = normalizeCastleGroups(JSON.parse(text));
+  if (importedGroups.length === 0) {
+    return null;
+  }
+
+  return importedGroups;
+}
+
 function applyImportedProgress(
   localProgress: CastleProgressMap,
   importedProgress: CastleProgressMap,
@@ -353,11 +441,40 @@ async function mergeImportedProgress(
   return changedCastles;
 }
 
+async function mergeImportedGroups(
+  extractDir: Directory,
+  mode: CollectibleImportMode,
+): Promise<number> {
+  let importedGroups: CastleGroup[];
+  try {
+    const parsed = await readImportedGroups(extractDir);
+    if (!parsed) {
+      return 0;
+    }
+
+    importedGroups = parsed;
+  } catch {
+    throw new Error('collectible-backup-invalid-groups');
+  }
+
+  const localGroups = await loadCastleGroups();
+  const mergedGroups = mergeCastleGroups(localGroups, importedGroups, mode);
+  const changedGroups = countChangedCastleGroups(localGroups, mergedGroups);
+
+  if (changedGroups === 0) {
+    return 0;
+  }
+
+  await saveCastleGroups(mergedGroups);
+  return changedGroups;
+}
+
 async function importCollectiblesFromDirectory(
   extractDir: Directory,
   mode: CollectibleImportMode,
 ): Promise<CollectibleImportResult> {
   const progressMerged = await mergeImportedProgress(extractDir, mode);
+  const groupsMerged = await mergeImportedGroups(extractDir, mode);
   const manifest = await readManifestFromExtractDir(extractDir);
   let imported = 0;
   let skipped = 0;
@@ -411,14 +528,21 @@ async function importCollectiblesFromDirectory(
 
   const hasBackupCollectibles = manifest.collectibles.length > 0;
   let hasBackupProgress = false;
+  let hasBackupGroups = false;
   try {
     hasBackupProgress = (await readImportedProgress(extractDir)) !== null;
   } catch {
     throw new Error('collectible-backup-invalid-progress');
   }
 
-  if (imported === 0 && progressMerged === 0) {
-    if (!hasBackupCollectibles && !hasBackupProgress) {
+  try {
+    hasBackupGroups = (await readImportedGroups(extractDir)) !== null;
+  } catch {
+    throw new Error('collectible-backup-invalid-groups');
+  }
+
+  if (imported === 0 && progressMerged === 0 && groupsMerged === 0) {
+    if (!hasBackupCollectibles && !hasBackupProgress && !hasBackupGroups) {
       throw new Error('collectible-backup-invalid-manifest');
     }
 
@@ -434,6 +558,7 @@ async function importCollectiblesFromDirectory(
     skipped,
     castlesUpdated,
     progressMerged,
+    groupsMerged,
   };
 }
 
@@ -455,6 +580,7 @@ function buildManifest(collectibles: ReturnType<typeof listAllCollectibles>): Co
 async function writeZipArchive(
   manifest: CollectibleBackupManifest,
   progressMap: CastleProgressMap,
+  groups: readonly CastleGroup[],
 ): Promise<File> {
   const archiveEntries: Record<string, Uint8Array> = {
     [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8(JSON.stringify(manifest, null, 2)),
@@ -464,6 +590,10 @@ async function writeZipArchive(
     archiveEntries[COLLECTIBLE_BACKUP_PROGRESS_NAME] = strToU8(
       JSON.stringify(serializeProgressMap(progressMap), null, 2),
     );
+  }
+
+  if (groups.length > 0) {
+    archiveEntries[COLLECTIBLE_BACKUP_GROUPS_NAME] = strToU8(JSON.stringify(groups, null, 2));
   }
 
   for (const entry of manifest.collectibles) {
@@ -595,23 +725,27 @@ export async function processCollectibleImport(
 export async function exportCollectibleArchive(): Promise<{
   fileCount: number;
   progressCastles: number;
+  groupCount: number;
 }> {
   const collectibles = listAllCollectibles();
   const progressMap = await loadProgressMap();
+  const groups = await loadCastleGroups();
   const hasCollectibles = collectibles.length > 0;
   const hasProgress = hasExportableProgress(progressMap);
+  const hasGroups = groups.length > 0;
 
-  if (!hasCollectibles && !hasProgress) {
+  if (!hasCollectibles && !hasProgress && !hasGroups) {
     throw new Error('collectible-backup-nothing-to-export');
   }
 
   const manifest = buildManifest(collectibles);
-  const zipFile = await writeZipArchive(manifest, progressMap);
+  const zipFile = await writeZipArchive(manifest, progressMap, groups);
   await shareZipFile(zipFile);
 
   return {
     fileCount: manifest.collectibles.length,
     progressCastles: hasProgress ? countProgressCastles(progressMap) : 0,
+    groupCount: hasGroups ? groups.length : 0,
   };
 }
 

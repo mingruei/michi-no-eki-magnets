@@ -5,9 +5,9 @@ import { getAppVersionInfo } from '../appVersion';
 
 jest.mock('expo-constants', () => ({
   expoConfig: {
-    version: '1.4.0',
-    ios: { buildNumber: '12' },
-    android: { versionCode: 49 },
+    version: '1.4.2',
+    ios: { buildNumber: '15' },
+    android: { versionCode: 52 },
   },
   nativeAppVersion: '9.9.9',
   nativeBuildVersion: '99',
@@ -22,9 +22,9 @@ describe('getAppVersionInfo', () => {
       value: originalOS,
     });
     (Constants as { expoConfig: unknown }).expoConfig = {
-      version: '1.4.0',
-      ios: { buildNumber: '12' },
-      android: { versionCode: 49 },
+      version: '1.4.2',
+      ios: { buildNumber: '15' },
+      android: { versionCode: 52 },
     };
   });
 
@@ -35,8 +35,8 @@ describe('getAppVersionInfo', () => {
     });
 
     expect(getAppVersionInfo()).toEqual({
-      version: '1.4.0',
-      build: '12',
+      version: '1.4.2',
+      build: '15',
     });
   });
 
@@ -47,8 +47,8 @@ describe('getAppVersionInfo', () => {
     });
 
     expect(getAppVersionInfo()).toEqual({
-      version: '1.4.0',
-      build: '49',
+      version: '1.4.2',
+      build: '52',
     });
   });
 
@@ -58,12 +58,12 @@ describe('getAppVersionInfo', () => {
       value: 'ios',
     });
     (Constants as { expoConfig: unknown }).expoConfig = {
-      version: '1.4.0',
+      version: '1.4.2',
       ios: {},
     };
 
     expect(getAppVersionInfo()).toEqual({
-      version: '1.4.0',
+      version: '1.4.2',
       build: '99',
     });
   });

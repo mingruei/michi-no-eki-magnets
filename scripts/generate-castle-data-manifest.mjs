@@ -9,12 +9,12 @@ const castlesPath = path.join(assetsDir, 'castles.json');
 const contentPath = path.join(assetsDir, 'i18n', 'castle-content.zh-Hant.json');
 const manifestPath = path.join(assetsDir, 'data-manifest.json');
 
-function sha256File(filePath: string): string {
+function sha256File(filePath) {
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
 }
 
-function readJson(filePath: string): Record<string, unknown> {
-  return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+function readJson(filePath) {
+  return JSON.parse(readFileSync(filePath, 'utf8'));
 }
 
 const castlesSize = readFileSync(castlesPath).byteLength;

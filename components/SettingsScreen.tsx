@@ -9,15 +9,16 @@ import {
   Text,
   View,
 } from 'react-native';
-
 import { colors } from '../constants/theme';
 import { useCastleData } from '../hooks/useCastleData';
+import { useCastleGroups } from '../hooks/useCastleGroups';
 import { useCastleProgress } from '../hooks/useCastleProgress';
 import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { MapProvider } from '../types/mapProvider';
 import type { CollectibleImportMode } from '../types/collectibleBackup';
 import { getAppVersionInfo } from '../utils/appVersion';
+import { FEEDBACK_EMAIL, openFeedbackEmail } from '../utils/openFeedbackEmail';
 import { TipJarSection } from './TipJarSection';
 
 type SettingsScreenProps = {
@@ -40,6 +41,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { t } = useI18n();
   const { mapProvider, setMapProvider } = useMapProvider();
   const { reloadProgressMap } = useCastleProgress();
+  const { reloadGroups } = useCastleGroups();
   const {
     version: castleDataVersion,
     updatedAt: castleDataUpdatedAt,
@@ -54,6 +56,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const [selectedImportMode, setSelectedImportMode] = useState<CollectibleImportMode>('merge-newer');
   const [collectibleMessage, setCollectibleMessage] = useState<string | null>(null);
   const [collectibleError, setCollectibleError] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
   useEffect(() => {
     void import('../utils/collectibleBackup');
@@ -72,6 +75,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           return t('settings.collectibleBackupImportNothingNew');
         case 'collectible-backup-invalid-manifest':
         case 'collectible-backup-invalid-progress':
+        case 'collectible-backup-invalid-groups':
         case 'collectible-backup-unsupported-version':
         case 'collectible-backup-empty-archive':
         case 'collectible-backup-invalid-archive':
@@ -94,6 +98,15 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     [t],
   );
 
+  const handleFeedbackEmailPress = useCallback(async () => {
+    setFeedbackMessage(null);
+
+    const result = await openFeedbackEmail();
+    if (result === 'unavailable') {
+      setFeedbackMessage(t('settings.feedbackUnavailable'));
+    }
+  }, [t]);
+
   const handleExportCollectibles = async () => {
     setCollectibleMessage(null);
     setCollectibleError(null);
@@ -107,6 +120,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         t('settings.collectibleExportSuccess', {
           files: result.fileCount,
           progress: result.progressCastles,
+          groups: result.groupCount,
         }),
       );
     } catch (error) {
@@ -156,11 +170,13 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       const { processCollectibleImport } = await import('../utils/collectibleBackup');
       const result = await processCollectibleImport(pendingImportUri, selectedImportMode);
       await reloadProgressMap();
+      await reloadGroups();
       setCollectibleMessage(
         t('settings.collectibleImportSuccess', {
           imported: result.imported,
           skipped: result.skipped,
           progress: result.progressMerged,
+          groups: result.groupsMerged,
         }),
       );
     } catch (error) {
@@ -429,6 +445,19 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </View>
 
         <View style={styles.card}>
+          <Text style={styles.sectionTitle}>{t('settings.feedback')}</Text>
+          <Text style={styles.rowHint}>{t('settings.feedbackHint')}</Text>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => void handleFeedbackEmailPress()}
+            style={styles.feedbackLink}
+          >
+            <Text style={styles.feedbackEmail}>{FEEDBACK_EMAIL}</Text>
+          </Pressable>
+          {feedbackMessage ? <Text style={styles.successText}>{feedbackMessage}</Text> : null}
+        </View>
+
+        <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t('settings.version')}</Text>
           <Text style={styles.versionValue}>
             {t('settings.versionValue', {
@@ -640,6 +669,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.text,
+  },
+  feedbackLink: {
+    alignSelf: 'flex-start',
+  },
+  feedbackEmail: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.original,
+    lineHeight: 22,
   },
   optionGroup: {
     gap: 8,

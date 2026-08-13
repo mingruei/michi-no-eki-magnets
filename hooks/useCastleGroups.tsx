@@ -25,6 +25,7 @@ type CastleGroupsContextValue = {
   ) => Promise<CastleGroup>;
   updateGroup: (id: string, patch: { name?: string; castleIds?: readonly number[] }) => Promise<void>;
   deleteGroup: (id: string) => Promise<void>;
+  reloadGroups: () => Promise<void>;
 };
 
 const CastleGroupsContext = createContext<CastleGroupsContextValue | null>(null);
@@ -94,6 +95,11 @@ export function CastleGroupsProvider({ children }: { children: ReactNode }) {
     [groups, persist],
   );
 
+  const reloadGroups = useCallback(async () => {
+    const loaded = await loadCastleGroups();
+    setGroups(loaded);
+  }, []);
+
   const value = useMemo(
     () => ({
       groups,
@@ -101,8 +107,9 @@ export function CastleGroupsProvider({ children }: { children: ReactNode }) {
       createGroup,
       updateGroup,
       deleteGroup,
+      reloadGroups,
     }),
-    [createGroup, deleteGroup, groups, ready, updateGroup],
+    [createGroup, deleteGroup, groups, ready, reloadGroups, updateGroup],
   );
 
   return <CastleGroupsContext.Provider value={value}>{children}</CastleGroupsContext.Provider>;

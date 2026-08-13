@@ -355,7 +355,7 @@ export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>
       </ScrollView>
 
       {isCapturing ? (
-        <View style={styles.captureLayer} pointerEvents="none">
+        <View style={styles.captureLayer} pointerEvents="none" collapsable={false}>
           <ViewShot
             ref={shotRef}
             style={[
@@ -365,7 +365,6 @@ export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>
                 paddingHorizontal: CAPTURE_HORIZONTAL_PADDING,
               },
             ]}
-            collapsable={false}
           >
             {showBody}
           </ViewShot>

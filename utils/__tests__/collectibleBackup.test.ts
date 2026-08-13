@@ -20,6 +20,39 @@ jest.mock('../castleProgressStorage', () => ({
   saveProgressMap: jest.fn(async () => undefined),
 }));
 
+jest.mock('../castleGroupStorage', () => ({
+  loadCastleGroups: jest.fn(async () => []),
+  saveCastleGroups: jest.fn(async () => undefined),
+  normalizeCastleGroups: jest.fn((raw: unknown) => {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw.filter((value) => {
+      if (!value || typeof value !== 'object') {
+        return false;
+      }
+
+      const candidate = value as {
+        id?: unknown;
+        name?: unknown;
+        castleIds?: unknown;
+        createdAt?: unknown;
+        updatedAt?: unknown;
+      };
+
+      return (
+        typeof candidate.id === 'string' &&
+        typeof candidate.name === 'string' &&
+        Array.isArray(candidate.castleIds) &&
+        candidate.castleIds.every((id) => typeof id === 'number') &&
+        typeof candidate.createdAt === 'string' &&
+        typeof candidate.updatedAt === 'string'
+      );
+    });
+  }),
+}));
+
 jest.mock('../collectibleFileIO', () => ({
   copySourceUriToFile: jest.fn(async (_source: string, destination: { write: (bytes: Uint8Array) => void }) => {
     destination.write(new Uint8Array([1, 2, 3]));
@@ -198,10 +231,12 @@ import { strToU8, unzipSync, zipSync } from 'fflate';
 import { Platform } from 'react-native';
 
 import {
+  COLLECTIBLE_BACKUP_GROUPS_NAME,
   COLLECTIBLE_BACKUP_MANIFEST_NAME,
   COLLECTIBLE_BACKUP_PROGRESS_NAME,
   COLLECTIBLE_BACKUP_VERSION,
 } from '../../types/collectibleBackup';
+import type { CastleGroup } from '../../types/castleGroup';
 import { createProgressEntry } from '../../types/castleProgress';
 import { getCastleCollectibleDirectory, listAllCollectibles, clearCastleCollectibleDirectory } from '../castleCollectibleStorage';
 import {
@@ -213,6 +248,7 @@ import {
 import { getInfoAsync } from 'expo-file-system/legacy';
 import { unzip as nativeUnzip } from 'react-native-zip-archive';
 import { loadProgressMap, saveProgressMap } from '../castleProgressStorage';
+import { loadCastleGroups, saveCastleGroups } from '../castleGroupStorage';
 import {
   exportCollectibleArchive,
   importCollectibleArchive,
@@ -223,6 +259,8 @@ import {
 const mockedListAll = listAllCollectibles as jest.MockedFunction<typeof listAllCollectibles>;
 const mockedLoadProgress = loadProgressMap as jest.MockedFunction<typeof loadProgressMap>;
 const mockedSaveProgress = saveProgressMap as jest.MockedFunction<typeof saveProgressMap>;
+const mockedLoadGroups = loadCastleGroups as jest.MockedFunction<typeof loadCastleGroups>;
+const mockedSaveGroups = saveCastleGroups as jest.MockedFunction<typeof saveCastleGroups>;
 const mockedGetDir = getCastleCollectibleDirectory as jest.MockedFunction<typeof getCastleCollectibleDirectory>;
 const mockedClearDir = clearCastleCollectibleDirectory as jest.MockedFunction<
   typeof clearCastleCollectibleDirectory
@@ -239,6 +277,8 @@ const mockedGetDocumentAsync = DocumentPicker.getDocumentAsync as jest.MockedFun
 
 function buildImportZip(options?: {
   includeProgress?: boolean;
+  includeGroups?: boolean;
+  groups?: CastleGroup[];
   kind?: 'goshuin' | 'meijo-stamp';
   manifestJson?: string;
   includeCollectibleFile?: boolean;
@@ -275,6 +315,22 @@ function buildImportZip(options?: {
     );
   }
 
+  if (options?.includeGroups) {
+    entries[COLLECTIBLE_BACKUP_GROUPS_NAME] = strToU8(
+      JSON.stringify(
+        options.groups ?? [
+          {
+            id: 'group-1',
+            name: 'Test Group',
+            castleIds: [1, 2],
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-02T00:00:00.000Z',
+          },
+        ],
+      ),
+    );
+  }
+
   return zipSync(entries);
 }
 
@@ -299,6 +355,7 @@ describe('collectibleBackup', () => {
     fileSystemMock.__mockFileRegistry.clear();
     mockedListAll.mockReturnValue([]);
     mockedLoadProgress.mockResolvedValue({});
+    mockedLoadGroups.mockResolvedValue([]);
     mockedGetDir.mockReturnValue({
       uri: 'file:///documents/castle-collectibles/1/goshuin',
       exists: true,
@@ -324,6 +381,25 @@ describe('collectibleBackup', () => {
 
     it('throws when there is nothing to export', async () => {
       await expect(exportCollectibleArchive()).rejects.toThrow('collectible-backup-nothing-to-export');
+    });
+
+    it('exports groups-only backups', async () => {
+      mockedLoadGroups.mockResolvedValue([
+        {
+          id: 'group-1',
+          name: 'Kanto',
+          castleIds: [1, 2],
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-02T00:00:00.000Z',
+        },
+      ]);
+
+      const result = await exportCollectibleArchive();
+
+      expect(result.fileCount).toBe(0);
+      expect(result.progressCastles).toBe(0);
+      expect(result.groupCount).toBe(1);
+      expect(Sharing.shareAsync).toHaveBeenCalled();
     });
 
     it('exports progress-only backups', async () => {
@@ -455,12 +531,99 @@ describe('collectibleBackup', () => {
         imported: 1,
         skipped: 0,
         castlesUpdated: 1,
+        groupsMerged: 0,
       });
       expect(mockedSaveProgress).toHaveBeenCalled();
     });
   });
 
   describe('processCollectibleImport', () => {
+    it('imports groups-only archives in replace mode', async () => {
+      mockNativeUnzipFromZip(
+        zipSync({
+          [COLLECTIBLE_BACKUP_GROUPS_NAME]: strToU8(
+            JSON.stringify([
+              {
+                id: 'group-1',
+                name: 'Imported Group',
+                castleIds: [3],
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-03T00:00:00.000Z',
+              },
+            ]),
+          ),
+        }),
+      );
+      mockedLoadGroups.mockResolvedValue([]);
+
+      const result = await processCollectibleImport('file:///picked/groups-only.zip', 'replace');
+
+      expect(result.imported).toBe(0);
+      expect(result.groupsMerged).toBe(1);
+      expect(mockedSaveGroups).toHaveBeenCalledWith([
+        {
+          id: 'group-1',
+          name: 'Imported Group',
+          castleIds: [3],
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-03T00:00:00.000Z',
+        },
+      ]);
+    });
+
+    it('merges groups by updatedAt in merge-newer mode', async () => {
+      mockNativeUnzipFromZip(
+        buildImportZip({
+          includeCollectibleFile: false,
+          includeProgress: false,
+          includeGroups: true,
+          groups: [
+            {
+              id: 'group-1',
+              name: 'Imported Name',
+              castleIds: [1],
+              createdAt: '2026-01-01T00:00:00.000Z',
+              updatedAt: '2026-01-05T00:00:00.000Z',
+            },
+          ],
+        }),
+      );
+      mockedLoadGroups.mockResolvedValue([
+        {
+          id: 'group-1',
+          name: 'Local Name',
+          castleIds: [2],
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-02T00:00:00.000Z',
+        },
+      ]);
+
+      const result = await processCollectibleImport('file:///picked/groups-merge.zip', 'merge-newer');
+
+      expect(result.groupsMerged).toBe(1);
+      expect(mockedSaveGroups).toHaveBeenCalledWith([
+        {
+          id: 'group-1',
+          name: 'Imported Name',
+          castleIds: [1],
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-05T00:00:00.000Z',
+        },
+      ]);
+    });
+
+    it('throws when groups.json is invalid', async () => {
+      mockNativeUnzipFromZip(
+        zipSync({
+          [COLLECTIBLE_BACKUP_GROUPS_NAME]: strToU8('{not-json'),
+        }),
+      );
+
+      await expect(processCollectibleImport('file:///picked/bad-groups.zip')).rejects.toThrow(
+        'collectible-backup-invalid-groups',
+      );
+    });
+
     it('imports collectibles from a staged zip archive', async () => {
       const result = await processCollectibleImport('file:///picked/backup.zip', 'replace');
 

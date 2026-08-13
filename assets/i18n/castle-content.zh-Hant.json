@@ -74,6 +74,12 @@
         "latitude": 41.794722,
         "longitude": 140.754167,
         "businessHours": "請洽詢五稜郭公園管理事務所"
+      },
+      {
+        "label": "お休処 いたくら柳野",
+        "googleLabel": "お休処いたくら柳野",
+        "latitude": 41.794722,
+        "longitude": 140.754167
       }
     ]
   },
@@ -968,11 +974,16 @@
     },
     "castleCardLocations": [
       {
-        "label": "小諸城址懷古園",
-        "googleLabel": "小諸城址 懐古園",
+        "label": "小諸城址徴古館",
+        "googleLabel": "小諸城址徴古館",
         "latitude": 36.328333,
-        "longitude": 138.417222,
-        "businessHours": "入園時間：9:00～17:00"
+        "longitude": 138.417222
+      },
+      {
+        "label": "懐古神社社務所",
+        "googleLabel": "懐古神社",
+        "latitude": 36.328333,
+        "longitude": 138.417222
       }
     ]
   },
@@ -3109,8 +3120,20 @@
     "alias": "四王司城",
     "castleCardLocations": [
       {
-        "label": "大野城（各自治體圖案不同，請洽詢現場）",
-        "googleLabel": "大野城",
+        "label": "太宰府展示館（太宰府市）",
+        "googleLabel": "太宰府展示館",
+        "latitude": 33.522222,
+        "longitude": 130.521389
+      },
+      {
+        "label": "心のふるさと館1樓 ここふるショップ（大野城市）",
+        "googleLabel": "心のふるさと館",
+        "latitude": 33.522222,
+        "longitude": 130.521389
+      },
+      {
+        "label": "宇美町立歴史民俗資料館（宇美町）",
+        "googleLabel": "宇美町立歴史民俗資料館",
         "latitude": 33.522222,
         "longitude": 130.521389
       }
@@ -3478,6 +3501,12 @@
         "latitude": 31.597778,
         "longitude": 130.555556,
         "businessHours": "※休館日は西郷銅像前広場観光案内所で可蓋章 開館時間：9:00～18:00 週一休館"
+      },
+      {
+        "label": "鹿児島まち歩き観光ステーション",
+        "googleLabel": "鹿児島まち歩き観光ステーション",
+        "latitude": 31.597778,
+        "longitude": 130.555556
       }
     ]
   },
@@ -4178,10 +4207,9 @@
       },
       {
         "label": "觀光物產ぷらっと♪ぎょうだ",
-        "googleLabel": "行田市",
+        "googleLabel": "観光物産ぷらっと♪ぎょうだ",
         "latitude": 36.136389,
-        "longitude": 139.458889,
-        "businessHours": "開館時間：9:00～16:30 週一休館"
+        "longitude": 139.458889
       },
       {
         "label": "忍城巴士總站觀光案內所",
@@ -4586,11 +4614,10 @@
     "alias": "舞鶴城",
     "castleCardLocations": [
       {
-        "label": "村上市鄉土資料館大廳",
-        "googleLabel": "村上市郷土資料館",
+        "label": "村上市郷土資料ロビー",
+        "googleLabel": "村上市郷土資料ロビー",
         "latitude": 38.225556,
-        "longitude": 139.475556,
-        "businessHours": "請洽詢東京電力網路村上電力中心（距城郭較遠）"
+        "longitude": 139.475556
       }
     ]
   },
@@ -4706,11 +4733,29 @@
     "alias": "和田城",
     "castleCardLocations": [
       {
+        "label": "道の駅砺波 となみ野の郷",
+        "googleLabel": "道の駅砺波",
+        "latitude": 36.643333,
+        "longitude": 137.018611
+      },
+      {
+        "label": "砺波駅観光案内所",
+        "googleLabel": "砺波駅",
+        "latitude": 36.643333,
+        "longitude": 137.018611
+      },
+      {
         "label": "砺波市埋蔵文化財センター",
         "googleLabel": "砺波市埋蔵文化財センター",
         "latitude": 36.643333,
         "longitude": 137.018611,
         "businessHours": "※城郭からは離れているので注意"
+      },
+      {
+        "label": "せんだんのHILL",
+        "googleLabel": "せんだんのHILL",
+        "latitude": 36.643333,
+        "longitude": 137.018611
       }
     ]
   },
@@ -4981,10 +5026,9 @@
     "castleCardLocations": [
       {
         "label": "可児市山城博物館",
-        "googleLabel": "可児市戦国山城ミュージアム",
+        "googleLabel": "可児市山城ミュージアム",
         "latitude": 35.456667,
-        "longitude": 137.094444,
-        "businessHours": "請洽詢可児市觀光交流館"
+        "longitude": 137.094444
       }
     ]
   },
@@ -5173,10 +5217,9 @@
     "castleCardLocations": [
       {
         "label": "小牧山城史跡情報館（れきしるこまき）",
-        "googleLabel": "小牧市歴史館",
-        "latitude": 35.433611,
-        "longitude": 136.7825,
-        "businessHours": "請洽詢小牧山歷史館或れきしるこまき"
+        "googleLabel": "小牧山城史跡情報館",
+        "latitude": 35.291389,
+        "longitude": 136.9125
       },
       {
         "label": "小牧山歴史館",
@@ -5580,6 +5623,12 @@
         "latitude": 34.458889,
         "longitude": 135.370833,
         "businessHours": "請洽詢岸和田城天守閣受付"
+      },
+      {
+        "label": "二の丸広場観光交流センター",
+        "googleLabel": "二の丸広場観光交流センター",
+        "latitude": 34.458889,
+        "longitude": 135.370833
       }
     ]
   },
@@ -5711,14 +5760,14 @@
     "alias": "大內館",
     "castleCardLocations": [
       {
-        "label": "柳沢文庫",
+        "label": "柳沢文庫窓口",
         "googleLabel": "柳沢文庫",
         "latitude": 34.651944,
         "longitude": 135.781667,
         "businessHours": "請洽詢柳澤文庫"
       },
       {
-        "label": "柳澤文庫前庭園內「番屋カフェ」（文庫休業日）",
+        "label": "柳澤文庫前庭園內「番屋カフェ」",
         "googleLabel": "大和郡山市観光協会",
         "latitude": 34.651944,
         "longitude": 135.781667
@@ -5798,7 +5847,7 @@
     "castleCardLocations": [
       {
         "label": "新宮市觀光協會",
-        "googleLabel": "新宮市立歴史民俗資料館",
+        "googleLabel": "新宮市観光協会",
         "latitude": 33.729722,
         "longitude": 135.992222
       }
@@ -5832,8 +5881,8 @@
     },
     "castleCardLocations": [
       {
-        "label": "若桜町観光案内所",
-        "googleLabel": "若桜町観光案内所",
+        "label": "若桜町觀光協會",
+        "googleLabel": "若桜町観光協会",
         "latitude": 35.3425,
         "longitude": 134.399444
       }
@@ -6015,10 +6064,10 @@
     "castleCardLocations": [
       {
         "label": "本郷町觀光協會",
-        "googleLabel": "本郷町観光協会",
+        "googleLabel": "本郷生涯学習センター",
         "latitude": 34.409167,
         "longitude": 132.995833,
-        "businessHours": "平日上午9時～12時"
+        "businessHours": "平日午前のみ"
       }
     ]
   },
@@ -6303,11 +6352,16 @@
     },
     "castleCardLocations": [
       {
-        "label": "水城館",
-        "googleLabel": "水城館",
+        "label": "太宰府展示館（太宰府市）",
+        "googleLabel": "太宰府展示館",
         "latitude": 33.526667,
-        "longitude": 130.496389,
-        "businessHours": "請洽詢現場或官方網站確認"
+        "longitude": 130.496389
+      },
+      {
+        "label": "ここふるショップ（心のふるさと館1樓・大野城市）",
+        "googleLabel": "心のふるさと館",
+        "latitude": 33.526667,
+        "longitude": 130.496389
       }
     ]
   },
@@ -6457,10 +6511,9 @@
     "castleCardLocations": [
       {
         "label": "五島市觀光協會",
-        "googleLabel": "五島市観光歴史資料館",
+        "googleLabel": "五島市観光協会",
         "latitude": 32.695278,
-        "longitude": 128.841944,
-        "businessHours": "請洽詢五島氏庭園隱殿屋敷或心字ヶ池"
+        "longitude": 128.841944
       }
     ]
   },
@@ -6706,16 +6759,7 @@
       "googleDestination": "延岡駅",
       "description": "搭乘JR日豐本線（特急）至「延岡」站下車，轉乘宮崎交通巴士約7分鐘至「市役所前」站下車，出站由側門步行僅需約5分鐘即可抵達城山公園主要入口。"
     },
-    "alias": "縣城",
-    "castleCardLocations": [
-      {
-        "label": "二之丸廣場觀光交流中心",
-        "googleLabel": "延岡城跡",
-        "latitude": 32.581667,
-        "longitude": 131.663056,
-        "businessHours": "二之丸廣場管理事務所入口前，全日可蓋章"
-      }
-    ]
+    "alias": "縣城"
   },
   "196": {
     "subtitle": "佐土原城",
@@ -6829,10 +6873,9 @@
     "castleCardLocations": [
       {
         "label": "世界遺產座喜味城跡ユンタンザミュージアム",
-        "googleLabel": "ユンタンザミュージアム",
+        "googleLabel": "世界遺産座喜味城跡",
         "latitude": 26.406944,
-        "longitude": 127.742222,
-        "businessHours": "請洽詢座喜味城跡ユンタンザミュージアム"
+        "longitude": 127.742222
       }
     ]
   },

@@ -41,6 +41,8 @@ function getKindLabel(kind: CollectibleKind, t: (key: string) => string): string
       return t('castle.goshuin');
     case 'castle-card':
       return t('castle.castleCard');
+    case 'visit-record':
+      return t('castle.visitRecordUploadTitle');
   }
 }
 
@@ -52,6 +54,8 @@ function getTypeHint(kind: CollectibleKind, t: (key: string) => string): string 
       return t('globalUpload.typeHintCastleCard');
     case 'goshuin':
       return t('globalUpload.typeHintGoshuin');
+    case 'visit-record':
+      return t('castle.visitRecordUploadHint');
   }
 }
 
