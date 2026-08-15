@@ -7,7 +7,7 @@ module.exports = {
     'hooks/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/__tests__/**',
-    '!utils/castleCollectibleStorage.ts',
+    '!utils/stationCollectibleStorage.ts',
   ],
   coverageThreshold: {
     global: {
@@ -40,7 +40,7 @@ module.exports = {
       lines: 90,
       statements: 90,
     },
-    './utils/castleCollectibleUpload.ts': {
+    './utils/stationCollectibleUpload.ts': {
       branches: 60,
       functions: 70,
       lines: 70,
@@ -54,6 +54,6 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx|js)'],
+  testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx|js|mjs)'],
   modulePathIgnorePatterns: ['<rootDir>/android/', '<rootDir>/ios/'],
 };

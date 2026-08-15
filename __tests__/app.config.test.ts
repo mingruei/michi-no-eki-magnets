@@ -2,10 +2,9 @@ import config from '../app.config';
 
 describe('app.config', () => {
   it('defines user-facing and Android version metadata', () => {
-    expect(config.version).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(config.android?.versionCode).toBeGreaterThan(0);
-    expect(config.android?.versionCode).toBeGreaterThanOrEqual(40);
-    expect(config.ios?.buildNumber).toBeTruthy();
+    expect(config.version).toBe('1.0.1');
+    expect(config.ios?.buildNumber).toBe('9');
+    expect(config.android?.versionCode).toBe(9);
   });
 
   it('includes required iOS permission usage descriptions', () => {
@@ -23,6 +22,13 @@ describe('app.config', () => {
     ) as [string, Record<string, unknown>] | undefined;
 
     expect(imagePicker?.[1]?.microphonePermission).toBe(false);
+  });
+
+  it('uses michi-no-eki app identity', () => {
+    expect(config.name).toBe('日本道之駅磁鐵收集帳');
+    expect(config.slug).toBe('michi-no-eki-magnets');
+    expect(config.ios?.bundleIdentifier).toBe('com.michinoeki.magnets');
+    expect(config.android?.package).toBe('com.michinoeki.magnets');
   });
 
   it('registers native config plugins that guard against recent regressions', () => {

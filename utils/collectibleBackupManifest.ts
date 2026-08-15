@@ -1,6 +1,6 @@
 import { strFromU8 } from 'fflate';
 
-import { isCollectibleKind, type CollectibleKind } from '../types/castleCollectible';
+import { isCollectibleKind, type CollectibleKind } from '../types/stationCollectible';
 import {
   COLLECTIBLE_BACKUP_MANIFEST_NAME,
   COLLECTIBLE_BACKUP_PROGRESS_NAME,
@@ -9,7 +9,7 @@ import {
   type CollectibleBackupEntry,
   type CollectibleBackupManifest,
 } from '../types/collectibleBackup';
-import { getCollectibleZipPath } from './castleCollectibleStorage';
+import { getCollectibleZipPath } from './stationCollectibleStorage';
 
 export function normalizeZipEntryPath(path: string): string {
   return path.replace(/\\/g, '/').replace(/^\.\//, '');
@@ -79,12 +79,12 @@ export function buildManifestFromArchive(
     }
 
     collectibles.push({
-      castleId: parsed.castleId,
+      stationId: parsed.stationId,
       kind: parsed.kind,
       filename: parsed.filename,
       mimeType: null,
       createdAt: Date.now(),
-      zipPath: getCollectibleZipPath(parsed.castleId, parsed.kind, parsed.filename),
+      zipPath: getCollectibleZipPath(parsed.stationId, parsed.kind, parsed.filename),
     });
   }
 
@@ -143,42 +143,42 @@ export function parseManifestBytes(bytes: Uint8Array): unknown {
 
 export function parseCollectibleZipPath(
   zipPath: string,
-): { castleId: number; kind: CollectibleKind; filename: string } | null {
+): { stationId: number; kind: CollectibleKind; filename: string } | null {
   const normalized = normalizeZipEntryPath(zipPath);
   const match = normalized.match(
-    new RegExp(`^${COLLECTIBLE_BACKUP_ZIP_PREFIX}/(\\d+)/(meijo-stamp|goshuin|castle-card)/([^/]+)$`),
+    new RegExp(`^${COLLECTIBLE_BACKUP_ZIP_PREFIX}/(\\d+)/(magnet|magnet|magnet)/([^/]+)$`),
   );
 
   if (!match) {
     return null;
   }
 
-  const castleId = Number(match[1]);
+  const stationId = Number(match[1]);
   const kind = match[2] as CollectibleKind;
   const filename = match[3];
 
-  if (!Number.isFinite(castleId) || castleId <= 0 || !filename) {
+  if (!Number.isFinite(stationId) || stationId <= 0 || !filename) {
     return null;
   }
 
-  return { castleId, kind, filename };
+  return { stationId, kind, filename };
 }
 
 export function parseManifestEntry(
   entry: Record<string, unknown>,
-): { castleId: number; kind: CollectibleKind; filename: string } | null {
+): { stationId: number; kind: CollectibleKind; filename: string } | null {
   const fromZipPath = parseCollectibleZipPath(typeof entry.zipPath === 'string' ? entry.zipPath : '');
   if (fromZipPath) {
     return fromZipPath;
   }
 
-  const castleId = Number(entry.castleId);
+  const stationId = Number(entry.stationId);
   const kind = entry.kind;
   const filename = entry.filename;
 
   if (
-    !Number.isFinite(castleId) ||
-    castleId <= 0 ||
+    !Number.isFinite(stationId) ||
+    stationId <= 0 ||
     typeof kind !== 'string' ||
     !isCollectibleKind(kind) ||
     typeof filename !== 'string' ||
@@ -187,7 +187,7 @@ export function parseManifestEntry(
     return null;
   }
 
-  return { castleId, kind, filename };
+  return { stationId, kind, filename };
 }
 
 export function validateManifest(
@@ -220,7 +220,7 @@ export function validateManifest(
     }
 
     collectibles.push({
-      castleId: parsed.castleId,
+      stationId: parsed.stationId,
       kind: parsed.kind,
       filename: parsed.filename,
       mimeType:
@@ -232,7 +232,7 @@ export function validateManifest(
         Number.isFinite((entry as CollectibleBackupEntry).createdAt)
           ? (entry as CollectibleBackupEntry).createdAt
           : Date.now(),
-      zipPath: getCollectibleZipPath(parsed.castleId, parsed.kind, parsed.filename),
+      zipPath: getCollectibleZipPath(parsed.stationId, parsed.kind, parsed.filename),
     });
   }
 

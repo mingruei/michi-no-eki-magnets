@@ -91,7 +91,7 @@ const versionCode =
 
 if (!versionCode) {
   console.error('Could not read versionCode from AAB.');
-  console.error('Build locally first, then verify the generated japan-castles-map-*.aab file.');
+  console.error('Build locally first, then verify the generated michi-no-eki-magnets-*.aab file.');
   process.exit(1);
 }
 

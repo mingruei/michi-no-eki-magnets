@@ -2,7 +2,7 @@ import * as MailComposer from 'expo-mail-composer';
 import { Linking } from 'react-native';
 
 export const FEEDBACK_EMAIL = 'framers.42clacks@icloud.com';
-const FEEDBACK_SUBJECT = '攻城師 意見反映';
+const FEEDBACK_SUBJECT = '日本道之駅磁鐵收集帳 意見反映';
 
 export type OpenFeedbackEmailResult = 'composed' | 'opened' | 'unavailable';
 

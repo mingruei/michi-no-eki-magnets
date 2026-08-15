@@ -1,39 +1,34 @@
-import type { Castle } from '../types/castle';
+import type { Station } from '../types/station';
 import {
-  CASTLE_PROGRESS_FIELDS,
-  EMPTY_CASTLE_PROGRESS_ENTRY,
-  type CastleProgressEntry,
-  type CastleProgressMap,
-} from '../types/castleProgress';
+  EMPTY_STATION_PROGRESS_ENTRY,
+  type StationProgressEntry,
+  type StationProgressMap,
+} from '../types/stationProgress';
 
 export type ProgressCounts = {
   visited: number;
-  meijoStamp: number;
-  goshuin: number;
-  castleCard: number;
+  magnet: number;
   total: number;
 };
 
 export type ProgressStats = {
-  original: ProgressCounts;
-  continued: ProgressCounts;
   total: ProgressCounts;
 };
 
-const PROGRESS_FIELDS = CASTLE_PROGRESS_FIELDS;
+type StatsProgressField = Exclude<keyof ProgressCounts, 'total'>;
+
+const STATS_PROGRESS_FIELDS: StatsProgressField[] = ['visited', 'magnet'];
 
 function createCounts(total: number): ProgressCounts {
   return {
     visited: 0,
-    meijoStamp: 0,
-    goshuin: 0,
-    castleCard: 0,
+    magnet: 0,
     total,
   };
 }
 
-function addProgress(counts: ProgressCounts, progress: CastleProgressEntry) {
-  for (const field of PROGRESS_FIELDS) {
+function addProgress(counts: ProgressCounts, progress: StationProgressEntry) {
+  for (const field of STATS_PROGRESS_FIELDS) {
     if (progress[field]) {
       counts[field] += 1;
     }
@@ -41,32 +36,15 @@ function addProgress(counts: ProgressCounts, progress: CastleProgressEntry) {
 }
 
 export function computeProgressStats(
-  castles: readonly Castle[],
-  progressMap: CastleProgressMap,
+  stations: readonly Station[],
+  progressMap: StationProgressMap,
 ): ProgressStats {
-  const original = createCounts(0);
-  const continued = createCounts(0);
+  const total = createCounts(stations.length);
 
-  for (const castle of castles) {
-    const progress = progressMap[castle.id] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
-    if (castle.series === 'original') {
-      original.total += 1;
-      addProgress(original, progress);
-    } else {
-      continued.total += 1;
-      addProgress(continued, progress);
-    }
+  for (const station of stations) {
+    const progress = progressMap[station.id] ?? EMPTY_STATION_PROGRESS_ENTRY;
+    addProgress(total, progress);
   }
 
-  return {
-    original,
-    continued,
-    total: {
-      visited: original.visited + continued.visited,
-      meijoStamp: original.meijoStamp + continued.meijoStamp,
-      goshuin: original.goshuin + continued.goshuin,
-      castleCard: original.castleCard + continued.castleCard,
-      total: original.total + continued.total,
-    },
-  };
+  return { total };
 }

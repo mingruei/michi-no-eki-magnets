@@ -13,18 +13,19 @@ import ViewShot from 'react-native-view-shot';
 
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
-import type { Castle } from '../types/castle';
-import type { CastleGroup } from '../types/castleGroup';
+import type { Station } from '../types/station';
+import type { StationGroup } from '../types/stationGroup';
 import {
   MEDIA_COLLECTIBLE_KINDS,
-  type CastleCollectible,
+  type StationCollectible,
   type MediaCollectibleKind,
-} from '../types/castleCollectible';
+} from '../types/stationCollectible';
+import { groupCollectiblesByRegionAndPrefecture } from '../utils/groupCollectiblesByLocation';
 import {
   getCollectibleDisplayUri,
   isImageCollectible,
   listCollectiblesForCastleIds,
-} from '../utils/castleCollectibleStorage';
+} from '../utils/stationCollectibleStorage';
 import { captureViewAsJpg, waitForCaptureRef, waitForExportLayout } from '../utils/exportGroupShowImage';
 
 const CollectibleGalleryViewer = lazy(async () => {
@@ -33,17 +34,12 @@ const CollectibleGalleryViewer = lazy(async () => {
 });
 
 type GroupShowViewProps = {
-  group: CastleGroup;
-  castleById: Map<number, Castle>;
+  group: StationGroup;
+  castleById: Map<number, Station>;
 };
 
 export type GroupShowViewHandle = {
   exportJpg: () => Promise<string>;
-};
-
-type VisitRecordGroup = {
-  castle: Castle;
-  items: CastleCollectible[];
 };
 
 const CAPTURE_HORIZONTAL_PADDING = 16;
@@ -68,28 +64,24 @@ function estimateGalleryWidth(screenWidth: number): number {
 
 function getKindLabel(kind: MediaCollectibleKind, t: (key: string) => string): string {
   switch (kind) {
-    case 'meijo-stamp':
-      return t('castle.meijoStampUploadTitle');
-    case 'goshuin':
-      return t('castle.goshuinUploadTitle');
-    case 'castle-card':
-      return t('castle.castleCardUploadTitle');
+    case 'magnet':
+      return t('station.magnetUploadTitle');
   }
 }
 
 function buildCollectiblesByKind(
-  castleIds: readonly number[],
-  items: readonly CastleCollectible[],
-): Map<MediaCollectibleKind, CastleCollectible[]> {
-  const byKind = new Map<MediaCollectibleKind, CastleCollectible[]>();
+  stationIds: readonly number[],
+  items: readonly StationCollectible[],
+): Map<MediaCollectibleKind, StationCollectible[]> {
+  const byKind = new Map<MediaCollectibleKind, StationCollectible[]>();
 
   for (const kind of MEDIA_COLLECTIBLE_KINDS) {
-    const kindItems: CastleCollectible[] = [];
+    const kindItems: StationCollectible[] = [];
 
-    for (const castleId of castleIds) {
+    for (const stationId of stationIds) {
       kindItems.push(
         ...items
-          .filter((item) => item.castleId === castleId && item.kind === kind)
+          .filter((item) => item.stationId === stationId && item.kind === kind)
           .sort((left, right) => right.createdAt - left.createdAt),
       );
     }
@@ -102,40 +94,15 @@ function buildCollectiblesByKind(
   return byKind;
 }
 
-function buildVisitRecordsByCastle(
-  castleIds: readonly number[],
-  items: readonly CastleCollectible[],
-  castleById: Map<number, Castle>,
-): VisitRecordGroup[] {
-  return castleIds
-    .map((castleId) => {
-      const castle = castleById.get(castleId);
-      if (!castle) {
-        return null;
-      }
-
-      const visitItems = items
-        .filter((item) => item.castleId === castleId && item.kind === 'visit-record')
-        .sort((left, right) => right.createdAt - left.createdAt);
-
-      if (visitItems.length === 0) {
-        return null;
-      }
-
-      return { castle, items: visitItems };
-    })
-    .filter((entry): entry is VisitRecordGroup => entry != null);
-}
-
 function CollectibleThumbnailGrid({
   items,
   thumbnailSize,
   onOpen,
   onGalleryLayout,
 }: {
-  items: readonly CastleCollectible[];
+  items: readonly StationCollectible[];
   thumbnailSize: number;
-  onOpen: (item: CastleCollectible, galleryItems: readonly CastleCollectible[]) => void;
+  onOpen: (item: StationCollectible, galleryItems: readonly StationCollectible[]) => void;
   onGalleryLayout?: (width: number) => void;
 }) {
   return (
@@ -178,7 +145,7 @@ function CollectibleThumbnailGrid({
 
 export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>(
   function GroupShowView({ group, castleById }, ref) {
-  const { t } = useI18n();
+  const { t, getRegionLabel, getPrefectureLabel } = useI18n();
   const { width: screenWidth } = useWindowDimensions();
   const [galleryWidth, setGalleryWidth] = useState<number | null>(null);
   const thumbnailSize = useMemo(
@@ -189,12 +156,12 @@ export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>
     setGalleryWidth((current) => (current === width ? current : width));
   }, []);
   const shotRef = useRef<ViewShot>(null);
-  const [items, setItems] = useState<CastleCollectible[]>([]);
+  const [items, setItems] = useState<StationCollectible[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-  const [viewerItems, setViewerItems] = useState<CastleCollectible[]>([]);
+  const [viewerItems, setViewerItems] = useState<StationCollectible[]>([]);
 
   useImperativeHandle(ref, () => ({
     exportJpg: async () => {
@@ -214,51 +181,26 @@ export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>
 
   useEffect(() => {
     setLoading(true);
-    setItems(listCollectiblesForCastleIds(group.castleIds));
+    setItems(listCollectiblesForCastleIds(group.stationIds));
     setLoading(false);
-  }, [group.castleIds, group.id]);
+  }, [group.stationIds, group.id]);
 
   const groupCastles = useMemo(
     () =>
-      group.castleIds
+      group.stationIds
         .map((id) => castleById.get(id))
-        .filter((castle): castle is Castle => castle != null),
-    [castleById, group.castleIds],
+        .filter((station): station is Station => station != null),
+    [castleById, group.stationIds],
   );
-
-  const castlesBySeries = useMemo(() => {
-    const original: Castle[] = [];
-    const continued: Castle[] = [];
-
-    for (const castleId of group.castleIds) {
-      const castle = castleById.get(castleId);
-      if (!castle) {
-        continue;
-      }
-
-      if (castle.series === 'original') {
-        original.push(castle);
-      } else {
-        continued.push(castle);
-      }
-    }
-
-    return { original, continued };
-  }, [castleById, group.castleIds]);
 
   const collectiblesByKind = useMemo(
-    () => buildCollectiblesByKind(group.castleIds, items),
-    [group.castleIds, items],
-  );
-
-  const visitRecordsByCastle = useMemo(
-    () => buildVisitRecordsByCastle(group.castleIds, items, castleById),
-    [castleById, group.castleIds, items],
+    () => buildCollectiblesByKind(group.stationIds, items),
+    [group.stationIds, items],
   );
 
   const openViewer = (
-    item: CastleCollectible,
-    galleryItems: readonly CastleCollectible[],
+    item: StationCollectible,
+    galleryItems: readonly StationCollectible[],
   ) => {
     const index = galleryItems.findIndex((candidate) => candidate.id === item.id);
     if (index < 0) {
@@ -272,65 +214,51 @@ export const GroupShowView = forwardRef<GroupShowViewHandle, GroupShowViewProps>
 
   const showBody = (
     <>
-      {groupCastles.length > 0 ? (
-        <View style={styles.castleNamesSection}>
-          {castlesBySeries.original.length > 0 ? (
-            <View style={styles.castleNamesGroup}>
-              <Text style={styles.castleNamesLabel}>{t('stats.rowOriginal')}</Text>
-              <Text style={styles.castleNamesInline}>
-                {castlesBySeries.original.map((castle) => castle.name).join('，')}
-              </Text>
-            </View>
-          ) : null}
-          {castlesBySeries.continued.length > 0 ? (
-            <View style={styles.castleNamesGroup}>
-              <Text style={styles.castleNamesLabel}>{t('stats.rowContinued')}</Text>
-              <Text style={styles.castleNamesInline}>
-                {castlesBySeries.continued.map((castle) => castle.name).join('，')}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : (
-        <Text style={styles.emptyText}>{t('group.showNoCastles')}</Text>
-      )}
+      {groupCastles.length === 0 ? (
+        <Text style={styles.emptyText}>{t('group.showNoStations')}</Text>
+      ) : null}
 
       {loading ? (
         <ActivityIndicator size="small" color={colors.original} style={styles.loader} />
       ) : (
         <>
-          {visitRecordsByCastle.length > 0 ? (
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>{t('group.visitRecordTitle')}</Text>
-              {visitRecordsByCastle.map(({ castle, items: visitItems }) => (
-                <View key={castle.id} style={styles.visitCastleSection}>
-                  <Text style={styles.visitCastleName}>{castle.name}</Text>
-                  <CollectibleThumbnailGrid
-                    items={visitItems}
-                    thumbnailSize={thumbnailSize}
-                    onOpen={openViewer}
-                    onGalleryLayout={handleGalleryLayout}
-                  />
-                </View>
-              ))}
-            </View>
-          ) : null}
-
           {MEDIA_COLLECTIBLE_KINDS.map((kind) => {
             const kindItems = collectiblesByKind.get(kind);
             if (!kindItems || kindItems.length === 0) {
               return null;
             }
 
+            const locationSections = groupCollectiblesByRegionAndPrefecture(
+              kindItems,
+              castleById,
+            );
+
             return (
               <View key={kind} style={styles.sectionCard}>
                 <Text style={styles.sectionTitle}>{getKindLabel(kind, t)}</Text>
-                <CollectibleThumbnailGrid
-                  items={kindItems}
-                  thumbnailSize={thumbnailSize}
-                  onOpen={openViewer}
-                  onGalleryLayout={handleGalleryLayout}
-                />
+                {locationSections.map((regionSection) => (
+                  <View key={regionSection.regionId} style={styles.regionSection}>
+                    <Text style={styles.regionTitle}>
+                      {getRegionLabel(regionSection.regionId)}
+                    </Text>
+                    {regionSection.prefectureGroups.map((prefectureGroup) => (
+                      <View
+                        key={`${regionSection.regionId}-${prefectureGroup.prefectureKey}`}
+                        style={styles.prefectureSection}
+                      >
+                        <Text style={styles.prefectureTitle}>
+                          {getPrefectureLabel(prefectureGroup.prefectureKey)}
+                        </Text>
+                        <CollectibleThumbnailGrid
+                          items={prefectureGroup.items}
+                          thumbnailSize={thumbnailSize}
+                          onOpen={openViewer}
+                          onGalleryLayout={handleGalleryLayout}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                ))}
               </View>
             );
           })}
@@ -418,29 +346,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
-  visitCastleSection: {
-    gap: 8,
-  },
-  visitCastleName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textMuted,
-  },
-  castleNamesSection: {
+  regionSection: {
     gap: 10,
+    marginTop: 4,
   },
-  castleNamesGroup: {
-    gap: 4,
+  regionTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: colors.original,
   },
-  castleNamesLabel: {
+  prefectureSection: {
+    gap: 8,
+    paddingLeft: 4,
+  },
+  prefectureTitle: {
     fontSize: 13,
     fontWeight: '700',
     color: colors.textMuted,
-  },
-  castleNamesInline: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 22,
   },
   emptyText: {
     fontSize: 13,

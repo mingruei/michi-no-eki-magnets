@@ -2,10 +2,9 @@ import { useCallback, useState } from 'react';
 
 import {
   COLLECTIBLE_PROGRESS_FIELD,
-  isSingleFileCollectibleKind,
   type CollectibleKind,
-} from '../types/castleCollectible';
-import { saveCastleCollectibleFromUri, listCastleCollectibles } from '../utils/castleCollectibleStorage';
+} from '../types/stationCollectible';
+import { saveStationCollectibleFromUri, listStationCollectibles } from '../utils/stationCollectibleStorage';
 import {
   detectCollectibleKind,
   type CollectibleTypeSuggestion,
@@ -14,11 +13,11 @@ import {
   pickCollectibleBySource,
   type CollectibleUploadSelection,
   type CollectibleUploadSource,
-} from '../utils/castleCollectibleUpload';
+} from '../utils/stationCollectibleUpload';
 import { resolveSelectionDimensions } from '../utils/getImageDimensions';
 import { persistUploadImage } from '../utils/persistUploadImage';
 import { waitForNativePicker } from '../utils/waitForNativePicker';
-import { useCastleProgress } from './useCastleProgress';
+import { useStationProgress } from './useStationProgress';
 
 export type GlobalUploadPhase =
   | 'idle'
@@ -40,11 +39,11 @@ type UseGlobalCollectibleUploadResult = {
   openSourcePicker: () => void;
   closeFlow: () => void;
   selectSource: (source: CollectibleUploadSource) => Promise<void>;
-  confirmUpload: (castleId: number, kind: CollectibleKind) => Promise<void>;
+  confirmUpload: (stationId: number, kind: CollectibleKind) => Promise<void>;
 };
 
 export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
-  const { markProgressCollected } = useCastleProgress();
+  const { markProgressCollected } = useStationProgress();
   const [phase, setPhase] = useState<GlobalUploadPhase>('idle');
   const [draft, setDraft] = useState<GlobalUploadDraft | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +126,7 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
   }, []);
 
   const confirmUpload = useCallback(
-    async (castleId: number, kind: CollectibleKind) => {
+    async (stationId: number, kind: CollectibleKind) => {
       if (!draft) {
         return;
       }
@@ -136,24 +135,22 @@ export function useGlobalCollectibleUpload(): UseGlobalCollectibleUploadResult {
       setError(null);
 
       try {
-        const existingCount = listCastleCollectibles(castleId, kind).length;
-        await saveCastleCollectibleFromUri(
-          castleId,
+        const existingCount = listStationCollectibles(stationId, kind).length;
+        await saveStationCollectibleFromUri(
+          stationId,
           kind,
           draft.selection.uri,
           draft.selection.mimeType,
           { base64Data: draft.selection.base64 },
         );
 
-        const savedItems = listCastleCollectibles(castleId, kind);
-        const uploadSucceeded = isSingleFileCollectibleKind(kind)
-          ? savedItems.length > 0
-          : savedItems.length > existingCount;
+        const savedItems = listStationCollectibles(stationId, kind);
+        const uploadSucceeded = savedItems.length > existingCount;
         if (!uploadSucceeded) {
           throw new Error('global-upload-failed');
         }
 
-        markProgressCollected(castleId, COLLECTIBLE_PROGRESS_FIELD[kind]);
+        markProgressCollected(stationId, COLLECTIBLE_PROGRESS_FIELD[kind]);
         dismissConfirmFlow();
       } catch (err) {
         if (err instanceof Error) {

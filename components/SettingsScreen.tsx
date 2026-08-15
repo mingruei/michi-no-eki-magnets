@@ -10,9 +10,9 @@ import {
   View,
 } from 'react-native';
 import { colors } from '../constants/theme';
-import { useCastleData } from '../hooks/useCastleData';
-import { useCastleGroups } from '../hooks/useCastleGroups';
-import { useCastleProgress } from '../hooks/useCastleProgress';
+import { useStationData } from '../hooks/useStationData';
+import { useStationGroups } from '../hooks/useStationGroups';
+import { useStationProgress } from '../hooks/useStationProgress';
 import { useMapProvider } from '../hooks/useMapProvider';
 import { useI18n } from '../i18n';
 import type { MapProvider } from '../types/mapProvider';
@@ -40,16 +40,16 @@ function waitForProcessingOverlay(): Promise<void> {
 export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { t } = useI18n();
   const { mapProvider, setMapProvider } = useMapProvider();
-  const { reloadProgressMap } = useCastleProgress();
-  const { reloadGroups } = useCastleGroups();
+  const { reloadProgressMap } = useStationProgress();
+  const { reloadGroups } = useStationGroups();
   const {
-    version: castleDataVersion,
-    updatedAt: castleDataUpdatedAt,
-    source: castleDataSource,
+    version: stationDataVersion,
+    updatedAt: stationDataUpdatedAt,
+    source: stationDataSource,
     bundledVersion,
     remoteSyncConfigured,
-    ready: castleDataReady,
-  } = useCastleData();
+    ready: stationDataReady,
+  } = useStationData();
   const [exportingCollectibles, setExportingCollectibles] = useState(false);
   const [importPhase, setImportPhase] = useState<CollectibleImportPhase | null>(null);
   const [pendingImportUri, setPendingImportUri] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       setCollectibleMessage(
         t('settings.collectibleExportSuccess', {
           files: result.fileCount,
-          progress: result.progressCastles,
+          progress: result.progressStations,
           groups: result.groupCount,
         }),
       );
@@ -213,17 +213,17 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
   const appVersion = getAppVersionInfo();
 
-  const castleDataSourceLabel =
-    castleDataSource === 'remote'
-      ? t('settings.castleDataSourceRemote')
-      : castleDataSource === 'cache'
-        ? t('settings.castleDataSourceCache')
-        : t('settings.castleDataSourceBundled');
+  const stationDataSourceLabel =
+    stationDataSource === 'remote'
+      ? t('settings.stationDataSourceRemote')
+      : stationDataSource === 'cache'
+        ? t('settings.stationDataSourceCache')
+        : t('settings.stationDataSourceBundled');
 
-  const formattedCastleDataUpdatedAt = (() => {
-    const parsed = Date.parse(castleDataUpdatedAt);
+  const formattedStationDataUpdatedAt = (() => {
+    const parsed = Date.parse(stationDataUpdatedAt);
     if (Number.isNaN(parsed)) {
-      return castleDataUpdatedAt;
+      return stationDataUpdatedAt;
     }
 
     return new Date(parsed).toLocaleString('zh-TW', {
@@ -413,30 +413,30 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         <TipJarSection />
 
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>{t('settings.castleData')}</Text>
-          <Text style={styles.rowHint}>{t('settings.castleDataHint')}</Text>
-          {castleDataReady ? (
+          <Text style={styles.sectionTitle}>{t('settings.stationData')}</Text>
+          <Text style={styles.rowHint}>{t('settings.stationDataHint')}</Text>
+          {stationDataReady ? (
             <>
               <Text style={styles.versionValue}>
-                {t('settings.castleDataVersionValue', {
-                  version: castleDataVersion,
-                  source: castleDataSourceLabel,
+                {t('settings.stationDataVersionValue', {
+                  version: stationDataVersion,
+                  source: stationDataSourceLabel,
                 })}
               </Text>
               <Text style={styles.rowHint}>
-                {t('settings.castleDataUpdatedAtValue', {
-                  updatedAt: formattedCastleDataUpdatedAt,
+                {t('settings.stationDataUpdatedAtValue', {
+                  updatedAt: formattedStationDataUpdatedAt,
                 })}
               </Text>
               <Text style={styles.rowHint}>
-                {t('settings.castleDataBundledVersionValue', {
+                {t('settings.stationDataBundledVersionValue', {
                   version: bundledVersion,
                 })}
               </Text>
               <Text style={styles.rowHint}>
                 {remoteSyncConfigured
-                  ? t('settings.castleDataRemoteSyncEnabled')
-                  : t('settings.castleDataRemoteSyncDisabled')}
+                  ? t('settings.stationDataRemoteSyncEnabled')
+                  : t('settings.stationDataRemoteSyncDisabled')}
               </Text>
             </>
           ) : (

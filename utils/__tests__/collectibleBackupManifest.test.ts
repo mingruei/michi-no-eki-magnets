@@ -35,16 +35,16 @@ describe('collectibleBackupManifest', () => {
 
   describe('parseCollectibleZipPath', () => {
     it('parses archive entry paths', () => {
-      expect(parseCollectibleZipPath('castle-collectibles/12/meijo-stamp/stamp.jpg')).toEqual({
-        castleId: 12,
-        kind: 'meijo-stamp',
+      expect(parseCollectibleZipPath('station-collectibles/12/magnet/stamp.jpg')).toEqual({
+        stationId: 12,
+        kind: 'magnet',
         filename: 'stamp.jpg',
       });
     });
 
     it('rejects invalid paths', () => {
       expect(parseCollectibleZipPath('manifest.json')).toBeNull();
-      expect(parseCollectibleZipPath('castle-collectibles/0/goshuin/a.jpg')).toBeNull();
+      expect(parseCollectibleZipPath('station-collectibles/0/magnet/a.jpg')).toBeNull();
     });
   });
 
@@ -52,25 +52,25 @@ describe('collectibleBackupManifest', () => {
     it('parses zipPath-based entries', () => {
       expect(
         parseManifestEntry({
-          zipPath: 'castle-collectibles/3/goshuin/page-1.jpg',
+          zipPath: 'station-collectibles/3/magnet/page-1.jpg',
         }),
       ).toEqual({
-        castleId: 3,
-        kind: 'goshuin',
+        stationId: 3,
+        kind: 'magnet',
         filename: 'page-1.jpg',
       });
     });
 
-    it('parses explicit castleId/kind/filename entries', () => {
+    it('parses explicit stationId/kind/filename entries', () => {
       expect(
         parseManifestEntry({
-          castleId: 5,
-          kind: 'castle-card',
+          stationId: 5,
+          kind: 'magnet',
           filename: 'card.jpg',
         }),
       ).toEqual({
-        castleId: 5,
-        kind: 'castle-card',
+        stationId: 5,
+        kind: 'magnet',
         filename: 'card.jpg',
       });
     });
@@ -83,15 +83,15 @@ describe('collectibleBackupManifest', () => {
         exportedAt: 1_700_000_000_000,
         collectibles: [
           {
-            castleId: 1,
-            kind: 'meijo-stamp',
+            stationId: 1,
+            kind: 'magnet',
             filename: 'stamp.jpg',
           },
         ],
       });
 
       expect(manifest.collectibles).toHaveLength(1);
-      expect(manifest.collectibles[0]?.zipPath).toBe('castle-collectibles/1/meijo-stamp/stamp.jpg');
+      expect(manifest.collectibles[0]?.zipPath).toBe('station-collectibles/1/magnet/stamp.jpg');
     });
 
     it('rejects unsupported versions', () => {
@@ -127,25 +127,25 @@ describe('collectibleBackupManifest', () => {
     it('skips invalid collectible entries instead of failing the whole manifest', () => {
       const manifest = validateManifest({
         version: COLLECTIBLE_BACKUP_VERSION,
-        collectibles: [{ castleId: -1, kind: 'goshuin', filename: 'bad.jpg' }, 'invalid', {
-          castleId: 2,
-          kind: 'goshuin',
+        collectibles: [{ stationId: -1, kind: 'magnet', filename: 'bad.jpg' }, 'invalid', {
+          stationId: 2,
+          kind: 'magnet',
           filename: 'good.jpg',
         }],
       });
 
       expect(manifest.collectibles).toHaveLength(1);
-      expect(manifest.collectibles[0]?.castleId).toBe(2);
+      expect(manifest.collectibles[0]?.stationId).toBe(2);
     });
   });
 
   describe('normalizeExtractedArchive', () => {
     it('normalizes zip entry paths', () => {
       const normalized = normalizeExtractedArchive({
-        '.\\castle-collectibles\\1\\goshuin\\a.jpg': new Uint8Array([1]),
+        '.\\station-collectibles\\1\\magnet\\a.jpg': new Uint8Array([1]),
       });
 
-      expect(Object.keys(normalized)[0]).toBe('castle-collectibles/1/goshuin/a.jpg');
+      expect(Object.keys(normalized)[0]).toBe('station-collectibles/1/magnet/a.jpg');
     });
   });
 
@@ -154,7 +154,7 @@ describe('collectibleBackupManifest', () => {
       const manifest = {
         version: COLLECTIBLE_BACKUP_VERSION,
         exportedAt: 1,
-        collectibles: [{ castleId: 1, kind: 'goshuin', filename: 'a.jpg' }],
+        collectibles: [{ stationId: 1, kind: 'magnet', filename: 'a.jpg' }],
       };
       const extracted = {
         [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8(JSON.stringify(manifest)),
@@ -162,18 +162,18 @@ describe('collectibleBackupManifest', () => {
 
       const result = resolveImportManifest(extracted);
       expect(result.collectibles).toHaveLength(1);
-      expect(result.collectibles[0]?.castleId).toBe(1);
+      expect(result.collectibles[0]?.stationId).toBe(1);
     });
 
     it('falls back to archive file paths when manifest is invalid', () => {
       const extracted = {
         [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8('{bad-json'),
-        'castle-collectibles/2/meijo-stamp/stamp.jpg': new Uint8Array([1, 2, 3]),
+        'station-collectibles/2/magnet/stamp.jpg': new Uint8Array([1, 2, 3]),
       };
 
       const result = resolveImportManifest(extracted);
       expect(result.collectibles).toHaveLength(1);
-      expect(result.collectibles[0]?.kind).toBe('meijo-stamp');
+      expect(result.collectibles[0]?.kind).toBe('magnet');
     });
 
     it('allows progress-only archives when configured', () => {
@@ -197,12 +197,12 @@ describe('collectibleBackupManifest', () => {
   describe('buildManifestFromArchive', () => {
     it('builds a manifest from collectible file paths', () => {
       const manifest = buildManifestFromArchive({
-        'castle-collectibles/4/goshuin/page.jpg': new Uint8Array([1]),
+        'station-collectibles/4/magnet/page.jpg': new Uint8Array([1]),
       });
 
       expect(manifest?.collectibles[0]).toMatchObject({
-        castleId: 4,
-        kind: 'goshuin',
+        stationId: 4,
+        kind: 'magnet',
         filename: 'page.jpg',
       });
     });

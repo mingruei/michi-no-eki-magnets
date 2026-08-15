@@ -4,7 +4,7 @@ import { normalizePrefectureKey } from '../constants/prefectureKeys';
 import { zhHant } from './locales/zh-Hant';
 import type { Locale, TranslationDictionary, TranslationParams } from './types';
 import type { RegionId } from '../constants/regions';
-import type { CastleSeries } from '../types/castle';
+import type { StationServiceId } from '../constants/stationServices';
 
 const DEFAULT_LOCALE: Locale = 'zh-Hant';
 
@@ -36,7 +36,7 @@ type I18nContextValue = {
   t: (key: string, params?: TranslationParams) => string;
   getRegionLabel: (regionId: RegionId) => string;
   getPrefectureLabel: (prefecture: string) => string;
-  getSeriesLabel: (series: CastleSeries, full?: boolean) => string;
+  getStationServiceLabel: (serviceId: StationServiceId) => string;
   formatCount: (count: number) => string;
 };
 
@@ -65,13 +65,8 @@ export function I18nProvider({ children, locale = DEFAULT_LOCALE }: I18nProvider
       getRegionLabel: (regionId) => dictionary.regions[regionId],
       getPrefectureLabel: (prefecture) =>
         dictionary.prefectures[normalizePrefectureKey(prefecture)] ?? prefecture,
-      getSeriesLabel: (series, full = false) => {
-        if (series === 'original') {
-          return full ? dictionary.castle.seriesOriginalFull : dictionary.castle.seriesOriginal;
-        }
-        return full ? dictionary.castle.seriesContinuedFull : dictionary.castle.seriesContinued;
-      },
-      formatCount: (count) => `${count} 座`,
+      getStationServiceLabel: (serviceId) => dictionary.stationServices[serviceId],
+      formatCount: (count) => `${count} 站`,
     };
   }, [locale]);
 

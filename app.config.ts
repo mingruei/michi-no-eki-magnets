@@ -10,13 +10,13 @@ const permissionMessages = require('./plugins/permissionMessages') as {
 const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
 
 const config: ExpoConfig = {
-  name: '攻城師',
-  slug: 'japan-castles-map',
-  version: '1.4.2',
+  name: '日本道之駅磁鐵收集帳',
+  slug: 'michi-no-eki-magnets',
+  version: '1.0.1',
   orientation: 'default',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
-  scheme: 'japan-castles-map',
+  scheme: 'michi-no-eki-magnets',
   plugins: [
     ...(isProductionBuild ? [] : (['expo-dev-client'] as const)),
     'expo-screen-orientation',
@@ -31,7 +31,6 @@ const config: ExpoConfig = {
       {
         photosPermission: permissionMessages.photo,
         cameraPermission: permissionMessages.camera,
-        // App only picks/captures still images for 御城印 / 城卡 — no video/audio.
         microphonePermission: false,
       },
     ],
@@ -68,8 +67,8 @@ const config: ExpoConfig = {
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.japancastles.map',
-    buildNumber: '15',
+    bundleIdentifier: 'com.michinoeki.magnets',
+    buildNumber: '9',
     infoPlist: {
       NSLocationWhenInUseUsageDescription: permissionMessages.location,
       NSLocationAlwaysUsageDescription: permissionMessages.location,
@@ -81,8 +80,8 @@ const config: ExpoConfig = {
     },
   },
   android: {
-    package: 'com.japancastles.map',
-    versionCode: 52,
+    package: 'com.michinoeki.magnets',
+    versionCode: 9,
     allowBackup: true,
     edgeToEdgeEnabled: true,
     softwareKeyboardLayoutMode: 'resize',
@@ -94,7 +93,7 @@ const config: ExpoConfig = {
       'READ_EXTERNAL_STORAGE',
     ],
     adaptiveIcon: {
-      backgroundColor: '#1A2744',
+      backgroundColor: '#FAF5E1',
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },

@@ -17,21 +17,21 @@ import {
   type CollectibleImportMode,
   type CollectibleImportResult,
 } from '../types/collectibleBackup';
-import { COLLECTIBLE_PROGRESS_FIELD } from '../types/castleCollectible';
-import type { CastleGroup } from '../types/castleGroup';
+import { COLLECTIBLE_PROGRESS_FIELD } from '../types/stationCollectible';
+import type { StationGroup } from '../types/stationGroup';
 import {
-  CASTLE_PROGRESS_FIELDS,
-  EMPTY_CASTLE_PROGRESS_ENTRY,
+  STATION_PROGRESS_FIELDS,
+  EMPTY_STATION_PROGRESS_ENTRY,
   withFieldUpdate,
-  type CastleProgressField,
-  type CastleProgressMap,
-} from '../types/castleProgress';
+  type StationProgressField,
+  type StationProgressMap,
+} from '../types/stationProgress';
 import {
-  getCastleCollectibleDirectory,
-  clearCastleCollectibleDirectory,
+  getStationCollectibleDirectory,
+  clearStationCollectibleDirectory,
   getCollectibleZipPath,
   listAllCollectibles,
-} from './castleCollectibleStorage';
+} from './stationCollectibleStorage';
 import {
   copySourceUriToFile,
   fileHasContent,
@@ -40,12 +40,12 @@ import {
   isFileEntry,
   readSourceBytes,
 } from './collectibleFileIO';
-import { loadProgressMap, saveProgressMap } from './castleProgressStorage';
+import { loadProgressMap, saveProgressMap } from './stationProgressStorage';
 import {
-  loadCastleGroups,
-  normalizeCastleGroups,
-  saveCastleGroups,
-} from './castleGroupStorage';
+  loadStationGroups,
+  normalizeStationGroups,
+  saveStationGroups,
+} from './stationGroupStorage';
 import {
   normalizeZipEntryPath,
   validateManifest,
@@ -55,9 +55,8 @@ import { normalizeFileUri } from './normalizeFileUri';
 import { waitForNativePicker } from './waitForNativePicker';
 import {
   isCollectibleKind,
-  isSingleFileCollectibleKind,
   type CollectibleKind,
-} from '../types/castleCollectible';
+} from '../types/stationCollectible';
 
 const ZIP_MIME_TYPE = 'application/zip';
 
@@ -72,26 +71,26 @@ function yieldToMainThread(): Promise<void> {
   });
 }
 
-function hasExportableProgress(progressMap: CastleProgressMap): boolean {
+function hasExportableProgress(progressMap: StationProgressMap): boolean {
   return Object.values(progressMap).some((entry) =>
-    CASTLE_PROGRESS_FIELDS.some((field) => entry[field]),
+    STATION_PROGRESS_FIELDS.some((field) => entry[field]),
   );
 }
 
-function countProgressCastles(progressMap: CastleProgressMap): number {
+function countProgressCastles(progressMap: StationProgressMap): number {
   return Object.keys(progressMap).length;
 }
 
-function countChangedProgressCastles(before: CastleProgressMap, after: CastleProgressMap): number {
+function countChangedProgressCastles(before: StationProgressMap, after: StationProgressMap): number {
   const ids = new Set([...Object.keys(before), ...Object.keys(after)].map(Number));
   let changed = 0;
 
-  for (const castleId of ids) {
-    const previous = before[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
-    const next = after[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
+  for (const stationId of ids) {
+    const previous = before[stationId] ?? EMPTY_STATION_PROGRESS_ENTRY;
+    const next = after[stationId] ?? EMPTY_STATION_PROGRESS_ENTRY;
 
     if (
-      CASTLE_PROGRESS_FIELDS.some(
+      STATION_PROGRESS_FIELDS.some(
         (field) =>
           previous[field] !== next[field] || previous.updatedAt[field] !== next.updatedAt[field],
       )
@@ -103,18 +102,18 @@ function countChangedProgressCastles(before: CastleProgressMap, after: CastlePro
   return changed;
 }
 
-function castleGroupsEqual(left: CastleGroup, right: CastleGroup): boolean {
+function stationGroupsEqual(left: StationGroup, right: StationGroup): boolean {
   return (
     left.id === right.id &&
     left.name === right.name &&
     left.createdAt === right.createdAt &&
     left.updatedAt === right.updatedAt &&
-    left.castleIds.length === right.castleIds.length &&
-    left.castleIds.every((castleId, index) => castleId === right.castleIds[index])
+    left.stationIds.length === right.stationIds.length &&
+    left.stationIds.every((stationId, index) => stationId === right.stationIds[index])
   );
 }
 
-function countChangedCastleGroups(before: readonly CastleGroup[], after: readonly CastleGroup[]): number {
+function countChangedStationGroups(before: readonly StationGroup[], after: readonly StationGroup[]): number {
   const beforeById = new Map(before.map((group) => [group.id, group]));
   const afterById = new Map(after.map((group) => [group.id, group]));
   const ids = new Set([...beforeById.keys(), ...afterById.keys()]);
@@ -124,7 +123,7 @@ function countChangedCastleGroups(before: readonly CastleGroup[], after: readonl
     const previous = beforeById.get(id);
     const next = afterById.get(id);
 
-    if (!previous || !next || !castleGroupsEqual(previous, next)) {
+    if (!previous || !next || !stationGroupsEqual(previous, next)) {
       changed += 1;
     }
   }
@@ -132,11 +131,11 @@ function countChangedCastleGroups(before: readonly CastleGroup[], after: readonl
   return changed;
 }
 
-function mergeCastleGroups(
-  localGroups: readonly CastleGroup[],
-  importedGroups: readonly CastleGroup[],
+function mergeStationGroups(
+  localGroups: readonly StationGroup[],
+  importedGroups: readonly StationGroup[],
   mode: CollectibleImportMode,
-): CastleGroup[] {
+): StationGroup[] {
   if (mode === 'replace') {
     return [...importedGroups];
   }
@@ -230,8 +229,8 @@ function buildManifestFromExtractedDirectory(
       continue;
     }
 
-    const castleId = Number(castleEntry.name);
-    if (!Number.isFinite(castleId) || castleId <= 0) {
+    const stationId = Number(castleEntry.name);
+    if (!Number.isFinite(stationId) || stationId <= 0) {
       continue;
     }
 
@@ -251,12 +250,12 @@ function buildManifestFromExtractedDirectory(
         }
 
         collectibles.push({
-          castleId,
+          stationId,
           kind,
           filename: fileEntry.name,
           mimeType: fileEntry.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
           createdAt: Date.now(),
-          zipPath: getCollectibleZipPath(castleId, kind, fileEntry.name),
+          zipPath: getCollectibleZipPath(stationId, kind, fileEntry.name),
         });
       }
     }
@@ -363,7 +362,7 @@ function cleanupImportArtifacts(stagedZip: File, extractDir: Directory | null): 
   }
 }
 
-async function readImportedProgress(extractDir: Directory): Promise<CastleProgressMap | null> {
+async function readImportedProgress(extractDir: Directory): Promise<StationProgressMap | null> {
   const progressFile = new File(extractDir, COLLECTIBLE_BACKUP_PROGRESS_NAME);
   if (!progressFile.exists) {
     return null;
@@ -382,7 +381,7 @@ async function readImportedProgress(extractDir: Directory): Promise<CastleProgre
   return importedProgress;
 }
 
-async function readImportedGroups(extractDir: Directory): Promise<CastleGroup[] | null> {
+async function readImportedGroups(extractDir: Directory): Promise<StationGroup[] | null> {
   const groupsFile = new File(extractDir, COLLECTIBLE_BACKUP_GROUPS_NAME);
   if (!groupsFile.exists) {
     return null;
@@ -393,7 +392,7 @@ async function readImportedGroups(extractDir: Directory): Promise<CastleGroup[] 
     text = text.slice(1);
   }
 
-  const importedGroups = normalizeCastleGroups(JSON.parse(text));
+  const importedGroups = normalizeStationGroups(JSON.parse(text));
   if (importedGroups.length === 0) {
     return null;
   }
@@ -402,10 +401,10 @@ async function readImportedGroups(extractDir: Directory): Promise<CastleGroup[] 
 }
 
 function applyImportedProgress(
-  localProgress: CastleProgressMap,
-  importedProgress: CastleProgressMap,
+  localProgress: StationProgressMap,
+  importedProgress: StationProgressMap,
   mode: CollectibleImportMode,
-): CastleProgressMap {
+): StationProgressMap {
   if (mode === 'replace') {
     return mergeProgressMapsPatch(localProgress, importedProgress);
   }
@@ -417,7 +416,7 @@ async function mergeImportedProgress(
   extractDir: Directory,
   mode: CollectibleImportMode,
 ): Promise<number> {
-  let importedProgress: CastleProgressMap;
+  let importedProgress: StationProgressMap;
   try {
     const parsed = await readImportedProgress(extractDir);
     if (!parsed) {
@@ -445,7 +444,7 @@ async function mergeImportedGroups(
   extractDir: Directory,
   mode: CollectibleImportMode,
 ): Promise<number> {
-  let importedGroups: CastleGroup[];
+  let importedGroups: StationGroup[];
   try {
     const parsed = await readImportedGroups(extractDir);
     if (!parsed) {
@@ -457,15 +456,15 @@ async function mergeImportedGroups(
     throw new Error('collectible-backup-invalid-groups');
   }
 
-  const localGroups = await loadCastleGroups();
-  const mergedGroups = mergeCastleGroups(localGroups, importedGroups, mode);
-  const changedGroups = countChangedCastleGroups(localGroups, mergedGroups);
+  const localGroups = await loadStationGroups();
+  const mergedGroups = mergeStationGroups(localGroups, importedGroups, mode);
+  const changedGroups = countChangedStationGroups(localGroups, mergedGroups);
 
   if (changedGroups === 0) {
     return 0;
   }
 
-  await saveCastleGroups(mergedGroups);
+  await saveStationGroups(mergedGroups);
   return changedGroups;
 }
 
@@ -490,22 +489,18 @@ async function importCollectiblesFromDirectory(
     }
 
     const destination = new File(
-      getCastleCollectibleDirectory(entry.castleId, entry.kind),
+      getStationCollectibleDirectory(entry.stationId, entry.kind),
       entry.filename,
     );
 
-    if (destination.exists) {
-      if (mode === 'merge-newer') {
-        skipped += 1;
-        continue;
-      }
+      if (destination.exists) {
+        if (mode === 'merge-newer') {
+          skipped += 1;
+          continue;
+        }
 
-      if (isSingleFileCollectibleKind(entry.kind)) {
-        clearCastleCollectibleDirectory(entry.castleId, entry.kind);
-      } else {
         destination.delete();
       }
-    }
 
     try {
       await copySourceUriToFile(sourceFile.uri, destination);
@@ -523,7 +518,7 @@ async function importCollectiblesFromDirectory(
     }
 
     imported += 1;
-    importedKeys.add(`${entry.castleId}:${entry.kind}`);
+    importedKeys.add(`${entry.stationId}:${entry.kind}`);
   }
 
   const hasBackupCollectibles = manifest.collectibles.length > 0;
@@ -567,20 +562,20 @@ function buildManifest(collectibles: ReturnType<typeof listAllCollectibles>): Co
     version: COLLECTIBLE_BACKUP_VERSION,
     exportedAt: Date.now(),
     collectibles: collectibles.map((item) => ({
-      castleId: item.castleId,
+      stationId: item.stationId,
       kind: item.kind,
       filename: item.filename,
       mimeType: item.mimeType,
       createdAt: item.createdAt,
-      zipPath: getCollectibleZipPath(item.castleId, item.kind, item.filename),
+      zipPath: getCollectibleZipPath(item.stationId, item.kind, item.filename),
     })),
   };
 }
 
 async function writeZipArchive(
   manifest: CollectibleBackupManifest,
-  progressMap: CastleProgressMap,
-  groups: readonly CastleGroup[],
+  progressMap: StationProgressMap,
+  groups: readonly StationGroup[],
 ): Promise<File> {
   const archiveEntries: Record<string, Uint8Array> = {
     [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8(JSON.stringify(manifest, null, 2)),
@@ -599,7 +594,7 @@ async function writeZipArchive(
   for (const entry of manifest.collectibles) {
     await yieldToMainThread();
 
-    const directory = getCastleCollectibleDirectory(entry.castleId, entry.kind);
+    const directory = getStationCollectibleDirectory(entry.stationId, entry.kind);
     const source = new File(directory, entry.filename);
     if (!source.exists) {
       continue;
@@ -615,7 +610,7 @@ async function writeZipArchive(
     exportDir.create({ idempotent: true });
   }
 
-  const zipFile = new File(exportDir, `japan-castles-backup-${Date.now()}.zip`);
+  const zipFile = new File(exportDir, `japan-stations-backup-${Date.now()}.zip`);
   if (zipFile.exists) {
     zipFile.delete();
   }
@@ -665,22 +660,22 @@ async function markImportedCollectibles(importedKeys: Set<string>): Promise<numb
   const updatedCastleIds = new Set<number>();
 
   for (const key of importedKeys) {
-    const [castleIdRaw, kindRaw] = key.split(':');
-    const castleId = Number(castleIdRaw);
+    const [stationIdRaw, kindRaw] = key.split(':');
+    const stationId = Number(stationIdRaw);
     const kind = kindRaw as CollectibleKind;
-    const progressField = COLLECTIBLE_PROGRESS_FIELD[kind] as CastleProgressField;
+    const progressField = COLLECTIBLE_PROGRESS_FIELD[kind] as StationProgressField;
 
-    if (!Number.isFinite(castleId) || castleId <= 0) {
+    if (!Number.isFinite(stationId) || stationId <= 0) {
       continue;
     }
 
-    const previous = progressMap[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
+    const previous = progressMap[stationId] ?? EMPTY_STATION_PROGRESS_ENTRY;
     if (previous[progressField]) {
       continue;
     }
 
-    progressMap[castleId] = withFieldUpdate(previous, progressField, true);
-    updatedCastleIds.add(castleId);
+    progressMap[stationId] = withFieldUpdate(previous, progressField, true);
+    updatedCastleIds.add(stationId);
   }
 
   await saveProgressMap(progressMap);
@@ -724,12 +719,12 @@ export async function processCollectibleImport(
 
 export async function exportCollectibleArchive(): Promise<{
   fileCount: number;
-  progressCastles: number;
+  progressStations: number;
   groupCount: number;
 }> {
   const collectibles = listAllCollectibles();
   const progressMap = await loadProgressMap();
-  const groups = await loadCastleGroups();
+  const groups = await loadStationGroups();
   const hasCollectibles = collectibles.length > 0;
   const hasProgress = hasExportableProgress(progressMap);
   const hasGroups = groups.length > 0;
@@ -744,7 +739,7 @@ export async function exportCollectibleArchive(): Promise<{
 
   return {
     fileCount: manifest.collectibles.length,
-    progressCastles: hasProgress ? countProgressCastles(progressMap) : 0,
+    progressStations: hasProgress ? countProgressCastles(progressMap) : 0,
     groupCount: hasGroups ? groups.length : 0,
   };
 }

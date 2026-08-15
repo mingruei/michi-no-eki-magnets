@@ -1,11 +1,12 @@
 import {
-  CASTLE_PROGRESS_FIELDS,
+  STATION_PROGRESS_FIELDS,
   createProgressEntry,
-  EMPTY_CASTLE_PROGRESS_ENTRY,
-  type CastleProgressEntry,
-  type CastleProgressField,
-  type CastleProgressMap,
-} from '../types/castleProgress';
+  EMPTY_STATION_PROGRESS_ENTRY,
+  sanitizeProgressEntry,
+  type StationProgressEntry,
+  type StationProgressField,
+  type StationProgressMap,
+} from '../types/stationProgress';
 
 function parseProgressBoolean(value: unknown): boolean {
   if (value === true || value === 1) {
@@ -42,11 +43,11 @@ function parseTimestamp(value: unknown): number | null {
 function normalizeUpdatedAt(
   raw: unknown,
   fallbackTimestamp: number,
-): Record<CastleProgressField, number> {
-  const updatedAt = { ...EMPTY_CASTLE_PROGRESS_ENTRY.updatedAt };
+): Record<StationProgressField, number> {
+  const updatedAt = { ...EMPTY_STATION_PROGRESS_ENTRY.updatedAt };
 
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    return CASTLE_PROGRESS_FIELDS.reduce(
+    return STATION_PROGRESS_FIELDS.reduce(
       (acc, field) => {
         acc[field] = fallbackTimestamp;
         return acc;
@@ -55,15 +56,15 @@ function normalizeUpdatedAt(
     );
   }
 
-  const source = raw as Partial<Record<CastleProgressField, unknown>>;
-  for (const field of CASTLE_PROGRESS_FIELDS) {
+  const source = raw as Partial<Record<StationProgressField, unknown>>;
+  for (const field of STATION_PROGRESS_FIELDS) {
     updatedAt[field] = parseTimestamp(source[field]) ?? fallbackTimestamp;
   }
 
   return updatedAt;
 }
 
-function normalizeProgressEntry(value: unknown, fallbackTimestamp = 0): CastleProgressEntry | null {
+function normalizeProgressEntry(value: unknown, fallbackTimestamp = 0): StationProgressEntry | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return null;
   }
@@ -75,36 +76,37 @@ function normalizeProgressEntry(value: unknown, fallbackTimestamp = 0): CastlePr
   const timestampSource = entry.updatedAt ?? entry._t ?? entry.updated_at;
   const entryFallback = hasExplicitTimestamps ? 0 : fallbackTimestamp;
 
-  return createProgressEntry(
-    {
-      visited: parseProgressBoolean(entry.visited),
-      meijoStamp: parseProgressBoolean(entry.meijoStamp),
-      goshuin: parseProgressBoolean(entry.goshuin),
-      castleCard: parseProgressBoolean(entry.castleCard),
-    },
-    normalizeUpdatedAt(timestampSource, entryFallback),
+  return sanitizeProgressEntry(
+    createProgressEntry(
+      {
+        visited: parseProgressBoolean(entry.visited),
+        magnet: parseProgressBoolean(entry.magnet),
+        magnetNotSold: parseProgressBoolean(entry.magnetNotSold),
+      },
+      normalizeUpdatedAt(timestampSource, entryFallback),
+    ),
   );
 }
 
 export function normalizeProgressMap(
   raw: unknown,
   fallbackTimestamp = 0,
-): CastleProgressMap {
+): StationProgressMap {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return {};
   }
 
-  const map: CastleProgressMap = {};
+  const map: StationProgressMap = {};
 
   for (const [key, value] of Object.entries(raw)) {
-    const castleId = Number(key);
-    if (!Number.isFinite(castleId) || castleId <= 0) {
+    const stationId = Number(key);
+    if (!Number.isFinite(stationId) || stationId <= 0) {
       continue;
     }
 
     const entry = normalizeProgressEntry(value, fallbackTimestamp);
     if (entry) {
-      map[castleId] = entry;
+      map[stationId] = entry;
     }
   }
 
@@ -112,12 +114,12 @@ export function normalizeProgressMap(
 }
 
 function mergeProgressEntry(
-  left: CastleProgressEntry,
-  right: CastleProgressEntry,
-): CastleProgressEntry {
+  left: StationProgressEntry,
+  right: StationProgressEntry,
+): StationProgressEntry {
   const merged = createProgressEntry();
 
-  for (const field of CASTLE_PROGRESS_FIELDS) {
+  for (const field of STATION_PROGRESS_FIELDS) {
     const leftTimestamp = left.updatedAt[field];
     const rightTimestamp = right.updatedAt[field];
 
@@ -137,21 +139,21 @@ function mergeProgressEntry(
     merged.updatedAt[field] = rightTimestamp;
   }
 
-  return merged;
+  return sanitizeProgressEntry(merged);
 }
 
 /** Last-write-wins merge per field using updatedAt timestamps. */
 export function mergeProgressMaps(
-  left: CastleProgressMap,
-  right: CastleProgressMap,
-): CastleProgressMap {
+  left: StationProgressMap,
+  right: StationProgressMap,
+): StationProgressMap {
   const ids = new Set([...Object.keys(left), ...Object.keys(right)].map(Number));
-  const merged: CastleProgressMap = {};
+  const merged: StationProgressMap = {};
 
-  for (const castleId of ids) {
-    const leftEntry = left[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
-    const rightEntry = right[castleId] ?? EMPTY_CASTLE_PROGRESS_ENTRY;
-    merged[castleId] = mergeProgressEntry(leftEntry, rightEntry);
+  for (const stationId of ids) {
+    const leftEntry = left[stationId] ?? EMPTY_STATION_PROGRESS_ENTRY;
+    const rightEntry = right[stationId] ?? EMPTY_STATION_PROGRESS_ENTRY;
+    merged[stationId] = mergeProgressEntry(leftEntry, rightEntry);
   }
 
   return merged;
@@ -159,30 +161,29 @@ export function mergeProgressMaps(
 
 /** Patch merge: incoming keys overwrite base; other keys are preserved. */
 export function mergeProgressMapsPatch(
-  base: CastleProgressMap,
-  patch: CastleProgressMap,
-): CastleProgressMap {
-  const merged: CastleProgressMap = { ...base };
+  base: StationProgressMap,
+  patch: StationProgressMap,
+): StationProgressMap {
+  const merged: StationProgressMap = { ...base };
 
   for (const [key, value] of Object.entries(patch)) {
-    const castleId = Number(key);
-    if (Number.isFinite(castleId) && castleId > 0) {
-      merged[castleId] = value;
+    const stationId = Number(key);
+    if (Number.isFinite(stationId) && stationId > 0) {
+      merged[stationId] = value;
     }
   }
 
   return merged;
 }
 
-export function serializeProgressMap(map: CastleProgressMap): Record<string, unknown> {
+export function serializeProgressMap(map: StationProgressMap): Record<string, unknown> {
   const serialized: Record<string, unknown> = {};
 
-  for (const [castleId, entry] of Object.entries(map)) {
-    serialized[castleId] = {
+  for (const [stationId, entry] of Object.entries(map)) {
+    serialized[stationId] = {
       visited: entry.visited,
-      meijoStamp: entry.meijoStamp,
-      goshuin: entry.goshuin,
-      castleCard: entry.castleCard,
+      magnet: entry.magnet,
+      magnetNotSold: entry.magnetNotSold,
       updatedAt: entry.updatedAt,
     };
   }

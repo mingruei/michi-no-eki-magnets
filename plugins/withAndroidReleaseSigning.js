@@ -72,7 +72,7 @@ function stripGeneratedBlocks(contents) {
       '\n',
     )
     .replace(
-      /\n?\s*\/\/ @generated begin japan-castles-release-signing-config[\s\S]*?\/\/ @generated end japan-castles-release-signing-config\n?/g,
+      /\n?\s*\/\/ @generated begin japan-stations-release-signing-config[\s\S]*?\/\/ @generated end japan-stations-release-signing-config\n?/g,
       '\n',
     )
     .replace(

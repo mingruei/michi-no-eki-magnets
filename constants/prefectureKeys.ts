@@ -7,7 +7,7 @@ const zhHantToJapanesePrefecture = new Map<string, string>(
   ]),
 );
 
-/** Map castle JSON prefecture values to the Japanese keys used by region filters. */
+/** Map station JSON prefecture values to the Japanese keys used by region filters. */
 export function normalizePrefectureKey(prefecture: string): string {
   return zhHantToJapanesePrefecture.get(prefecture) ?? prefecture;
 }

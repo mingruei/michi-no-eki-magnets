@@ -3,8 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
-import type { CollectibleUploadSource } from '../utils/castleCollectibleUpload';
-import { DEFAULT_COLLECTIBLE_UPLOAD_SOURCES } from '../utils/castleCollectibleUpload';
+import type { CollectibleUploadSource } from '../utils/stationCollectibleUpload';
+import { DEFAULT_COLLECTIBLE_UPLOAD_SOURCES } from '../utils/stationCollectibleUpload';
 
 type CollectibleUploadSourceModalProps = {
   visible: boolean;
@@ -21,13 +21,13 @@ function getUploadSourceLabel(
 ): string {
   switch (source) {
     case 'scan':
-      return t('castle.collectibleScan');
+      return t('station.collectibleScan');
     case 'file':
-      return t('castle.collectibleUploadFile');
+      return t('station.collectibleUploadFile');
     case 'gallery':
-      return t('castle.collectiblePhotoLibrary');
+      return t('station.collectiblePhotoLibrary');
     case 'camera':
-      return t('castle.collectibleCamera');
+      return t('station.collectibleCamera');
   }
 }
 
@@ -56,7 +56,7 @@ export function CollectibleUploadSourceModal({
         onPress={onClose}
       >
         <Pressable style={styles.modalCard} onPress={(event) => event.stopPropagation()}>
-          <Text style={styles.modalTitle}>{title ?? t('castle.collectibleChooseSource')}</Text>
+          <Text style={styles.modalTitle}>{title ?? t('station.collectibleChooseSource')}</Text>
           {sources.map((source) => (
             <Pressable
               key={source}

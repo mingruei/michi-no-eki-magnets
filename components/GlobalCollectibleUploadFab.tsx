@@ -6,14 +6,14 @@ import { CollectibleUploadSourceModal } from './CollectibleUploadSourceModal';
 import { colors } from '../constants/theme';
 import { useGlobalCollectibleUpload } from '../hooks/useGlobalCollectibleUpload';
 import { useI18n } from '../i18n';
-import type { Castle } from '../types/castle';
+import type { Station } from '../types/station';
 import {
   isCameraPermissionErrorMessage,
   isMediaPermissionErrorMessage,
 } from '../utils/collectibleUploadErrors';
 
 type GlobalCollectibleUploadProps = {
-  castles: readonly Castle[];
+  stations: readonly Station[];
   enabled: boolean;
   onRegisterOpen?: (openSourcePicker: () => void) => void;
 };
@@ -24,11 +24,11 @@ function getErrorMessage(error: string | null, t: (key: string) => string): stri
   }
 
   if (isCameraPermissionErrorMessage(error)) {
-    return t('castle.collectibleCameraPermissionDenied');
+    return t('station.collectibleCameraPermissionDenied');
   }
 
   if (isMediaPermissionErrorMessage(error)) {
-    return t('castle.collectibleMediaPermissionDenied');
+    return t('station.collectibleMediaPermissionDenied');
   }
 
   switch (error) {
@@ -48,7 +48,7 @@ function getErrorMessage(error: string | null, t: (key: string) => string): stri
 }
 
 export function GlobalCollectibleUploadFab({
-  castles,
+  stations,
   enabled: _enabled,
   onRegisterOpen,
 }: GlobalCollectibleUploadProps) {
@@ -93,11 +93,11 @@ export function GlobalCollectibleUploadFab({
           key={draft.selection.uri}
           visible={isConfirmPhase}
           draft={draft}
-          castles={castles}
+          stations={stations}
           saving={phase === 'saving'}
           errorMessage={errorMessage}
           onClose={closeFlow}
-          onConfirm={(castleId, kind) => void confirmUpload(castleId, kind)}
+          onConfirm={(stationId, kind) => void confirmUpload(stationId, kind)}
         />
       ) : null}
     </>

@@ -21,12 +21,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
-import type { CastleCollectible } from '../types/castleCollectible';
-import { isImageCollectible } from '../utils/castleCollectibleStorage';
-import { getCollectibleDisplayUri } from '../utils/castleCollectibleStorage';
+import type { StationCollectible } from '../types/stationCollectible';
+import { isImageCollectible } from '../utils/stationCollectibleStorage';
+import { getCollectibleDisplayUri } from '../utils/stationCollectibleStorage';
 
 type CollectibleGalleryViewerProps = {
-  items: CastleCollectible[];
+  items: StationCollectible[];
   initialIndex: number;
   visible: boolean;
   onClose: () => void;
@@ -212,7 +212,7 @@ export function CollectibleGalleryViewer({
                     onPress={() => void openPdf(currentItem.uri)}
                     style={styles.openPdfButton}
                   >
-                    <Text style={styles.openPdfLabel}>{t('castle.collectibleOpenPdf')}</Text>
+                    <Text style={styles.openPdfLabel}>{t('station.collectibleOpenPdf')}</Text>
                   </Pressable>
                 </View>
               ) : null}
@@ -225,7 +225,7 @@ export function CollectibleGalleryViewer({
           >
             <View pointerEvents="auto" style={styles.topBar}>
               <Text style={styles.counter}>
-                {t('castle.collectibleViewerCounter', {
+                {t('station.collectibleViewerCounter', {
                   current: currentIndex + 1,
                   total: items.length,
                 })}
@@ -247,8 +247,8 @@ export function CollectibleGalleryViewer({
           >
             <Text style={styles.swipeHint}>
               {items.length > 1
-                ? t('castle.collectibleViewerSwipeHint')
-                : t('castle.collectibleViewerDismissHint')}
+                ? t('station.collectibleViewerSwipeHint')
+                : t('station.collectibleViewerDismissHint')}
             </Text>
           </View>
         </Animated.View>

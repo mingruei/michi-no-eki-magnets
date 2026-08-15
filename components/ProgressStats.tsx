@@ -1,71 +1,33 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../constants/theme';
-import { useCastles } from '../hooks/useCastleData';
-import { useCastleProgress } from '../hooks/useCastleProgress';
+import { useStations } from '../hooks/useStationData';
+import { useStationProgress } from '../hooks/useStationProgress';
 import { useI18n } from '../i18n';
-import type { Castle } from '../types/castle';
 import { computeProgressStats } from '../utils/progressStats';
-
-type StatsRowProps = {
-  label: string;
-  visited: number;
-  meijoStamp: number;
-  goshuin: number;
-  castleCard: number;
-  highlight?: boolean;
-};
-
-function StatsRow({ label, visited, meijoStamp, goshuin, castleCard, highlight = false }: StatsRowProps) {
-  return (
-    <View style={[styles.row, highlight && styles.rowHighlight]}>
-      <Text style={[styles.rowLabel, highlight && styles.rowLabelHighlight]}>{label}</Text>
-      <Text style={styles.cell}>{visited}</Text>
-      <Text style={styles.cell}>{meijoStamp}</Text>
-      <Text style={styles.cell}>{goshuin}</Text>
-      <Text style={styles.cell}>{castleCard}</Text>
-    </View>
-  );
-}
 
 export function ProgressStats() {
   const { t } = useI18n();
-  const castles = useCastles();
-  const { progressMap } = useCastleProgress();
-  const stats = computeProgressStats(castles, progressMap);
+  const stations = useStations();
+  const { progressMap } = useStationProgress();
+  const stats = computeProgressStats(stations, progressMap);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.headerSpacer} />
         <Text style={styles.headerCell}>{t('stats.visited')}</Text>
-        <Text style={styles.headerCell}>{t('stats.meijoStamp')}</Text>
-        <Text style={styles.headerCell}>{t('stats.goshuin')}</Text>
-        <Text style={styles.headerCell}>{t('stats.castleCard')}</Text>
+        <Text style={styles.headerCell}>{t('stats.magnet')}</Text>
       </View>
 
-      <StatsRow
-        label={t('stats.rowOriginal')}
-        visited={stats.original.visited}
-        meijoStamp={stats.original.meijoStamp}
-        goshuin={stats.original.goshuin}
-        castleCard={stats.original.castleCard}
-      />
-      <StatsRow
-        label={t('stats.rowContinued')}
-        visited={stats.continued.visited}
-        meijoStamp={stats.continued.meijoStamp}
-        goshuin={stats.continued.goshuin}
-        castleCard={stats.continued.castleCard}
-      />
-      <StatsRow
-        label={t('stats.rowTotal')}
-        visited={stats.total.visited}
-        meijoStamp={stats.total.meijoStamp}
-        goshuin={stats.total.goshuin}
-        castleCard={stats.total.castleCard}
-        highlight
-      />
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>{t('stats.rowTotal')}</Text>
+        <Text style={styles.cell}>{stats.total.visited}</Text>
+        <Text style={styles.cell}>{stats.total.magnet}</Text>
+      </View>
+      <Text style={styles.totalHint}>
+        {t('stats.totalCount', { count: stats.total.total })}
+      </Text>
     </View>
   );
 }
@@ -97,17 +59,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 8,
     borderRadius: 10,
-  },
-  rowHighlight: {
     backgroundColor: colors.background,
   },
   rowLabel: {
     flex: 1.1,
     fontSize: 14,
     fontWeight: '700',
-    color: colors.text,
-  },
-  rowLabelHighlight: {
     color: colors.original,
   },
   cell: {
@@ -116,5 +73,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: colors.text,
+  },
+  totalHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    textAlign: 'right',
   },
 });

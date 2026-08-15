@@ -5,21 +5,23 @@ import { colors } from '../constants/theme';
 type CheckOptionProps = {
   label: string;
   checked: boolean;
+  disabled?: boolean;
   onToggle: () => void;
 };
 
-export function CheckOption({ label, checked, onToggle }: CheckOptionProps) {
+export function CheckOption({ label, checked, disabled = false, onToggle }: CheckOptionProps) {
   return (
     <Pressable
       accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
+      accessibilityState={{ checked, disabled }}
+      disabled={disabled}
       onPress={onToggle}
-      style={styles.row}
+      style={[styles.row, disabled && styles.rowDisabled]}
     >
-      <View style={[styles.box, checked && styles.boxChecked]}>
+      <View style={[styles.box, checked && styles.boxChecked, disabled && styles.boxDisabled]}>
         {checked ? <Text style={styles.checkmark}>✓</Text> : null}
       </View>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, disabled && styles.labelDisabled]}>{label}</Text>
     </Pressable>
   );
 }
@@ -56,5 +58,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.text,
+  },
+  rowDisabled: {
+    opacity: 0.5,
+  },
+  boxDisabled: {
+    backgroundColor: colors.background,
+  },
+  labelDisabled: {
+    color: colors.textMuted,
   },
 });

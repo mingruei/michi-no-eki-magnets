@@ -1,6 +1,6 @@
 {
-  "name": "japan-castles-map",
-  "version": "1.0.0",
+  "name": "michi-no-eki-magnets",
+  "version": "1.0.1",
   "main": "index.ts",
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -53,7 +53,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "generate:castle-data-manifest": "node scripts/generate-castle-data-manifest.mjs",
+    "generate:station-data-manifest": "node scripts/generate-station-data-manifest.mjs",
+    "build:stations": "node scripts/build-stations-from-linkdata.mjs --csv && node scripts/generate-station-data-manifest.mjs",
+    "build:stations:offline": "node scripts/build-stations-from-linkdata.mjs --offline --csv && node scripts/generate-station-data-manifest.mjs",
+    "prebuild:ios": "expo prebuild --platform ios",
+    "prebuild:android": "expo prebuild --platform android",
     "postinstall": "patch-package"
   },
   "private": true

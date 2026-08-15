@@ -2,19 +2,19 @@ import { act, renderHook } from '@testing-library/react-native';
 
 import { useGlobalCollectibleUpload } from '../useGlobalCollectibleUpload';
 import {
-  listCastleCollectibles,
-  saveCastleCollectibleFromUri,
-} from '../../utils/castleCollectibleStorage';
-import { pickCollectibleBySource } from '../../utils/castleCollectibleUpload';
+  listStationCollectibles,
+  saveStationCollectibleFromUri,
+} from '../../utils/stationCollectibleStorage';
+import { pickCollectibleBySource } from '../../utils/stationCollectibleUpload';
 import { persistUploadImage } from '../../utils/persistUploadImage';
 
-jest.mock('../../utils/castleCollectibleUpload', () => ({
+jest.mock('../../utils/stationCollectibleUpload', () => ({
   pickCollectibleBySource: jest.fn(),
 }));
 
-jest.mock('../../utils/castleCollectibleStorage', () => ({
-  listCastleCollectibles: jest.fn(() => []),
-  saveCastleCollectibleFromUri: jest.fn(async () => undefined),
+jest.mock('../../utils/stationCollectibleStorage', () => ({
+  listStationCollectibles: jest.fn(() => []),
+  saveStationCollectibleFromUri: jest.fn(async () => undefined),
 }));
 
 jest.mock('../../utils/persistUploadImage', () => ({
@@ -25,15 +25,15 @@ jest.mock('../../utils/waitForNativePicker', () => ({
   waitForNativePicker: jest.fn(async () => undefined),
 }));
 
-jest.mock('../useCastleProgress', () => ({
-  useCastleProgress: () => ({
+jest.mock('../useStationProgress', () => ({
+  useStationProgress: () => ({
     markProgressCollected: jest.fn(),
   }),
 }));
 
 const mockedPick = pickCollectibleBySource as jest.MockedFunction<typeof pickCollectibleBySource>;
-const mockedList = listCastleCollectibles as jest.MockedFunction<typeof listCastleCollectibles>;
-const mockedSave = saveCastleCollectibleFromUri as jest.MockedFunction<typeof saveCastleCollectibleFromUri>;
+const mockedList = listStationCollectibles as jest.MockedFunction<typeof listStationCollectibles>;
+const mockedSave = saveStationCollectibleFromUri as jest.MockedFunction<typeof saveStationCollectibleFromUri>;
 
 describe('useGlobalCollectibleUpload', () => {
   beforeEach(() => {
@@ -102,7 +102,7 @@ describe('useGlobalCollectibleUpload', () => {
     });
 
     expect(result.current.phase).toBe('confirm');
-    expect(result.current.draft?.typeSuggestion.kind).toBe('meijo-stamp');
+    expect(result.current.draft?.typeSuggestion.kind).toBe('magnet');
     expect(result.current.error).toBeNull();
   });
 
@@ -133,9 +133,9 @@ describe('useGlobalCollectibleUpload', () => {
       .mockReturnValueOnce([])
       .mockReturnValueOnce([
         {
-          id: '3:castle-card:card.jpg',
-          castleId: 3,
-          kind: 'castle-card',
+          id: '3:magnet:card.jpg',
+          stationId: 3,
+          kind: 'magnet',
           uri: 'file:///saved/card.jpg',
           filename: 'card.jpg',
           mimeType: 'image/jpeg',
@@ -150,7 +150,7 @@ describe('useGlobalCollectibleUpload', () => {
     });
 
     await act(async () => {
-      await result.current.confirmUpload(3, 'castle-card');
+      await result.current.confirmUpload(3, 'magnet');
     });
 
     expect(mockedSave).toHaveBeenCalled();

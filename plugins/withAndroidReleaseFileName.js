@@ -4,7 +4,7 @@ const MARKER = 'release-artifact-file-name';
 
 /**
  * Copy (do not rename/delete) the AGP output artifact to a friendlier name.
- * Always copy from app-release.* so stale japan-castles-map-* artifacts cannot
+ * Always copy from app-release.* so stale michi-no-eki-magnets-* artifacts cannot
  * be picked up when versionCode changes.
  */
 const RELEASE_FILE_NAME_SNIPPET = `
@@ -13,7 +13,7 @@ afterEvaluate {
     tasks.matching { it.name == "bundleRelease" }.configureEach { task ->
         task.doLast {
             def artifactBaseName =
-                "japan-castles-map-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
+                "michi-no-eki-magnets-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
             def outputDir = file("\${layout.buildDirectory.get()}/outputs/bundle/release")
             def bundleFile = new File(outputDir, "app-release.aab")
             if (!bundleFile.isFile()) {
@@ -35,7 +35,7 @@ afterEvaluate {
     tasks.matching { it.name == "assembleRelease" }.configureEach { task ->
         task.doLast {
             def artifactBaseName =
-                "japan-castles-map-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
+                "michi-no-eki-magnets-\${android.defaultConfig.versionName}-\${android.defaultConfig.versionCode}"
             def outputDir = file("\${layout.buildDirectory.get()}/outputs/apk/release")
             def apkFile = new File(outputDir, "app-release.apk")
             if (!apkFile.isFile()) {

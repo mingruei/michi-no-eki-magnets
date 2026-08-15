@@ -1,13 +1,11 @@
 {
-  "version": 4,
-  "updatedAt": "2026-08-10T01:13:00.000Z",
+  "version": 3,
+  "updatedAt": "2026-08-13T09:24:18.340Z",
   "files": {
-    "castles": {
-      "path": "castles.json"
-    },
-    "content": {
-      "path": "castle-content.zh-Hant.json",
-      "locale": "zh-Hant"
+    "stations": {
+      "path": "stations.json",
+      "size": 763009,
+      "sha256": "8c7494f386aa4563c435abc417cffcf2ac13a2cd7f9930651ef5f9542eb2e076"
     }
   }
 }

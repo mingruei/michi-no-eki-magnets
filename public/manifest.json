@@ -1,7 +1,7 @@
 {
-  "short_name": "攻城師",
-  "name": "攻城師",
-  "description": "Explore Japan's 200 famous castles with maps, filters, and visit tracking.",
+  "short_name": "日本道之駅磁鐵收集帳",
+  "name": "日本道之駅磁鐵收集帳",
+  "description": "Collect michi-no-eki magnets across Japan with maps, filters, and progress tracking.",
   "lang": "zh-Hant",
   "icons": [
     {
@@ -33,5 +33,5 @@
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#1A2744",
-  "background_color": "#F8FAFC"
+  "background_color": "#FAF5E1"
 }

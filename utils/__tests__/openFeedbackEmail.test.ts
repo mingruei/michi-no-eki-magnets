@@ -29,7 +29,7 @@ describe('openFeedbackEmail', () => {
     await expect(openFeedbackEmail()).resolves.toBe('composed');
     expect(mockedMailComposer.composeAsync).toHaveBeenCalledWith({
       recipients: [FEEDBACK_EMAIL],
-      subject: '攻城師 意見反映',
+      subject: '日本道之駅磁鐵收集帳 意見反映',
     });
     expect(Linking.openURL).not.toHaveBeenCalled();
   });
@@ -41,7 +41,7 @@ describe('openFeedbackEmail', () => {
 
     await expect(openFeedbackEmail()).resolves.toBe('opened');
     expect(Linking.openURL).toHaveBeenCalledWith(
-      `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('攻城師 意見反映')}`,
+      `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('日本道之駅磁鐵收集帳 意見反映')}`,
     );
   });
 

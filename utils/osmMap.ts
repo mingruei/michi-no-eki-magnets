@@ -1,8 +1,8 @@
 import { colors, mapRegion } from '../constants/theme';
-import type { Castle } from '../types/castle';
-import type { CastleProgressMap } from '../types/castleProgress';
+import type { Station } from '../types/station';
+import type { StationProgressMap } from '../types/stationProgress';
 
-export type OsmCastleMarker = {
+export type OsmStationMarker = {
   id: number;
   lat: number;
   lng: number;
@@ -10,24 +10,20 @@ export type OsmCastleMarker = {
   color: string;
 };
 
-export function getCastleMarkerColor(series: Castle['series'], visited = false): string {
-  if (visited) {
-    return colors.visitedMarker;
-  }
-
-  return series === 'original' ? colors.original : colors.continued;
+export function getStationMarkerColor(visited = false): string {
+  return visited ? colors.visitedMarker : colors.original;
 }
 
-export function toOsmCastleMarkers(
-  castles: readonly Castle[],
-  progressMap: CastleProgressMap = {},
-): OsmCastleMarker[] {
-  return castles.map((castle) => ({
-    id: castle.id,
-    lat: castle.latitude,
-    lng: castle.longitude,
-    name: castle.name,
-    color: getCastleMarkerColor(castle.series, progressMap[castle.id]?.visited ?? false),
+export function toOsmStationMarkers(
+  stations: readonly Station[],
+  progressMap: StationProgressMap = {},
+): OsmStationMarker[] {
+  return stations.map((station) => ({
+    id: station.id,
+    lat: station.latitude,
+    lng: station.longitude,
+    name: station.name,
+    color: getStationMarkerColor(progressMap[station.id]?.visited ?? false),
   }));
 }
 
@@ -81,7 +77,7 @@ export function buildOsmMapHtml(): string {
           }
         }
 
-        window.__castleMap = {
+        window.__stationMap = {
           updateMarkers: function (items) {
             layer.clearLayers();
             items.forEach(function (item) {
@@ -110,9 +106,9 @@ export function buildOsmMapHtml(): string {
 }
 
 export function buildOsmMapUpdateScript(
-  castles: readonly Castle[],
-  progressMap: CastleProgressMap = {},
+  stations: readonly Station[],
+  progressMap: StationProgressMap = {},
 ): string {
-  const markers = JSON.stringify(toOsmCastleMarkers(castles, progressMap));
-  return `(function(){if(window.__castleMap){window.__castleMap.updateMarkers(${markers});}})();true;`;
+  const markers = JSON.stringify(toOsmStationMarkers(stations, progressMap));
+  return `(function(){if(window.__stationMap){window.__stationMap.updateMarkers(${markers});}})();true;`;
 }

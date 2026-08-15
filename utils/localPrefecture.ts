@@ -2,8 +2,9 @@ import * as Location from 'expo-location';
 
 import type { RegionId } from '../constants/regions';
 import { getRegionIdForPrefecture } from '../constants/regions';
+import { getHokkaidoArea } from '../constants/hokkaidoAreas';
 import { normalizePrefectureKey } from '../constants/prefectureKeys';
-import type { Castle } from '../types/castle';
+import type { Station } from '../types/station';
 
 export const NEARBY_CASTLE_RADIUS_METERS = 1000;
 
@@ -14,7 +15,7 @@ export type LocalPrefectureFilter = {
 
 export type LocalStartupContext = {
   filter: LocalPrefectureFilter | null;
-  nearbyCastle: Castle | null;
+  nearbyStation: Station | null;
 };
 
 type PrefectureCentroid = {
@@ -68,18 +69,18 @@ export function distanceInMeters(
   return EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
 }
 
-function buildPrefectureCentroids(castles: readonly Castle[]): PrefectureCentroid[] {
+function buildPrefectureCentroids(stations: readonly Station[]): PrefectureCentroid[] {
   const totals = new Map<string, { latitude: number; longitude: number; count: number }>();
 
-  for (const castle of castles) {
-    if (!castle.prefecture) {
+  for (const station of stations) {
+    if (!station.prefecture) {
       continue;
     }
 
-    const current = totals.get(castle.prefecture) ?? { latitude: 0, longitude: 0, count: 0 };
-    totals.set(castle.prefecture, {
-      latitude: current.latitude + castle.latitude,
-      longitude: current.longitude + castle.longitude,
+    const current = totals.get(station.prefecture) ?? { latitude: 0, longitude: 0, count: 0 };
+    totals.set(station.prefecture, {
+      latitude: current.latitude + station.latitude,
+      longitude: current.longitude + station.longitude,
       count: current.count + 1,
     });
   }
@@ -269,7 +270,10 @@ async function getCurrentJapanCoordinates(): Promise<JapanCoordinates | null> {
   }
 }
 
-function filterFromPrefecture(prefecture: string | null | undefined): LocalPrefectureFilter | null {
+function filterFromPrefecture(
+  prefecture: string | null | undefined,
+  city?: string | null,
+): LocalPrefectureFilter | null {
   if (!prefecture) {
     return null;
   }
@@ -280,89 +284,109 @@ function filterFromPrefecture(prefecture: string | null | undefined): LocalPrefe
     return null;
   }
 
+  if (canonical === '北海道' && city) {
+    const area = getHokkaidoArea(city);
+    if (area) {
+      return { regionId, prefecture: area };
+    }
+  }
+
   return { regionId, prefecture: canonical };
 }
 
 async function resolvePrefectureFilter(
-  castles: readonly Castle[],
+  stations: readonly Station[],
   latitude: number,
   longitude: number,
 ): Promise<LocalPrefectureFilter | null> {
-  if (castles.length === 0) {
+  if (stations.length === 0) {
     return null;
   }
 
   // 1) Administrative reverse geocode is the source of truth for "which prefecture
-  // am I in?". Nearest-castle heuristics mislabel border towns when the closest
-  // famous castle sits across a prefecture line.
+  // am I in?". Nearest-station heuristics mislabel border towns when the closest
+  // famous station sits across a prefecture line.
   const geocodedPrefecture = await resolvePrefectureFromReverseGeocode(latitude, longitude);
   const fromGeocode = filterFromPrefecture(geocodedPrefecture);
-  if (fromGeocode) {
+  if (fromGeocode && fromGeocode.prefecture !== '北海道') {
     return fromGeocode;
   }
 
-  // 2) If geocoding fails, prefer the nearest castle's prefecture over averaging
-  // all castles in a prefecture (Shimane centroid is near Matsue, so Tsuwano was
+  // 2) Prefer nearest station for Hokkaido sub-areas (geocode only returns 北海道).
+  // all stations in a prefecture (Shimane centroid is near Matsue, so Tsuwano was
   // wrongly labeled Yamaguchi).
   const nearestCastle = findNearestCastleWithinRadius(
-    castles,
+    stations,
     latitude,
     longitude,
     Number.POSITIVE_INFINITY,
   );
-  const fromNearestCastle = filterFromPrefecture(nearestCastle?.prefecture);
+  const fromNearestCastle = filterFromPrefecture(
+    nearestCastle?.prefecture,
+    nearestCastle?.city,
+  );
   if (fromNearestCastle) {
     return fromNearestCastle;
   }
 
-  // 3) Last resort: prefecture castle-centroid distance.
-  const centroids = buildPrefectureCentroids(castles);
-  return filterFromPrefecture(findNearestPrefecture(latitude, longitude, centroids));
+  // 3) Last resort: prefecture station-centroid distance.
+  const centroids = buildPrefectureCentroids(stations);
+  const nearestPrefecture = findNearestPrefecture(latitude, longitude, centroids);
+  const nearestStationInPrefecture = nearestPrefecture
+    ? findNearestCastleWithinRadius(
+        stations.filter((station) => station.prefecture === nearestPrefecture),
+        latitude,
+        longitude,
+        Number.POSITIVE_INFINITY,
+      )
+    : null;
+
+  return filterFromPrefecture(nearestPrefecture, nearestStationInPrefecture?.city);
 }
 
 export function findNearestCastleWithinRadius(
-  castles: readonly Castle[],
+  stations: readonly Station[],
   latitude: number,
   longitude: number,
   radiusMeters: number,
-): Castle | null {
-  let nearestCastle: Castle | null = null;
+): Station | null {
+  let nearestCastle: Station | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
 
-  for (const castle of castles) {
-    const distance = distanceInMeters(latitude, longitude, castle.latitude, castle.longitude);
+  for (const station of stations) {
+    const distance = distanceInMeters(latitude, longitude, station.latitude, station.longitude);
     if (distance > radiusMeters || distance >= nearestDistance) {
       continue;
     }
 
     nearestDistance = distance;
-    nearestCastle = castle;
+    nearestCastle = station;
   }
 
   return nearestCastle;
 }
 
 export async function resolveLocalStartupContext(
-  castles: readonly Castle[],
+  stations: readonly Station[],
   radiusMeters = NEARBY_CASTLE_RADIUS_METERS,
 ): Promise<LocalStartupContext> {
   const coordinates = await getCurrentJapanCoordinates();
   if (!coordinates) {
-    return { filter: null, nearbyCastle: null };
+    return { filter: null, nearbyStation: null };
   }
 
   const { latitude, longitude } = coordinates;
-  const [filter, nearbyCastle] = await Promise.all([
-    resolvePrefectureFilter(castles, latitude, longitude),
-    Promise.resolve(findNearestCastleWithinRadius(castles, latitude, longitude, radiusMeters)),
+  const [filter, nearbyStation] = await Promise.all([
+    resolvePrefectureFilter(stations, latitude, longitude),
+    Promise.resolve(findNearestCastleWithinRadius(stations, latitude, longitude, radiusMeters)),
   ]);
 
-  return { filter, nearbyCastle };
+  return { filter, nearbyStation };
 }
 
 export async function resolveLocalPrefectureFilter(
-  castles: readonly Castle[],
+  stations: readonly Station[],
 ): Promise<LocalPrefectureFilter | null> {
-  const context = await resolveLocalStartupContext(castles);
+  const context = await resolveLocalStartupContext(stations);
   return context.filter;
 }

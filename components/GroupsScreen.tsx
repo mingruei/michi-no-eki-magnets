@@ -11,31 +11,31 @@ import {
 
 import { type RegionId } from '../constants/regions';
 import { colors } from '../constants/theme';
-import { useCastleGroups } from '../hooks/useCastleGroups';
-import { useCastleProgress } from '../hooks/useCastleProgress';
+import { useStationGroups } from '../hooks/useStationGroups';
+import { useStationProgress } from '../hooks/useStationProgress';
 import { useI18n } from '../i18n';
-import type { Castle, ProgressFilter, SeriesFilter } from '../types/castle';
-import type { CastleGroup } from '../types/castleGroup';
-import { filterCastles, getAvailablePrefectures } from '../utils/filterCastles';
+import type { Station, ProgressFilter } from '../types/station';
+import type { StationGroup } from '../types/stationGroup';
+import { filterStations, getAvailablePrefectures } from '../utils/filterStations';
 import { shareJpgFile, resolveExportJpgError } from '../utils/exportGroupShowImage';
 import { GroupShowView, type GroupShowViewHandle } from './GroupShowView';
 import { LocationFilters } from './LocationFilters';
 
 type GroupsScreenProps = {
-  castles: readonly Castle[];
+  stations: readonly Station[];
   onBack: () => void;
 };
 
 type Mode = 'list' | 'create' | 'edit' | 'show';
 
-export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
-  const { t, getPrefectureLabel, getSeriesLabel, formatCount } = useI18n();
-  const { groups, createGroup, updateGroup } = useCastleGroups();
-  const { progressMap } = useCastleProgress();
+export function GroupsScreen({ stations, onBack }: GroupsScreenProps) {
+  const { t, getPrefectureLabel, formatCount } = useI18n();
+  const { groups, createGroup, updateGroup } = useStationGroups();
+  const { progressMap } = useStationProgress();
 
   const [mode, setMode] = useState<Mode>('list');
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
-  const [viewingGroup, setViewingGroup] = useState<CastleGroup | null>(null);
+  const [viewingGroup, setViewingGroup] = useState<StationGroup | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [groupName, setGroupName] = useState('');
   const [nameError, setNameError] = useState(false);
@@ -43,7 +43,6 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
   const trimmedGroupName = groupName.trim();
   const canSave = trimmedGroupName.length > 0;
 
-  const [series, setSeries] = useState<SeriesFilter>('all');
   const [progressFilter, setProgressFilter] = useState<ProgressFilter>('all');
   const [regionId, setRegionId] = useState<RegionId | null>(null);
   const [prefecture, setPrefecture] = useState<string | null>(null);
@@ -53,23 +52,23 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
   const showViewRef = useRef<GroupShowViewHandle>(null);
 
   const castleById = useMemo(() => {
-    const map = new Map<number, Castle>();
-    for (const castle of castles) {
-      map.set(castle.id, castle);
+    const map = new Map<number, Station>();
+    for (const station of stations) {
+      map.set(station.id, station);
     }
     return map;
-  }, [castles]);
+  }, [stations]);
 
-  const selectedCastles = useMemo(
+  const selectedStations = useMemo(
     () =>
       selectedIds
         .map((id) => castleById.get(id))
-        .filter((castle): castle is Castle => castle != null),
+        .filter((station): station is Station => station != null),
     [castleById, selectedIds],
   );
 
   const prefectureOptions = useMemo(() => {
-    const prefectures = getAvailablePrefectures(castles, regionId, series);
+    const prefectures = getAvailablePrefectures(stations, regionId);
     return [
       { value: null, label: t('common.all') },
       ...prefectures.map((item) => ({
@@ -77,36 +76,29 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
         label: getPrefectureLabel(item),
       })),
     ];
-  }, [castles, getPrefectureLabel, regionId, series, t]);
+  }, [stations, getPrefectureLabel, regionId, t]);
 
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
-  const filteredCastles = useMemo(
+  const stationsMatchingFilters = useMemo(
     () =>
-      filterCastles(castles, {
+      filterStations(stations, {
         regionId,
         prefecture,
-        series,
+        selectedServices: [],
         nameQuery,
         progressFilter,
         progressMap,
-      })
-        .filter((castle) => !selectedIdSet.has(castle.id))
-        .sort((left, right) => left.number - right.number),
-    [
-      castles,
-      nameQuery,
-      prefecture,
-      progressFilter,
-      progressMap,
-      regionId,
-      selectedIdSet,
-      series,
-    ],
+      }).sort((left, right) => left.number - right.number),
+    [stations, nameQuery, prefecture, progressFilter, progressMap, regionId],
+  );
+
+  const filteredStations = useMemo(
+    () => stationsMatchingFilters.filter((station) => !selectedIdSet.has(station.id)),
+    [stationsMatchingFilters, selectedIdSet],
   );
 
   const resetFilters = () => {
-    setSeries('all');
     setProgressFilter('all');
     setRegionId(null);
     setPrefecture(null);
@@ -123,17 +115,17 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
     setMode('create');
   };
 
-  const openEdit = (group: CastleGroup) => {
+  const openEdit = (group: StationGroup) => {
     setViewingGroup(null);
     setEditingGroupId(group.id);
-    setSelectedIds([...group.castleIds]);
+    setSelectedIds([...group.stationIds]);
     setGroupName(group.name);
     setNameError(false);
     resetFilters();
     setMode('edit');
   };
 
-  const openShow = (group: CastleGroup) => {
+  const openShow = (group: StationGroup) => {
     setEditingGroupId(null);
     setViewingGroup(group);
     setExportJpgError(null);
@@ -151,14 +143,28 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
     onBack();
   };
 
-  const addCastle = (castleId: number) => {
+  const addStation = (stationId: number) => {
     setSelectedIds((current) =>
-      current.includes(castleId) ? current : [...current, castleId],
+      current.includes(stationId) ? current : [...current, stationId],
     );
   };
 
-  const removeCastle = (castleId: number) => {
-    setSelectedIds((current) => current.filter((id) => id !== castleId));
+  const removeCastle = (stationId: number) => {
+    setSelectedIds((current) => current.filter((id) => id !== stationId));
+  };
+
+  const addAllFiltered = () => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      for (const station of stationsMatchingFilters) {
+        next.add(station.id);
+      }
+      return [...next];
+    });
+  };
+
+  const removeAllSelected = () => {
+    setSelectedIds([]);
   };
 
   const handleSave = async () => {
@@ -170,7 +176,7 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
     if (mode === 'edit' && editingGroupId) {
       await updateGroup(editingGroupId, {
         name: trimmedGroupName,
-        castleIds: selectedIds,
+        stationIds: selectedIds,
       });
     } else {
       await createGroup(trimmedGroupName, selectedIds);
@@ -286,7 +292,7 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
         </View>
       ) : (
         <FlatList
-          data={filteredCastles}
+          data={filteredStations}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
@@ -309,22 +315,29 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
                   <Text style={styles.fieldError}>{t('group.nameRequired')}</Text>
                 ) : null}
 
-                {selectedCastles.length > 0 ? (
+                {selectedStations.length > 0 ? (
                   <View style={styles.joinedList}>
-                    <Text style={styles.joinedTitle}>
-                      {t('group.joinedTitle', { count: selectedCastles.length })}
-                    </Text>
-                    <Text style={styles.joinedHint}>{t('group.joinedHint')}</Text>
-                    {selectedCastles.map((castle) => (
+                    <View style={styles.joinedListHeader}>
+                      <Text style={styles.joinedTitle}>
+                        {t('group.joinedTitle', { count: selectedStations.length })}
+                      </Text>
                       <Pressable
-                        key={castle.id}
                         accessibilityRole="button"
-                        onPress={() => removeCastle(castle.id)}
+                        onPress={removeAllSelected}
+                        style={styles.bulkActionButton}
+                      >
+                        <Text style={styles.bulkActionLabelMuted}>{t('group.removeAllSelected')}</Text>
+                      </Pressable>
+                    </View>
+                    <Text style={styles.joinedHint}>{t('group.joinedHint')}</Text>
+                    {selectedStations.map((station) => (
+                      <Pressable
+                        key={station.id}
+                        accessibilityRole="button"
+                        onPress={() => removeCastle(station.id)}
                         style={styles.castleRow}
                       >
-                        <Text style={styles.castleRowLabel}>
-                          {castle.number} {castle.name}
-                        </Text>
+                        <Text style={styles.castleRowLabel}>{station.name}</Text>
                         <Text style={styles.castleRowAction}>{t('group.remove')}</Text>
                       </Pressable>
                     ))}
@@ -337,16 +350,11 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
                   {t('group.filterTitle')}
                 </Text>
                 <LocationFilters
-                  series={series}
                   progressFilter={progressFilter}
                   regionId={regionId}
                   prefecture={prefecture}
                   nameQuery={nameQuery}
                   prefectureOptions={prefectureOptions}
-                  onSeriesChange={(next) => {
-                    setSeries(next);
-                    setNameQuery('');
-                  }}
                   onProgressFilterChange={setProgressFilter}
                   onRegionChange={(next) => {
                     setRegionId(next);
@@ -360,32 +368,67 @@ export function GroupsScreen({ castles, onBack }: GroupsScreenProps) {
                   onNameQueryChange={(next) => {
                     setNameQuery(next);
                     if (next.trim()) {
-                      setSeries('all');
                       setRegionId(null);
                       setPrefecture(null);
                     }
                   }}
                 />
                 <View style={styles.resultBar}>
-                  <Text style={styles.resultCount}>{formatCount(filteredCastles.length)}</Text>
+                  <Text style={styles.resultCount}>{formatCount(filteredStations.length)}</Text>
                   <Text style={styles.resultHint}>{t('filter.resultHint')}</Text>
+                </View>
+                <View style={styles.bulkActionRow}>
+                  <Pressable
+                    accessibilityRole="button"
+                    disabled={stationsMatchingFilters.length === 0}
+                    onPress={addAllFiltered}
+                    style={[
+                      styles.bulkActionButton,
+                      stationsMatchingFilters.length === 0 && styles.bulkActionButtonDisabled,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.bulkActionLabel,
+                        stationsMatchingFilters.length === 0 && styles.bulkActionLabelDisabled,
+                      ]}
+                    >
+                      {t('group.addAllFiltered')}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    disabled={selectedIds.length === 0}
+                    onPress={removeAllSelected}
+                    style={[
+                      styles.bulkActionButton,
+                      selectedIds.length === 0 && styles.bulkActionButtonDisabled,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.bulkActionLabelMuted,
+                        selectedIds.length === 0 && styles.bulkActionLabelDisabled,
+                      ]}
+                    >
+                      {t('group.removeAllSelected')}
+                    </Text>
+                  </Pressable>
                 </View>
               </View>
 
-              <Text style={styles.sectionTitle}>{t('group.castleListTitle')}</Text>
+              <Text style={styles.sectionTitle}>{t('group.stationListTitle')}</Text>
               <Text style={styles.joinedHint}>{t('group.addHint')}</Text>
             </View>
           }
           renderItem={({ item }) => (
             <Pressable
               accessibilityRole="button"
-              onPress={() => addCastle(item.id)}
+              onPress={() => addStation(item.id)}
               style={styles.castleRow}
             >
-              <Text style={styles.castleRowLabel}>
-                {item.number} {item.name}（{getSeriesLabel(item.series)}）
-              </Text>
-              <Text style={styles.castleRowActionAdd}>{t('group.addCastle')}</Text>
+              <Text style={styles.castleRowLabel}>{item.name}</Text>
+              <Text style={styles.castleRowActionAdd}>{t('group.addStation')}</Text>
             </Pressable>
           )}
         />
@@ -400,13 +443,13 @@ function GroupListRow({
   onShow,
   onEdit,
 }: {
-  group: CastleGroup;
-  castleById: Map<number, Castle>;
-  onShow: (group: CastleGroup) => void;
-  onEdit: (group: CastleGroup) => void;
+  group: StationGroup;
+  castleById: Map<number, Station>;
+  onShow: (group: StationGroup) => void;
+  onEdit: (group: StationGroup) => void;
 }) {
   const { t } = useI18n();
-  const names = group.castleIds
+  const names = group.stationIds
     .map((id) => castleById.get(id)?.name)
     .filter((name): name is string => Boolean(name));
 
@@ -434,7 +477,7 @@ function GroupListRow({
         </View>
       </View>
       <Text style={styles.groupMeta}>
-        {t('group.castleCount', { count: group.castleIds.length })}
+        {t('group.stationCount', { count: group.stationIds.length })}
       </Text>
       {names.length > 0 ? (
         <Text style={styles.groupPreview} numberOfLines={2}>
@@ -650,7 +693,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     gap: 4,
   },
+  joinedListHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   joinedTitle: {
+    flex: 1,
     fontSize: 15,
     fontWeight: '700',
     color: colors.text,
@@ -709,6 +759,34 @@ const styles = StyleSheet.create({
   },
   resultHint: {
     fontSize: 13,
+    color: colors.textMuted,
+  },
+  bulkActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 16,
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+  },
+  bulkActionButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  bulkActionButtonDisabled: {
+    opacity: 0.4,
+  },
+  bulkActionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.original,
+  },
+  bulkActionLabelMuted: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.continued,
+  },
+  bulkActionLabelDisabled: {
     color: colors.textMuted,
   },
 });

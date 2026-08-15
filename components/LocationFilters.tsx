@@ -12,9 +12,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { REGIONS, type RegionId } from '../constants/regions';
+import type { StationServiceId } from '../constants/stationServices';
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
-import type { SeriesFilter, ProgressFilter } from '../types/castle';
+import type { ProgressFilter } from '../types/station';
+import { ServiceFilterField } from './ServiceFilterField';
 
 type Option = {
   value: string | null;
@@ -24,21 +26,21 @@ type Option = {
 type LocationFiltersProps = {
   regionId: RegionId | null;
   prefecture: string | null;
-  series: SeriesFilter;
   progressFilter: ProgressFilter;
-  nameQuery: string;
   prefectureOptions: readonly Option[];
   groupOptions?: readonly Option[];
   groupId?: string | null;
   onGroupChange?: (groupId: string | null) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
-  onSeriesChange: (series: SeriesFilter) => void;
   onProgressFilterChange: (progressFilter: ProgressFilter) => void;
-  onNameQueryChange: (nameQuery: string) => void;
+  selectedServices?: readonly StationServiceId[];
+  onServicesChange?: (services: StationServiceId[]) => void;
+  nameQuery?: string;
+  onNameQueryChange?: (nameQuery: string) => void;
 };
 
-type ActivePicker = 'region' | 'prefecture' | 'series' | 'progress' | 'group' | null;
+type ActivePicker = 'region' | 'prefecture' | 'progress' | 'group' | null;
 
 function FilterField({
   label,
@@ -166,20 +168,20 @@ function PickerModal({
 export function LocationFilters({
   regionId,
   prefecture,
-  series,
   progressFilter,
-  nameQuery,
   prefectureOptions,
   groupOptions,
   groupId = null,
   onGroupChange,
   onRegionChange,
   onPrefectureChange,
-  onSeriesChange,
   onProgressFilterChange,
+  selectedServices = [],
+  onServicesChange,
+  nameQuery = '',
   onNameQueryChange,
 }: LocationFiltersProps) {
-  const { t, getRegionLabel, getSeriesLabel } = useI18n();
+  const { t, getRegionLabel } = useI18n();
   const [activePicker, setActivePicker] = useState<ActivePicker>(null);
 
   const regionOptions = useMemo<readonly Option[]>(
@@ -193,26 +195,13 @@ export function LocationFilters({
     [getRegionLabel, t],
   );
 
-  const seriesOptions = useMemo<readonly Option[]>(
-    () => [
-      { value: 'all', label: t('common.all') },
-      { value: 'original', label: getSeriesLabel('original', true) },
-      { value: 'continued', label: getSeriesLabel('continued', true) },
-    ],
-    [getSeriesLabel, t],
-  );
-
   const progressOptions = useMemo<readonly Option[]>(
     () => [
       { value: 'all', label: t('common.all') },
       { value: 'not-visited', label: t('filter.progressNotVisited') },
-      { value: 'no-meijo-stamp', label: t('filter.progressNoMeijoStamp') },
-      { value: 'no-goshuin', label: t('filter.progressNoGoshuin') },
-      { value: 'no-castle-card', label: t('filter.progressNoCastleCard') },
+      { value: 'no-magnet', label: t('filter.progressNoMagnet') },
       { value: 'visited', label: t('filter.progressVisited') },
-      { value: 'has-meijo-stamp', label: t('filter.progressHasMeijoStamp') },
-      { value: 'has-goshuin', label: t('filter.progressHasGoshuin') },
-      { value: 'has-castle-card', label: t('filter.progressHasCastleCard') },
+      { value: 'has-magnet', label: t('filter.progressHasMagnet') },
     ],
     [t],
   );
@@ -221,8 +210,6 @@ export function LocationFilters({
     regionOptions.find((option) => option.value === regionId)?.label ?? t('common.all');
   const prefectureLabel =
     prefectureOptions.find((option) => option.value === prefecture)?.label ?? t('common.all');
-  const seriesLabel =
-    seriesOptions.find((option) => option.value === series)?.label ?? t('common.all');
   const progressLabel =
     progressOptions.find((option) => option.value === progressFilter)?.label ?? t('common.all');
   const groupLabel =
@@ -231,23 +218,21 @@ export function LocationFilters({
 
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.cell}>
-          <SearchField
-            label={t('filter.name')}
-            value={nameQuery}
-            placeholder={t('filter.namePlaceholder')}
-            onChangeText={onNameQueryChange}
-          />
-        </View>
-        <View style={styles.cell}>
-          <FilterField
-            label={t('filter.series')}
-            value={seriesLabel}
-            onPress={() => setActivePicker('series')}
-          />
-        </View>
-      </View>
+      {onServicesChange ? (
+        <ServiceFilterField
+          selectedServices={selectedServices}
+          onChange={onServicesChange}
+        />
+      ) : null}
+
+      {onNameQueryChange ? (
+        <SearchField
+          label={t('filter.name')}
+          value={nameQuery}
+          placeholder={t('filter.namePlaceholder')}
+          onChangeText={onNameQueryChange}
+        />
+      ) : null}
 
       <View style={styles.row}>
         <View style={styles.cell}>
@@ -296,15 +281,6 @@ export function LocationFilters({
         options={progressOptions}
         selectedValue={progressFilter}
         onSelect={(value) => onProgressFilterChange((value ?? 'all') as ProgressFilter)}
-        onClose={() => setActivePicker(null)}
-      />
-
-      <PickerModal
-        visible={activePicker === 'series'}
-        title={t('filter.selectSeries')}
-        options={seriesOptions}
-        selectedValue={series}
-        onSelect={(value) => onSeriesChange((value ?? 'all') as SeriesFilter)}
         onClose={() => setActivePicker(null)}
       />
 

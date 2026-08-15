@@ -22,34 +22,22 @@ function formatCoordinates(latitude: number, longitude: number): string {
   return `${latitude},${longitude}`;
 }
 
-function resolveGoogleQuery(
-  latitude: number,
-  longitude: number,
-  googleLabel?: string,
-): string {
-  const label = googleLabel?.trim();
-  if (label) {
-    return encodeQuery(label);
-  }
-  return formatCoordinates(latitude, longitude);
+/** Google Maps queries use coordinates so 道の駅 names are not geocoded to the wrong place. */
+function buildGoogleMapsCoordinatesQuery(latitude: number, longitude: number): string {
+  return encodeQuery(formatCoordinates(latitude, longitude));
 }
 
 function buildGoogleMapsDirectionsUrl(
   latitude: number,
   longitude: number,
   travelmode: 'driving' | 'transit',
-  googleLabel?: string,
 ): string {
-  const destination = resolveGoogleQuery(latitude, longitude, googleLabel);
+  const destination = buildGoogleMapsCoordinatesQuery(latitude, longitude);
   return `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=${travelmode}`;
 }
 
-function buildGoogleMapsPlaceUrl(
-  latitude: number,
-  longitude: number,
-  googleLabel?: string,
-): string {
-  const query = resolveGoogleQuery(latitude, longitude, googleLabel);
+function buildGoogleMapsPlaceUrl(latitude: number, longitude: number): string {
+  const query = buildGoogleMapsCoordinatesQuery(latitude, longitude);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
@@ -65,8 +53,9 @@ function openAppleMapsUrl(url: string) {
   openUrl(url);
 }
 
-function googleLabelFromPoint(point: NavigationPoint): string | undefined {
-  return point.googleLabel ?? point.label;
+function buildAppleMapsPlaceUrl(latitude: number, longitude: number): string {
+  const coords = formatCoordinates(latitude, longitude);
+  return `http://maps.apple.com/?ll=${coords}&q=${encodeQuery(coords)}`;
 }
 
 async function openDirections(
@@ -74,7 +63,6 @@ async function openDirections(
   latitude: number,
   longitude: number,
   mode: 'driving' | 'transit',
-  googleLabel?: string,
 ) {
   const coords = formatCoordinates(latitude, longitude);
 
@@ -84,21 +72,16 @@ async function openDirections(
     return;
   }
 
-  // iOS Google Maps resolves dir/?destination= names to postal codes; search/?query= works (same as stamp).
   if (Platform.OS === 'ios') {
-    openGoogleMapsUrl(buildGoogleMapsPlaceUrl(latitude, longitude, googleLabel));
+    openGoogleMapsUrl(buildGoogleMapsPlaceUrl(latitude, longitude));
     return;
   }
 
   const travelmode = mode === 'transit' ? 'transit' : 'driving';
-  const webUrl = buildGoogleMapsDirectionsUrl(latitude, longitude, travelmode, googleLabel);
+  const webUrl = buildGoogleMapsDirectionsUrl(latitude, longitude, travelmode);
 
   if (Platform.OS === 'android' && mode === 'driving') {
-    openUrl(
-      googleLabel?.trim()
-        ? `google.navigation:q=${encodeQuery(googleLabel.trim())}&mode=d`
-        : `google.navigation:q=${coords}&mode=d`,
-    );
+    openUrl(`google.navigation:q=${coords}&mode=d`);
     return;
   }
 
@@ -115,7 +98,7 @@ async function openPlace(
   const coords = formatCoordinates(latitude, longitude);
 
   if (provider === 'apple') {
-    openAppleMapsUrl(`http://maps.apple.com/?ll=${coords}&q=${encodeQuery(label)}`);
+    openAppleMapsUrl(buildAppleMapsPlaceUrl(latitude, longitude));
     return;
   }
 
@@ -125,7 +108,7 @@ async function openPlace(
     return;
   }
 
-  openGoogleMapsUrl(buildGoogleMapsPlaceUrl(latitude, longitude, googleLabel ?? label));
+  openGoogleMapsUrl(buildGoogleMapsPlaceUrl(latitude, longitude));
 }
 
 async function openSearch(provider: MapProvider, query: string) {
@@ -141,19 +124,19 @@ export async function openMapsNavigation(
   provider: MapProvider,
   latitude: number,
   longitude: number,
-  googleLabel?: string,
+  _googleLabel?: string,
   mode: 'driving' | 'transit' = 'driving',
 ) {
-  await openDirections(provider, latitude, longitude, mode, googleLabel);
+  await openDirections(provider, latitude, longitude, mode);
 }
 
 export async function openGoogleMapsTransit(
   provider: MapProvider,
   latitude: number,
   longitude: number,
-  googleLabel?: string,
+  _googleLabel?: string,
 ) {
-  await openDirections(provider, latitude, longitude, 'transit', googleLabel);
+  await openDirections(provider, latitude, longitude, 'transit');
 }
 
 export async function openMapsParkingNavigation(
@@ -164,13 +147,7 @@ export async function openMapsParkingNavigation(
     return;
   }
 
-  await openDirections(
-    provider,
-    point.latitude,
-    point.longitude,
-    'driving',
-    googleLabelFromPoint(point),
-  );
+  await openDirections(provider, point.latitude, point.longitude, 'driving');
 }
 
 export async function openMapsStampLocation(provider: MapProvider, point: NavigationPoint) {
@@ -183,7 +160,7 @@ export async function openMapsStampLocation(provider: MapProvider, point: Naviga
     point.latitude,
     point.longitude,
     point.label,
-    googleLabelFromPoint(point),
+    point.googleLabel,
   );
 }
 

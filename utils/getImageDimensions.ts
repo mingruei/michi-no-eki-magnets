@@ -1,6 +1,6 @@
 import { Image } from 'react-native';
 
-import type { CollectibleUploadSelection } from './castleCollectibleUpload';
+import type { CollectibleUploadSelection } from './stationCollectibleUpload';
 import { normalizeFileUri } from './normalizeFileUri';
 
 export type ImageDimensions = {

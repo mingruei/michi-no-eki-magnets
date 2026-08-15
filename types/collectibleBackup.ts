@@ -1,13 +1,13 @@
-import type { CollectibleKind } from './castleCollectible';
+import type { CollectibleKind } from './stationCollectible';
 
 export const COLLECTIBLE_BACKUP_VERSION = 1;
 export const COLLECTIBLE_BACKUP_MANIFEST_NAME = 'manifest.json';
 export const COLLECTIBLE_BACKUP_PROGRESS_NAME = 'progress.json';
 export const COLLECTIBLE_BACKUP_GROUPS_NAME = 'groups.json';
-export const COLLECTIBLE_BACKUP_ZIP_PREFIX = 'castle-collectibles';
+export const COLLECTIBLE_BACKUP_ZIP_PREFIX = 'station-collectibles';
 
 export type CollectibleBackupEntry = {
-  castleId: number;
+  stationId: number;
   kind: CollectibleKind;
   filename: string;
   mimeType: string | null;

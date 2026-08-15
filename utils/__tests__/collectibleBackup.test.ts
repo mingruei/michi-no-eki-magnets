@@ -2,28 +2,28 @@ jest.mock('../waitForNativePicker', () => ({
   waitForNativePicker: jest.fn(async () => undefined),
 }));
 
-jest.mock('../castleCollectibleStorage', () => ({
+jest.mock('../stationCollectibleStorage', () => ({
   listAllCollectibles: jest.fn(() => []),
   getCollectibleZipPath: jest.fn(
-    (castleId: number, kind: string, filename: string) =>
-      `castle-collectibles/${castleId}/${kind}/${filename}`,
+    (stationId: number, kind: string, filename: string) =>
+      `station-collectibles/${stationId}/${kind}/${filename}`,
   ),
-  getCastleCollectibleDirectory: jest.fn(() => ({
+  getStationCollectibleDirectory: jest.fn(() => ({
     exists: false,
     list: jest.fn(() => []),
   })),
-  clearCastleCollectibleDirectory: jest.fn(),
+  clearStationCollectibleDirectory: jest.fn(),
 }));
 
-jest.mock('../castleProgressStorage', () => ({
+jest.mock('../stationProgressStorage', () => ({
   loadProgressMap: jest.fn(async () => ({})),
   saveProgressMap: jest.fn(async () => undefined),
 }));
 
-jest.mock('../castleGroupStorage', () => ({
-  loadCastleGroups: jest.fn(async () => []),
-  saveCastleGroups: jest.fn(async () => undefined),
-  normalizeCastleGroups: jest.fn((raw: unknown) => {
+jest.mock('../stationGroupStorage', () => ({
+  loadStationGroups: jest.fn(async () => []),
+  saveStationGroups: jest.fn(async () => undefined),
+  normalizeStationGroups: jest.fn((raw: unknown) => {
     if (!Array.isArray(raw)) {
       return [];
     }
@@ -36,7 +36,7 @@ jest.mock('../castleGroupStorage', () => ({
       const candidate = value as {
         id?: unknown;
         name?: unknown;
-        castleIds?: unknown;
+        stationIds?: unknown;
         createdAt?: unknown;
         updatedAt?: unknown;
       };
@@ -44,8 +44,8 @@ jest.mock('../castleGroupStorage', () => ({
       return (
         typeof candidate.id === 'string' &&
         typeof candidate.name === 'string' &&
-        Array.isArray(candidate.castleIds) &&
-        candidate.castleIds.every((id) => typeof id === 'number') &&
+        Array.isArray(candidate.stationIds) &&
+        candidate.stationIds.every((id) => typeof id === 'number') &&
         typeof candidate.createdAt === 'string' &&
         typeof candidate.updatedAt === 'string'
       );
@@ -236,9 +236,9 @@ import {
   COLLECTIBLE_BACKUP_PROGRESS_NAME,
   COLLECTIBLE_BACKUP_VERSION,
 } from '../../types/collectibleBackup';
-import type { CastleGroup } from '../../types/castleGroup';
-import { createProgressEntry } from '../../types/castleProgress';
-import { getCastleCollectibleDirectory, listAllCollectibles, clearCastleCollectibleDirectory } from '../castleCollectibleStorage';
+import type { StationGroup } from '../../types/stationGroup';
+import { createProgressEntry } from '../../types/stationProgress';
+import { getStationCollectibleDirectory, listAllCollectibles, clearStationCollectibleDirectory } from '../stationCollectibleStorage';
 import {
   copySourceUriToFile,
   fileHasContent,
@@ -247,8 +247,8 @@ import {
 } from '../collectibleFileIO';
 import { getInfoAsync } from 'expo-file-system/legacy';
 import { unzip as nativeUnzip } from 'react-native-zip-archive';
-import { loadProgressMap, saveProgressMap } from '../castleProgressStorage';
-import { loadCastleGroups, saveCastleGroups } from '../castleGroupStorage';
+import { loadProgressMap, saveProgressMap } from '../stationProgressStorage';
+import { loadStationGroups, saveStationGroups } from '../stationGroupStorage';
 import {
   exportCollectibleArchive,
   importCollectibleArchive,
@@ -259,11 +259,11 @@ import {
 const mockedListAll = listAllCollectibles as jest.MockedFunction<typeof listAllCollectibles>;
 const mockedLoadProgress = loadProgressMap as jest.MockedFunction<typeof loadProgressMap>;
 const mockedSaveProgress = saveProgressMap as jest.MockedFunction<typeof saveProgressMap>;
-const mockedLoadGroups = loadCastleGroups as jest.MockedFunction<typeof loadCastleGroups>;
-const mockedSaveGroups = saveCastleGroups as jest.MockedFunction<typeof saveCastleGroups>;
-const mockedGetDir = getCastleCollectibleDirectory as jest.MockedFunction<typeof getCastleCollectibleDirectory>;
-const mockedClearDir = clearCastleCollectibleDirectory as jest.MockedFunction<
-  typeof clearCastleCollectibleDirectory
+const mockedLoadGroups = loadStationGroups as jest.MockedFunction<typeof loadStationGroups>;
+const mockedSaveGroups = saveStationGroups as jest.MockedFunction<typeof saveStationGroups>;
+const mockedGetDir = getStationCollectibleDirectory as jest.MockedFunction<typeof getStationCollectibleDirectory>;
+const mockedClearDir = clearStationCollectibleDirectory as jest.MockedFunction<
+  typeof clearStationCollectibleDirectory
 >;
 const mockedCopy = copySourceUriToFile as jest.MockedFunction<typeof copySourceUriToFile>;
 const mockedFileHasContent = fileHasContent as jest.MockedFunction<typeof fileHasContent>;
@@ -278,20 +278,20 @@ const mockedGetDocumentAsync = DocumentPicker.getDocumentAsync as jest.MockedFun
 function buildImportZip(options?: {
   includeProgress?: boolean;
   includeGroups?: boolean;
-  groups?: CastleGroup[];
-  kind?: 'goshuin' | 'meijo-stamp';
+  groups?: StationGroup[];
+  kind?: 'magnet' | 'magnet';
   manifestJson?: string;
   includeCollectibleFile?: boolean;
 }): Uint8Array {
-  const kind = options?.kind ?? 'goshuin';
-  const filename = kind === 'meijo-stamp' ? 'stamp.jpg' : 'page.jpg';
-  const zipPath = `castle-collectibles/1/${kind}/${filename}`;
+  const kind = options?.kind ?? 'magnet';
+  const filename = kind === 'magnet' ? 'stamp.jpg' : 'page.jpg';
+  const zipPath = `station-collectibles/1/${kind}/${filename}`;
   const manifest = options?.manifestJson ?? JSON.stringify({
     version: COLLECTIBLE_BACKUP_VERSION,
     exportedAt: Date.now(),
     collectibles: [
       {
-        castleId: 1,
+        stationId: 1,
         kind,
         filename,
         mimeType: 'image/jpeg',
@@ -322,7 +322,7 @@ function buildImportZip(options?: {
           {
             id: 'group-1',
             name: 'Test Group',
-            castleIds: [1, 2],
+            stationIds: [1, 2],
             createdAt: '2026-01-01T00:00:00.000Z',
             updatedAt: '2026-01-02T00:00:00.000Z',
           },
@@ -357,7 +357,7 @@ describe('collectibleBackup', () => {
     mockedLoadProgress.mockResolvedValue({});
     mockedLoadGroups.mockResolvedValue([]);
     mockedGetDir.mockReturnValue({
-      uri: 'file:///documents/castle-collectibles/1/goshuin',
+      uri: 'file:///documents/station-collectibles/1/magnet',
       exists: true,
       list: jest.fn(() => []),
     } as never);
@@ -388,7 +388,7 @@ describe('collectibleBackup', () => {
         {
           id: 'group-1',
           name: 'Kanto',
-          castleIds: [1, 2],
+          stationIds: [1, 2],
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-02T00:00:00.000Z',
         },
@@ -397,29 +397,29 @@ describe('collectibleBackup', () => {
       const result = await exportCollectibleArchive();
 
       expect(result.fileCount).toBe(0);
-      expect(result.progressCastles).toBe(0);
+      expect(result.progressStations).toBe(0);
       expect(result.groupCount).toBe(1);
       expect(Sharing.shareAsync).toHaveBeenCalled();
     });
 
     it('exports progress-only backups', async () => {
       mockedLoadProgress.mockResolvedValue({
-        1: createProgressEntry({ visited: true }, { visited: 100, meijoStamp: 0, goshuin: 0, castleCard: 0 }),
+        1: createProgressEntry({ visited: true }, { visited: 100, magnet: 0, magnet: 0, magnet: 0 }),
       });
 
       const result = await exportCollectibleArchive();
 
       expect(result.fileCount).toBe(0);
-      expect(result.progressCastles).toBe(1);
+      expect(result.progressStations).toBe(1);
       expect(Sharing.shareAsync).toHaveBeenCalled();
     });
 
     it('exports collectible manifests', async () => {
       mockedListAll.mockReturnValue([
         {
-          id: '1:goshuin:page.jpg',
-          castleId: 1,
-          kind: 'goshuin',
+          id: '1:magnet:page.jpg',
+          stationId: 1,
+          kind: 'magnet',
           uri: 'file:///mock/page.jpg',
           filename: 'page.jpg',
           mimeType: 'image/jpeg',
@@ -430,7 +430,7 @@ describe('collectibleBackup', () => {
       const result = await exportCollectibleArchive();
 
       expect(result.fileCount).toBe(1);
-      expect(result.progressCastles).toBe(0);
+      expect(result.progressStations).toBe(0);
       expect(Sharing.shareAsync).toHaveBeenCalled();
     });
 
@@ -447,22 +447,22 @@ describe('collectibleBackup', () => {
     it('includes collectible bytes when source files exist on disk', async () => {
       mockedListAll.mockReturnValue([
         {
-          id: '1:goshuin:page.jpg',
-          castleId: 1,
-          kind: 'goshuin',
-          uri: 'file:///documents/castle-collectibles/1/goshuin/page.jpg',
+          id: '1:magnet:page.jpg',
+          stationId: 1,
+          kind: 'magnet',
+          uri: 'file:///documents/station-collectibles/1/magnet/page.jpg',
           filename: 'page.jpg',
           mimeType: 'image/jpeg',
           createdAt: 100,
         },
       ]);
       mockedGetDir.mockReturnValue({
-        uri: 'file:///documents/castle-collectibles/1/goshuin',
+        uri: 'file:///documents/station-collectibles/1/magnet',
         exists: true,
         list: jest.fn(() => []),
       } as never);
       fileSystemMock.__mockFileRegistry.set(
-        'file:///documents/castle-collectibles/1/goshuin/page.jpg',
+        'file:///documents/station-collectibles/1/magnet/page.jpg',
         new Uint8Array([9, 9, 9]),
       );
       mockedReadSource.mockResolvedValue(new Uint8Array([9, 9, 9]));
@@ -470,7 +470,7 @@ describe('collectibleBackup', () => {
       await exportCollectibleArchive();
 
       expect(mockedReadSource).toHaveBeenCalledWith(
-        'file:///documents/castle-collectibles/1/goshuin/page.jpg',
+        'file:///documents/station-collectibles/1/magnet/page.jpg',
       );
     });
 
@@ -479,7 +479,7 @@ describe('collectibleBackup', () => {
         1: createProgressEntry({ visited: true }),
       });
       mockedFileHasContent.mockImplementation(async (file: { uri?: string }) => {
-        if (file.uri?.includes('japan-castles-backup')) {
+        if (file.uri?.includes('japan-stations-backup')) {
           return false;
         }
         return true;
@@ -546,7 +546,7 @@ describe('collectibleBackup', () => {
               {
                 id: 'group-1',
                 name: 'Imported Group',
-                castleIds: [3],
+                stationIds: [3],
                 createdAt: '2026-01-01T00:00:00.000Z',
                 updatedAt: '2026-01-03T00:00:00.000Z',
               },
@@ -564,7 +564,7 @@ describe('collectibleBackup', () => {
         {
           id: 'group-1',
           name: 'Imported Group',
-          castleIds: [3],
+          stationIds: [3],
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-03T00:00:00.000Z',
         },
@@ -581,7 +581,7 @@ describe('collectibleBackup', () => {
             {
               id: 'group-1',
               name: 'Imported Name',
-              castleIds: [1],
+              stationIds: [1],
               createdAt: '2026-01-01T00:00:00.000Z',
               updatedAt: '2026-01-05T00:00:00.000Z',
             },
@@ -592,7 +592,7 @@ describe('collectibleBackup', () => {
         {
           id: 'group-1',
           name: 'Local Name',
-          castleIds: [2],
+          stationIds: [2],
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-02T00:00:00.000Z',
         },
@@ -605,7 +605,7 @@ describe('collectibleBackup', () => {
         {
           id: 'group-1',
           name: 'Imported Name',
-          castleIds: [1],
+          stationIds: [1],
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-05T00:00:00.000Z',
         },
@@ -633,10 +633,10 @@ describe('collectibleBackup', () => {
 
     it('throws when archive has nothing new in merge-newer mode', async () => {
       mockedLoadProgress.mockResolvedValue({
-        1: createProgressEntry({ visited: true, goshuin: true }),
+        1: createProgressEntry({ visited: true, magnet: true }),
       });
       fileSystemMock.__mockFileRegistry.set(
-        'file:///documents/castle-collectibles/1/goshuin/page.jpg',
+        'file:///documents/station-collectibles/1/magnet/stamp.jpg',
         new Uint8Array([1]),
       );
 
@@ -708,17 +708,17 @@ describe('collectibleBackup', () => {
     });
 
     it('replaces an existing multi-file collectible in replace mode', async () => {
-      mockedGetDir.mockImplementation((castleId: number, kind: string) => ({
-        uri: `file:///documents/castle-collectibles/${castleId}/${kind}`,
+      mockedGetDir.mockImplementation((stationId: number, kind: string) => ({
+        uri: `file:///documents/station-collectibles/${stationId}/${kind}`,
         exists: true,
         list: jest.fn(() => []),
       }));
       fileSystemMock.__mockFileRegistry.set(
-        'file:///documents/castle-collectibles/1/goshuin/page.jpg',
+        'file:///documents/station-collectibles/1/magnet/page.jpg',
         new Uint8Array([4, 4, 4]),
       );
 
-      const result = await processCollectibleImport('file:///picked/replace-goshuin.zip', 'replace');
+      const result = await processCollectibleImport('file:///picked/replace-magnet.zip', 'replace');
 
       expect(result.imported).toBe(1);
     });
@@ -733,21 +733,22 @@ describe('collectibleBackup', () => {
       expect(mockedSaveProgress).toHaveBeenCalled();
     });
 
-    it('replaces existing meijo-stamp files in replace mode', async () => {
-      mockNativeUnzipFromZip(buildImportZip({ kind: 'meijo-stamp' }));
-      mockedGetDir.mockImplementation((castleId: number, kind: string) => ({
-        uri: `file:///documents/castle-collectibles/${castleId}/${kind}`,
+    it('replaces existing magnet files in replace mode', async () => {
+      mockNativeUnzipFromZip(buildImportZip({ kind: 'magnet' }));
+      mockedGetDir.mockImplementation((stationId: number, kind: string) => ({
+        uri: `file:///documents/station-collectibles/${stationId}/${kind}`,
         exists: true,
         list: jest.fn(() => []),
       }));
       fileSystemMock.__mockFileRegistry.set(
-        'file:///documents/castle-collectibles/1/meijo-stamp/stamp.jpg',
+        'file:///documents/station-collectibles/1/magnet/stamp.jpg',
         new Uint8Array([1]),
       );
 
-      await processCollectibleImport('file:///picked/stamp.zip', 'replace');
+      const result = await processCollectibleImport('file:///picked/stamp.zip', 'replace');
 
-      expect(mockedClearDir).toHaveBeenCalledWith(1, 'meijo-stamp');
+      expect(mockedClearDir).not.toHaveBeenCalled();
+      expect(result.imported).toBe(1);
     });
 
     it('skips missing source files listed in the manifest', async () => {
@@ -812,19 +813,19 @@ describe('collectibleBackup', () => {
         exportedAt: Date.now(),
         collectibles: [
           {
-            castleId: 1,
-            kind: 'goshuin',
+            stationId: 1,
+            kind: 'magnet',
             filename: 'page.jpg',
             mimeType: 'image/jpeg',
             createdAt: 100,
-            zipPath: 'castle-collectibles/1/goshuin/page.jpg',
+            zipPath: 'station-collectibles/1/magnet/page.jpg',
           },
         ],
       });
       mockNativeUnzipFromZip(
         zipSync({
           [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8(`\uFEFF${manifest}`),
-          'castle-collectibles/1/goshuin/page.jpg': strToU8('image-data'),
+          'station-collectibles/1/magnet/page.jpg': strToU8('image-data'),
           [COLLECTIBLE_BACKUP_PROGRESS_NAME]: strToU8('{}'),
         }),
       );
@@ -838,7 +839,7 @@ describe('collectibleBackup', () => {
       mockNativeUnzipFromZip(
         zipSync({
           [COLLECTIBLE_BACKUP_MANIFEST_NAME]: strToU8('{invalid-manifest'),
-          'castle-collectibles/1/goshuin/page.jpg': strToU8('image-data'),
+          'station-collectibles/1/magnet/page.jpg': strToU8('image-data'),
           [COLLECTIBLE_BACKUP_PROGRESS_NAME]: strToU8(
             JSON.stringify({ 1: createProgressEntry({ visited: true }) }),
           ),
@@ -850,9 +851,9 @@ describe('collectibleBackup', () => {
       expect(result.imported).toBe(1);
     });
 
-    it('does not mark castles updated when progress is already collected', async () => {
+    it('does not mark stations updated when progress is already collected', async () => {
       mockedLoadProgress.mockResolvedValue({
-        1: createProgressEntry({ goshuin: true }),
+        1: createProgressEntry({ magnet: true }),
       });
 
       const result = await processCollectibleImport('file:///picked/backup.zip', 'replace');

@@ -20,45 +20,48 @@ describe('maps', () => {
     jest.restoreAllMocks();
   });
 
-  it('opens Apple Maps driving directions', async () => {
+  it('opens Apple Maps driving directions with coordinates', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'ios' });
 
-    await openMapsNavigation('apple', 35.0, 135.0, 'Himeji Castle');
+    await openMapsNavigation('apple', 35.0, 135.0, 'Himeji Station');
 
     expect(openURL).toHaveBeenCalledWith(
       expect.stringContaining('maps.apple.com/?daddr=35,135&dirflg=d'),
     );
   });
 
-  it('opens Google Maps place search on iOS for driving navigation', async () => {
+  it('opens Google Maps coordinate search on iOS for driving navigation', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'ios' });
 
-    await openMapsNavigation('google', 35.0, 135.0, 'Himeji Castle');
+    await openMapsNavigation('google', 35.0, 135.0, 'Himeji Station');
 
     expect(openURL).toHaveBeenCalledWith(
-      expect.stringContaining('google.com/maps/search/?api=1&query='),
+      'https://www.google.com/maps/search/?api=1&query=35%2C135',
     );
   });
 
-  it('opens native Google navigation on Android for driving', async () => {
+  it('opens native Google navigation on Android for driving with coordinates', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' });
 
-    await openMapsNavigation('google', 35.0, 135.0);
+    await openMapsNavigation('google', 35.0, 135.0, 'Himeji Station');
 
     expect(openURL).toHaveBeenCalledWith('google.navigation:q=35,135&mode=d');
   });
 
-  it('opens Google transit directions on Android', async () => {
+  it('opens Google transit directions on Android with coordinates', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' });
 
-    await openGoogleMapsTransit('google', 35.0, 135.0, 'Himeji Castle');
+    await openGoogleMapsTransit('google', 35.0, 135.0, 'Himeji Station');
 
+    expect(openURL).toHaveBeenCalledWith(
+      expect.stringContaining('destination=35%2C135'),
+    );
     expect(openURL).toHaveBeenCalledWith(
       expect.stringContaining('travelmode=transit'),
     );
   });
 
-  it('opens Apple Maps place view for stamp locations', async () => {
+  it('opens Apple Maps place view with coordinates instead of place name', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'ios' });
 
     await openMapsStampLocation('apple', {
@@ -68,11 +71,11 @@ describe('maps', () => {
     });
 
     expect(openURL).toHaveBeenCalledWith(
-      expect.stringContaining('maps.apple.com/?ll=35,135&q='),
+      'http://maps.apple.com/?ll=35,135&q=35%2C135',
     );
   });
 
-  it('opens native Google navigation for parking on Android', async () => {
+  it('opens native Google navigation for parking on Android with coordinates', async () => {
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' });
 
     await openMapsParkingNavigation('google', {
@@ -82,7 +85,7 @@ describe('maps', () => {
       googleLabel: 'Himeji parking',
     });
 
-    expect(openURL).toHaveBeenCalledWith('google.navigation:q=Himeji%20parking&mode=d');
+    expect(openURL).toHaveBeenCalledWith('google.navigation:q=35,135&mode=d');
   });
 
   it('opens geo intent for stamp locations on Android', async () => {

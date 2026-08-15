@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import type { StationServiceId } from '../constants/stationServices';
 import { colors } from '../constants/theme';
 import { useI18n } from '../i18n';
 import type { RegionId } from '../constants/regions';
-import type { SeriesFilter, ProgressFilter } from '../types/castle';
+import type { ProgressFilter } from '../types/station';
 import { LocationFilters } from './LocationFilters';
 import { ProgressStats } from './ProgressStats';
 
@@ -13,39 +14,39 @@ type Option = {
 };
 
 type BrowseListHeaderProps = {
-  series: SeriesFilter;
   progressFilter: ProgressFilter;
   regionId: RegionId | null;
   prefecture: string | null;
+  selectedServices: readonly StationServiceId[];
   nameQuery: string;
   prefectureOptions: readonly Option[];
   groupOptions?: readonly Option[];
   groupId?: string | null;
   resultCount: number;
-  onSeriesChange: (series: SeriesFilter) => void;
   onProgressFilterChange: (progressFilter: ProgressFilter) => void;
   onGroupChange?: (groupId: string | null) => void;
   onRegionChange: (regionId: RegionId | null) => void;
   onPrefectureChange: (prefecture: string | null) => void;
   onNameQueryChange: (nameQuery: string) => void;
+  onServicesChange: (services: StationServiceId[]) => void;
 };
 
 export function BrowseListHeader({
-  series,
   progressFilter,
   regionId,
   prefecture,
+  selectedServices,
   nameQuery,
   prefectureOptions,
   groupOptions,
   groupId,
   resultCount,
-  onSeriesChange,
   onProgressFilterChange,
   onGroupChange,
   onRegionChange,
   onPrefectureChange,
   onNameQueryChange,
+  onServicesChange,
 }: BrowseListHeaderProps) {
   const { t, formatCount } = useI18n();
 
@@ -54,20 +55,20 @@ export function BrowseListHeader({
       <ProgressStats />
       <View style={styles.divider} />
       <LocationFilters
-        series={series}
         progressFilter={progressFilter}
         regionId={regionId}
         prefecture={prefecture}
+        selectedServices={selectedServices}
         nameQuery={nameQuery}
         prefectureOptions={prefectureOptions}
         groupOptions={groupOptions}
         groupId={groupId}
-        onSeriesChange={onSeriesChange}
         onProgressFilterChange={onProgressFilterChange}
         onGroupChange={onGroupChange}
         onRegionChange={onRegionChange}
         onPrefectureChange={onPrefectureChange}
         onNameQueryChange={onNameQueryChange}
+        onServicesChange={onServicesChange}
       />
       <View style={styles.divider} />
       <View style={styles.resultBar}>

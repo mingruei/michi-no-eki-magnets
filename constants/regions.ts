@@ -1,3 +1,4 @@
+import { HOKKAIDO_AREA_IDS, isHokkaidoAreaId } from './hokkaidoAreas';
 import { normalizePrefectureKey } from './prefectureKeys';
 
 export type RegionId =
@@ -16,7 +17,7 @@ export type Region = {
 };
 
 export const REGIONS: readonly Region[] = [
-  { id: 'hokkaido', prefectures: ['北海道'] },
+  { id: 'hokkaido', prefectures: [...HOKKAIDO_AREA_IDS] },
   {
     id: 'tohoku',
     prefectures: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'],
@@ -88,8 +89,15 @@ const prefectureToRegion = new Map<string, RegionId>(
   ),
 );
 
+prefectureToRegion.set('北海道', 'hokkaido');
+
 export function getRegionIdForPrefecture(prefecture: string): RegionId | null {
-  return prefectureToRegion.get(normalizePrefectureKey(prefecture)) ?? null;
+  const normalized = normalizePrefectureKey(prefecture);
+  if (isHokkaidoAreaId(normalized)) {
+    return 'hokkaido';
+  }
+
+  return prefectureToRegion.get(normalized) ?? null;
 }
 
 export function getRegionById(regionId: RegionId): Region {
